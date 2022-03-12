@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #bgd {
+            width: 300px;
+            height: 300px;
+            background-color: beige;
+            background-image: url(https://via.placeholder.com/150);
+            background-repeat: no-repeat;
+            /* background-position: 方位名词; */
+            /* background-position: center top; */
+            background-position: center 50%;
+        }
+        
+        #bgd2 {
+            width: 300px;
+            /*块高度*/
+            height: 40px;
+            background-color: beige;
+            background: url(https://csdnimg.cn/release/blogv2/dist/pc/img/original.png);
+            background-repeat: no-repeat;
+            background-size: 15%;
+            /*与块高度同高，让文字居中*/
+            line-height: 40px;
+            /*手动调整行内文字距离图片3个文字*/
+            text-indent: 3em;
+        }
+        
+        #bgd4 {
+            width: 300px;
+            height: 300px;
+            background-color: beige;
+            background-image: url(https://via.placeholder.com/150);
+            background-repeat: no-repeat;
+            /*background-position: 20px;*/
+            /*只写一个参数默认y轴center*/
+            background-position: 20px 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="bgd"></div>
+    <div id="bgd2">此处原创标题</div>
+
+    <div id="bgd3">大图片使用`background-position：center top`调整位置</div>
+
+    <div id="bgd4"></div>
+
+
+</body>
+
+</html>

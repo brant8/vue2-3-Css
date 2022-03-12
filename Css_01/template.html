@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>五彩导航栏</title>
+    <style>
+        .nav a {
+            /*a为行内元素，inline-block切换为块元素*/
+            display: inline-block;
+            width: 120px;
+            height: 58px;
+            text-decoration: none;
+            background-color: pink;
+            /*文件水平居中*/
+            text-align: center;
+            /*文字垂直居中，与块等高*/
+            line-height: 58px;
+            /*文字白色*/
+            color: #fff;
+            background-image: url(https://www.xmple.com/wallpaper/circles-rings-violet-pink-concentric-1920x1080-c2-aa45f7-550d34-k2-25-100-l-58-f-25.svg);
+            background-size: 100%;
+        }
+        
+        .nav a:hover {
+            background-image: url(https://wallpaper-mania.com/wp-content/uploads/2018/09/High_resolution_wallpaper_background_ID_77700364308-1024x576.jpg);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="nav">
+        <a href="#">五彩导航</a>
+        <a href="#">五彩导航</a>
+        <a href="#">五彩导航</a>
+        <a href="#">五彩导航</a>
+        <a href="#">五彩导航</a>
+    </div>
+
+
+    <h3>练习价值：</h3>
+    <p>1. 链接属于行内元素，但是此时需要宽度高度，因此需要模式转换 </p>
+    <p>2. 里面文字需要水平居中和垂直居中，因此需要单行文字垂直剧中的代码 </p>
+    <p>3. 链接里面需要设置背景图片，因此需要用到背景的相关的属性 </p>
+    <p>4. 鼠标经过变化背景图片，因此需要用到链接伪选择器。</p>
+</body>
+
+</html>
