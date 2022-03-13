@@ -101,16 +101,109 @@ ___
 21. CSS三特性之层叠性：谁靠近使用谁的样式
 22. CSS三特性之优先级：
     1.  选择器相同，执行层叠性
-    2.  选择器不同，根据选择器权重执行  
+    2.  选择器不同，根据选择器权重执行
+    3.  如：`div{ color: pink!important;}`  
  
 选择器 | 选择器权重
 ---- | ---
 继承 或者 * | 0，0，0，0
 元素选择器 |  0，0，0，1
 类选择器，伪类选择器 |  0，0，1，0
-ID选择器 |  0，，0，0
+ID选择器 |  0，1，0，0
 行内样式style="" |  1，0，0，0
 !important 重要的 |  无穷大
+
+23. 权重叠加:复合选择器的权重。权重虽然是叠加，但是永远不会有进位。
+
+24. 页面布局三大核心：盒子模型，浮动，定位。布局过程如下：
+    1.  定义盒子
+    2.  给盒子css样式，摆放到相应位置。
+    3.  往盒子装内容
+
+25. 盒子模型 - 从外到里： 外边距`margin`、边框`border`、内边距`padding`、实际内容`content`。== 重点 ==  
+    
+26. 边框border三部分组成：宽度(粗细)`border-width`、边框样式`border-style`、边框颜色`border-color`。
+    1.  `border-style`：
+        1.  `solid`  
+        2.  `dashed`(虚线) 
+        3.  | `dotted`(点线) 等
+    2.  例子：`border:1px solid red;` 没有顺序
+    3.  `border-top`,`border-bottom`,`border-left`,`border-right`.
+        1.  单边不同样式时，先设置四边，再设置单独一边的样式。
+        2.  例子：`table, td {..}` 表格内部也有border。
+    4. `border-collapse:collapse`：两个相邻边框合并成一个边框，常用在table上。
+
+27. 边框`border`会影响盒子的大小。
+    1.  例子：盒子`div{ width:200px; height:200px; border-width:10px }`
+    2.  例子中的盒子整体变为`220px`。实际盒子内容大小不变`200px`。整体上大了`20px`。
+
+28. 内边距`padding`内部为填充内容。
+    1.  `padding-left`等
+    2.  内边距复写组合规范
+        1.  padding：5px；所有内边距(顺时针方向)
+        2.  padding：5px 10px，上下内边距5像素，左右内边距10像素。
+        3.  padding：5px 10px 20px， 上边5像素，左右10像素，下边20像素
+    3.  例子：`div{ width:200px; height:200px; padding:5px }`
+    4.  例子中的内边距影响了块，最终大小为`210*210`.
+    5.  导航栏利用padding给导航标题设置到左右距离的padding相等。
+    6.  未给盒子设置`width/height`的情况时，pading不会撑开盒子(未设置区)的大小。
+    7.  给盒子设置`100%`再加`padding`后会有左右/上下滚轴出现。
+    8.  嵌套情况下，父级设置宽度高度，子级padding小于父级宽度高度不会偏移/溢出。
+
+29. 外边距，控制盒子与盒子之间的距离。
+    1.  margin-top等。
+    2.  块级盒子`水平居中`条件：
+        1.  盒子必须制定了宽度`width`。
+        2.  盒子的`左右外边距`都设置为`auto`。3种常用写法如下：
+            1.  `margin-left:auto; margin-right:auto`
+            2.  `margin: auto`
+            3.  `margin：0 auto`
+        3.  盒子内的行内元素居中对齐可以使用`text-align:center`
+    3.  相邻块元素垂直外边距的合并：
+        1.  上下两个盒子外边距各有距离时，取两个值中较大者的值。
+    4.  嵌套元素垂直外边距的塌陷：
+        1.  两个嵌套(父子)关系的块元素，父元素有上外边距同时，子元素也有上外边距，此时父元素会塌陷较大的外边距值。
+        2.  即：父与子一起向下移动，移动的数值为其中移动的较大值。
+            1.  解决一起移动的方法一：父级添加上边框
+            2.  解决一起移动的方法二：父级添加上内边距
+            3.  解决一起移动的方法三：父元素添加`overflow: hidden;`
+    5.  浏览器默认有内外边距。
+        1.  消除浏览器默认边距： `*｛padding:0; margin:0 ｝`
+        2.  行内元素为了照顾兼容性，尽量只设置左右内外边距，不要设置上下内外边距。但是转换为块级和行内块元素就可以。
+        3.  文字溢出部分：`text-overflow: ellipsis` 输出效果让其溢出部分省略号。
+        4.  倾斜标签 `<em> | </em>`输出斜线，并用css让其变成竖线：`font-style:normal`
+        5.  去掉`ul li`的圆点，`li{ list-style: none}`
+
+30. Photoshop基本操作。用来测量和切图。
+    1.  快捷键： 
+        1.  标尺->`Ctrl + R`
+        2.  取消选区：`Ctrl + D`
+        3.  取色：Eyedropper Tool工具（吸取）
+
+31. CSS3新增的圆角边框
+    1.  `border-radius: length`。如`border-radisu:10px`相当于在矩形的四个角放四个10px的圆。
+    2.  做一个圆形，先做一个正方形然后CSS：`border-radius： 矩形的一半长度`，相当于圆放在正方形中心。也可以`border-radius： 50%`.
+    3.  圆角矩形（横向）：设置成高度的一半。
+    4.  不规则弧度：`border-radius: 左上角 右上角 右下角 左下角`
+
+32.  CSS3新增的盒子阴影 ==(重点)==
+     1. 格式`box-shadow: h-shadow v-shadow blur spread color inset;`
+        1. h-shadow：必须，水平阴影的位置，允许负值。
+        2. v-shadow：必须，垂直阴影的位置，允许负值。
+        3. blur：可选，模糊距离。
+        4. spread：可选，阴影的尺寸。
+        5. color：可选，阴影的颜色。
+        6. inset：可选，将外部阴影(outset)改为内部阴影。
+        7. 例如：`box-shadow: 10px 10px 10px 10px black inset` 其中`inset`不写默认`outset`但是`outset`不能写在css中。
+
+33.  CSS3新增的文字阴影，了解即可。
+     1. 格式`text-shadow： h-shadow v-shadow blur color`
+
+
+
+
+
+
 
 
 
