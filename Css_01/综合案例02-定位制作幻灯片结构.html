@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        
+        li {
+            list-style: none;
+        }
+        
+        .tb-promo {
+            position: relative;
+            width: 520px;
+            height: 280px;
+            background: pink;
+            margin: 100px auto;
+        }
+        /*对图片强制规定尺寸防止盒子拉伸*/
+        
+        .tb-promo img {
+            width: 520px;
+            height: 280px;
+        }
+        /*并集选择器：
+        .prev, .next{
+            提取相同的代码
+        }
+        遇到的问题：如果一个盒子既有left属性也有right属性，则默认会执行left属性。同理top、bottom。
+        解决方案：
+            1. ！Important
+            2. 删掉共同代码的相同样式，单独设置
+        */
+        
+        .prev {
+            /*固定在promo内，注意子绝父相*/
+            position: absolute;
+            /*预设left和top都为0，然后水平居中设置相应的值*/
+            left: 0px;
+            top: 50%;
+            margin-top: -15px;
+            /*加了绝对定位的盒子可以直接设置高度和宽度*/
+            width: 20px;
+            height: 30px;
+            background-color: rgba(0, 0, 0, 0.3);
+            text-align: center;
+            line-height: 30px;
+            color: #fff;
+            /* border-radius: 5px; */
+            border-top-right-radius: 15px;
+            border-bottom-right-radius: 15px;
+            text-decoration: none;
+        }
+        
+        .next {
+            /*固定在promo内，注意子绝父相*/
+            position: absolute;
+            /*预设left和top都为0，然后水平居中设置相应的值*/
+            right: 0px;
+            top: 50%;
+            margin-top: -15px;
+            /*加了绝对定位的盒子可以直接设置高度和宽度*/
+            width: 20px;
+            height: 30px;
+            background-color: rgba(0, 0, 0, 0.3);
+            text-align: center;
+            line-height: 30px;
+            color: #fff;
+            /* border-radius: 5px; */
+            border-top-left-radius: 15px;
+            border-bottom-left-radius: 15px;
+            text-decoration: none;
+        }
+        
+        .promo-nav {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            margin-left: -35px;
+            width: 70px;
+            height: 13px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 7px;
+        }
+        /*此处权重为10 + 1*/
+        
+        .promo-nav li {
+            float: left;
+            width: 8px;
+            height: 8px;
+            background-color: #fff;
+            border-radius: 50%;
+            margin: 3px;
+        }
+        /*如果没有.promo-nav则权重仅为10； 此处权重为10 + 10*/
+        
+        .promo-nav .selected {
+            background-color: #ff5000;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="tb-promo">
+        <img src="https://cdn.vox-cdn.com/thumbor/WEfQUw-9v5ti4MQ_fi84t7Vd6OM=/1400x1400/filters:format(jpeg)/cdn.vox-cdn.com/uploads/chorus_asset/file/18980526/TuSimple_Self_Drving_Truck_4_copy.jpg" alt="" />
+        <!--行内元素，需要转换为行内块元素，一般用display:in-inline，但此处可以直接用绝对定位方式自动转换-->
+        <a href="#" class="prev"> &lt; </a>
+        <a href="#" class="next"> &gt; </a>
+
+        <ul class="promo-nav">
+            <li></li>
+            <li class="selected"></li>
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+    </div>
+
+
+</body>
+
+</html>

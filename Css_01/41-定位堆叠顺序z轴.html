@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title</title>
+    <style>
+        .box {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 300px;
+            height: 300px;
+        }
+        
+        .xiongda {
+            z-index: 1;
+            background-color: red;
+        }
+        
+        .xionger {
+            z-index: 50;
+            top: 50px;
+            left: 50px;
+            background-color: green;
+        }
+        
+        .xiongsan {
+            top: 100px;
+            left: 100px;
+            background-color: blue;
+        }
+        
+        .mar {
+            position: absolute;
+            left: 50%;
+            margin-left: -150px;
+            top: 50%;
+            margin-top: -150px;
+            height: 300px;
+            width: 300px;
+            background-color: skyblue;
+            /* margin: 0 auto; */
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="box xiongda">1</div>
+    <div class="box xionger">2</div>
+    <div class="box xiongsan">3</div>
+
+    <div class="mar">4</div>
+
+
+</body>
+
+</html>
