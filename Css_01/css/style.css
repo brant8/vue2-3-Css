@@ -1,0 +1,63 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* 权重10 */
+
+.clearfix {
+    clear: both;
+}
+
+
+/* 权重10 */
+
+.wraper {
+    width: 100%;
+    height: auto;
+    margin: 0 auto;
+    text-align: center;
+    background-color: lightgray;
+}
+
+
+/* 权重1 */
+
+header {
+    height: 35px;
+    width: 100%;
+    background-color: skyblue;
+}
+
+
+/* 权重11 */
+
+header .info {
+    width: 80%;
+    line-height: 35px;
+}
+
+nav {
+    width: 100%;
+    height: 50px;
+    background-color: pink;
+}
+
+main {
+    height: 450px;
+    width: 100%;
+    background-image: url("../img/truck2.jpg");
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center top;
+    background-size: 100%;
+}
+
+section {
+    width: 80%;
+    height: 300px;
+    margin: 0 auto;
+    background-color: aquamarine;
+}

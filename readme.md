@@ -418,11 +418,74 @@ ID选择器 |  0，1，0，0
             1.  `nth-of-type`会把<strong>指定的盒子</strong>排列序号，文档例子中执行的时候首先看`:nth-child(1)`之后， 会回去看前面的`div`
     3.  伪元素选择器：利用CSS创建新标签元素，而不需要HTML标签，简化HTML结构。
         1.  如`:hover`遮罩原来在盒子上再加`div`再进行定位等，此后用为元素即可。
-        2.  before和after创建一个元素，但是属于行内元素。
+        2.  `before`和`after`创建一个元素，但是属于行内元素。
         3.  新创建的这个元素再文档树中找不到的我们成为伪元素。语法：`element::before{}`。
-        4.  `before`和`after`必须有`content属性`。
+        4.  `before`和`after`必须有<strong>content属性</strong>。
         5.  `before`在父元素内容前面创建元素，`after`在父元素内容的后面插入元素。
         6.  为元素选择器和标签选择器一样，<strong>权重为1</strong>
             1.  `::before`
             2.  `::after`
+
+55. 伪元素清除浮动。
+    1.  父级添加`after`伪元素，`after`使用`display:block`，如方法三。
+        1.  具体：`element::after{content:""; display:block; height:0; clear:both; visibility:hidden;}`
+        2.  其中`clear:both`为核心
+    2.  父级添加双伪元素
+        1.  具体：`element::before,element::after{ content:""; display:table;}  &  element::after{ clear:both; }`
+    3.  其他清除浮动方法
+        1.  额外标签法：盒子【】中有`【 [浮动1] [浮动2] [clear:both] 】`，其中末尾新的空标签必须是块元素。
+
+56. CSS3盒子模型可以通过`box-sizing`来指定盒子模型。
+    1.  `box-sizing: content-box`（默认样式）： 盒子大小为 <strong>width + pading + border</strong> 
+    2.  `box-sizing`：盒子最终大小为`width`宽度，不会撑大盒子（前提：padding和border值不大于宽度情况）。
+    3.  推荐样式：`* { padding:0; margin:0; box-sizing:border-box}`
+
+57. CSS3其他特性：
+    1.  滤镜`filter`：将模糊或颜色偏移等图形效果应用于元素。
+        1.  `filter: 函数()`：如`filter:blur(5px); `，blue模糊处理，数值越大越模糊。
+    2.  `calc（）`函数：在声明CSS属性值时执行一些计算。  
+        1.  `width:calc（100%-80px）`（放在子元素）：子盒子永远比父盒子小80px。 注意：减号要空格。
+
+58. CSS3的过渡动画`transition`，元素从一种状态渐渐过渡到另外一种状态。经常和`:hover`一起使用。
+    1.  `transition：要过渡的属性 花费时间 运动曲线 何时开始`
+        1.  属性：想要变化的CSS属性，宽度高度背景颜色，内外边距都可以。所有属性都要变化过渡使用`all`。
+        2.  花费时间：单位是秒，如`5s`。必须写时间。
+        3.  运动曲线：默认是ease，可以省略。还有匀速等其他。
+        4.  何时开始：单位是秒，必须写单位，可以设置延迟出发，默认是`0s`，可以省略。
+        5.  多个变化使用逗号`,`隔开。
+        6.  <strong>谁做过渡给谁加</strong>
+
+59. 项目搭建：总结知识
+    1. `ico`小图标：`<link rel="shorcut icon" href="images/favicon.ico" />
+    2. SEO搜索引擎优化三大标签：`title`, `description`, `keyword`
+       1. `Title`：网页入口对网页主题归属大的最佳判断点。
+          1. 建议：网站名（产品名） - 网站的介绍（尽量不超过30个汉字）
+       2. `Description`：网站的总体业务和主题概括。采用：我们是..我们提供..之类。
+       3. `Keywords`：最好6-8个关键词，用英文逗号隔开。
+`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
