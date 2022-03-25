@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title</title>
+    <style>
+        body {
+            perspective: 400px;
+        }
+        
+        .box {
+            text-align: center;
+            width: 300px;
+            height: 300px;
+            margin: 200px auto;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: all .4s;
+        }
+        
+        .box:hover {
+            transform: rotateY(180deg);
+        }
+        /* .box:hover .back {
+            z-index: 2;
+        } */
+        
+        .front,
+        .back {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 300px;
+            border-radius: 50%;
+            line-height: 300px;
+            backface-visibility: hidden;
+        }
+        
+        .front {
+            background-color: pink;
+            z-index: 1;
+            /* transform: rotateY(90deg); */
+        }
+        
+        .back {
+            background-color: purple;
+            /*像手机一样背靠背*/
+            transform: rotateY(180deg);
+        }
+        /*3D导航*/
+        
+        ul {
+            margin: 100px;
+        }
+        
+        ul li {
+            float: left;
+            margin-right: 10px;
+            width: 100px;
+            height: 32px;
+            list-style: none;
+            /*box2也需要旋转*/
+            perspective: 500px;
+        }
+        
+        .box2 {
+            /*box2下面子盒子需要旋转*/
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: all .5s;
+        }
+        
+        .box2:hover {
+            transform: rotateX(90deg);
+        }
+        
+        .top,
+        .bottom {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .top {
+            background-color: pink;
+            z-index: 1;
+            transform: translateZ(17.5px);
+        }
+        
+        .bottom {
+            background-color: purple;
+            /*旋转在中间，如果右移动和其他样式，需要先写移动再旋转*/
+            transform: translateY(50%) rotateX(-90deg);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="box">
+        <div class="front">黑马程序员</div>
+        <div class="back">pink老师嘿嘿嘿</div>
+    </div>
+
+    闪烁是因为transform的stacking-context(堆叠上下文)导致z-index失效,front和back都添加backface-visibility:hidden解决
+
+
+    <ul>
+        <li>
+            <div class="box2">
+                <div class="top">123</div>
+                <div class="bottom">321</div>
+            </div>
+        </li>
+        <li>
+            <div class="box2">
+                <div class="top">123</div>
+                <div class="bottom">321</div>
+            </div>
+        </li>
+        <li>
+            <div class="box2">
+                <div class="top">123</div>
+                <div class="bottom">321</div>
+            </div>
+        </li>
+    </ul>
+</body>
+
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title</title>
+    <style>
+        body {}
+        
+        .map {
+            position: relative;
+            width: 1278px;
+            height: 719px;
+            background: url("https://dthezntil550i.cloudfront.net/y4/latest/y42005071026254610014022742/1280_960/08dfe89d-337f-4e40-a29d-ecfc00b2a715.png") no-repeat;
+            margin: auto;
+        }
+        
+        .city {
+            position: absolute;
+            top: 320px;
+            right: 345px;
+            color: #fff;
+            /* background-color: blue; */
+        }
+        
+        .dotted {
+            width: 8px;
+            height: 8px;
+            background-color: #09f;
+            border-radius: 50%;
+        }
+        
+        .city div[class^="pulse"] {
+            /*保证小波纹在父盒子里面水平垂直居中，放大后就会中心向四周发散*/
+            position: absolute;
+            /*让其位于pulse左上角处于点的中心*/
+            top: 50%;
+            left: 50%;
+            /*通过位移，在盒子里水平垂直居中*/
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            box-shadow: 0px 0px 12px #009dfd;
+            /* box-shadow: 0px 0 12px #34abf5; */
+            border-radius: 50%;
+            animation: pulsed 1.2s linear infinite;
+        }
+        /*提权方法一*/
+        
+        .city div.pulse2 {
+            animation-delay: 0.4s;
+        }
+        
+        .pulse3 {
+            /*提权方法二*/
+            animation-delay: 0.8s!Important;
+        }
+        
+        @keyframes pulsed {
+            0% {}
+            70% {
+                width: 40px;
+                height: 40px;
+                opacity: 1;
+            }
+            100% {
+                width: 70px;
+                height: 70px;
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="map">
+        <div class="city">
+            <div class="dotted"></div>
+            <div class="pulse1"></div>
+            <div class="pulse2"></div>
+            <div class="pulse3"></div>
+        </div>
+    </div>
+
+
+</body>
+
+</html>

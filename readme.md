@@ -442,6 +442,7 @@ ID选择器 |  0，1，0，0
     1.  `box-sizing: content-box`（默认样式）： 盒子大小为 <strong>width + pading + border</strong> 
     2.  `box-sizing`：盒子最终大小为`width`宽度，不会撑大盒子（前提：padding和border值不大于宽度情况）。
     3.  推荐样式：`* { padding:0; margin:0; box-sizing:border-box}`
+    4.  其他说明[mozillaCSS说明](https://developer.mozilla.org/zh-CN/docs/Web/CSS/box-sizing) 
 
 57. CSS3其他特性：
     1.  滤镜`filter`：将模糊或颜色偏移等图形效果应用于元素。
@@ -458,7 +459,7 @@ ID选择器 |  0，1，0，0
         5.  多个变化使用逗号`,`隔开。
         6.  <strong>谁做过渡给谁加</strong>
 
-59. 项目搭建：总结知识
+59. 项目搭建：基础总结知识
     1. `ico`小图标：`<link rel="shorcut icon" href="images/favicon.ico" />
     2. SEO搜索引擎优化三大标签：`title`, `description`, `keyword`
        1. `Title`：网页入口对网页主题归属大的最佳判断点。
@@ -479,20 +480,173 @@ ID选择器 |  0，1，0，0
     8. 盒子设置高度与不设置高度
        1. 如果不给高度，浮动的元素时脱标的，不会将盒子撑开，所以要清除浮动(设置高度)。
        2. 父盒子没有给高低压，子盒子可以随扩大，高度撑开，但是子盒子时浮动的，父盒子实际高度为0。要清除浮动，是的大盒子高度随子盒子高度改变。
+    9. 设置文本字数多出部分单行`<li>`为例：
+       1. 步骤一：` overflow: hidden; `，步骤二：`white-space: nowrap;`，步骤三：`text-overflow: ellipsis;`
+    10. 楼层区，左侧栏固定导航。
+    11. 如果标题`h1`,`h2`等字体过粗，可以使用`font-weight:400`降到普通文字粗细。
+    12. 注册表格使用`<form>`和`<li>`元素时，使用左侧`<label>`时设置一个宽度，可以让其对右对齐。
+        1.  `<li><label for="">手机号：</label> <input type="text"> <span class="error"> <i class="icon"></i>手机号码格式不对，请重新输入</span>`
+        2.  `label text-align:right; display:inline-block; width:88px;}`
+    13. 验证安全强度写法：
+        1.  `<li class="safe">安全强度 <em>弱</em> <em>中</em> <em>强</em> </li>`
 
+60. 2D转换：`transform`，实现了元素的位移、旋转、缩放等效果。优点：<strong>不会影响到其他元素的位置</strong>。对行内标签没有效果。
+    1.  `translate`：移动，类似定位。
+        1.  `transform:translate(x,y);` 或者分开写。
+        2.  `transform:translateX(n);`
+        3.  `transform:translateY(n);`
+        4.  `translate`中的百分比单位时相对于自身元素的`translate(50%,50%)`，移动的距离为自身长度的50%。
+    2.  `rotate(度数)`：旋转。
+        1.  旋转单位`deg`如`rotate（45deg)`
+        2.  角度为正时，顺时针；负时，逆时针。
+        3.  默认旋转的中心点为元素的中心点。
+        4.  操作案例1：旋转`360度`，使用过渡动画`transition`能让其旋转。
+        5.  操作案例2：`>`三角使用正方形`border`旋转操作
+        6.  案例：产品图片`:hover`放大。常跟`overflow:hidden`和`transition:all 0.4s`配合使用。
+    3.  `scale（x,y）`：缩放，倍数不跟数值单位。不会影响其他盒子。
+        1.  x和y使用逗号分隔。可以设置转换中心点缩放，默认以中心点缩放。
+        2.  `transform:scale(1,1)`：宽和高都放大一倍，相当于没放大。
+        3.  `transform:scale(2,2)`: 宽和高都放大了2倍。
+        4.  `transform:scale(2)`:相当于scale(2,2)
+        5.  `transform:scale(0.5,0.5)`：缩小
+        6.  其他方式放大缩小如`:hover`设置宽度高度，以`top`水平固定向其他方向放大。
+    4.  `transform-origin: x y`：旋转中心点。空格隔开。
+        1.  x与y默认转换的中心点时元素的中心点(50% 50%)
+        2.  还可以给xy设置`像素`或者`方位名词`（top bottom left right center）
+    5.  2D转换综合写法
+        1.  格式：`transform:translate() rotate() scale()..`等。
+        2.  其顺序会影响转换效果。先旋转会改变坐标轴方向。
+        3.  当同时有位移和其他属性的时候，记得要<strong>将位移放到最前面</strong>。
 
+ 1.  动画`animation`：通过设置多个节点来精确控制一个或一组动画，常用来实现复杂的动画效果，如连续播放。   
+     1.  步骤一：先定义动画
+     2.  步骤二：调用动画
+```CSS
+        /*打开一个网页，一个盒子从左边走到右边*/
+        
+        @keyframes move {
+            0% {
+                transform: translateX(0px);
+            }
+            100% {
+                transform: translateX(1000px)
+            }
+        }
+        
+        div {
+            width: 300px;
+            height: 300px;
+            background-color: pink;
+            /*调用动画*/
+            animation-name: move;
+            /*持续时间*/
+            animation-duration: 10s;
+        }
+```
+62. 动画讲解
+    1.  动画序列：
+    2.  `0%`时动画的开始，`100%`时动画的完成，这样的规则就是动画序列。
+    3.  `@keyframes`创建当前样式逐渐改为新样式的动画效果。
+    4.  可以任意多样式，任意多的次数。
+    5.  使用百分比规定变化发生的时间。或者用`from`和`to`等同。
+    6.  动画简写属性
+        1.  `animation: 动画名称 持续时间 运动曲线 何时开始 播放次数 是否反方向 动画其实或者结束的状态`
+        2.  如：`animation: myfirst 5s liner 2s infinite alternate;`
+        3.  `animation-timing-function`可以用来做动画，如一张PNG的熊跑起来，类似定格动画。[b站教程](https://www.bilibili.com/video/BV14J4114768?p=374&spm_id_from=pageDriver)
+        4.  多个动画效果使用逗号隔开，如`animation:move1 1s forwards, move2 2s backwards`
 
+动画常用属性 | 描述
+---- | ---
+@keyframes | 规定动画
+animation |  所有动画属性的简写属性，除了animation-play-state属性
+animation-name | 规定@keyframes动画的名称（必须的）
+animation-duration | 规定动画完成一个周期所花费的秒或毫秒，默认时0.（必须的）
+animation-timing-function | 规定动画的速度曲线，默认是ease。其他参数：linear,ease-in,ease-out,ease-in-out,steps()
+animation-delay | 规定动画何时开始，默认是0。
+animation-iteration-count | 规定动画被播放的次数，默认时1，还有infinite。
+animation-direction | 规定动画是否在下一周逆向播放，默认时"normal",alternate逆播放
+animation-play-state | 规定动画是否正在运行或暂停。默认是“running”，还有“pause”。
+animation-fill-mode | 规定动画结束后状态，保持在结束状态forwards，默认回到起始backwards。
 
+63. 3D转换：近大远小，物体后面遮挡不可见。
+    1.  x轴，水平向右，左边负值，右边正值
+    2.  y轴，垂直向下，y上负值，y下正值
+    3.  z轴，垂直屏幕，<strog>往里负值，往外正值</strog>
+64. 3D移动`translate3d`  
+    1.  `transform:translateZ(100px)`仅在Z轴上移动，translateZ一般用px单位。
+    2.  `transform:translate3d(x,y,z)`：xyz是不能省略的，如果没有就写0.
+    3.  透视：`perspective`,<strog>透视写在被观察元素的父盒子上面</strog>。
+        1.  `d`：视距，视距就是一个距离人的眼睛到屏幕的距离
+        2.  `z轴`：物理距离屏幕的距离，z轴越大（正值），物体越大。  
+        3.  `perspective:(10px)`比`perspective:(100px)`看到的大。相当于`d距离`更近看到的更大。
+        4.  `d`与`z轴`作用元素不同。
 
+65. 3D旋转`rotate3d`：
+    1.  transform:rotateX(45deg)：沿着x轴正方向旋转45度，旋转方向，左手准则，大拇指X轴正方向（右），其余手指弯曲方向为该元素沿x轴旋转的方向。
+    2.  transform:rotateY(45deg)：沿着y轴正方向旋转45deg，左手准则，大拇指Y轴正方向（下），其余手指弯曲方向为该元素沿Y轴旋转的方向
+    3.  transform:rotateZ(45deg)：沿着Z轴正方向旋转45读，类似于2D旋转
+    4.  tramsform:rotate3d(x,yx,z,deg)：沿着自定义轴旋转deg角度。矢量方向。（了解即可）
+66. 3D呈现`transform-style`,多个子元素保持3D立体空间环境。
+    1.  控制子元素是否开启三维立体环境
+    2.  `transform-style:flat`子元素不开启3d立体空间，默认参数，最后一个3d其他变成2d。
+    3.  `transform-style:preserve-3d`子元素开启立体空间
+    4.  代码写给父级，但是影响的是子盒子
 
+67. 私有前缀:兼容老版本
+    1.  `-moz-`：firefox,`-moz-border-radius:10px`
+    2.  `-ms-`：ie,`-ms-border-radius:10px`
+    3.  `-webkit-`：safari，chrome,`-webkit-border-radius:10px`
+    4.  `-o-`：Opera, `-o-border-radius:10px;`
 
+68. 移动端, 视口`viewport`：浏览器显示页面内容的屏幕区域。视口可以分为布局视口，视觉视口，理想视口。
+    1.  布局视口`layout viewport`（缩小）
+        1.  一般移动设备浏览器都默认设置了一个布局视口，用于解决早期pc页面在手机显示问题
+        2.  iOS和Android都将这个视口分辨率设置为`980px`。多数PC端网页在手机也可以看，只不过很小需要缩放。
+    2.  视觉视口`visual viewport`,用户正在看的网页区域（不缩小）
+    3.  理想视口`ideal viewport`
+    4. 标准移动端`meta`视口标签如下：
+    5. `<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">`
+    6. 移动端常用`normalize.css`清除默认样式
 
+69.  二倍图：手机显示`50*50`，在电脑端会模糊。实际应用为`100*100`，给图片盒子设计宽高`50px*50px`压缩图片比，电脑端就会显示清晰。
+    7.  物理像素&物理像素比
+        1.  物理像素是屏幕显示的最小颗粒，物理真是存在，出厂时就设置好了的。
+        2.  开发时1px不一定等于一个物理像素。
+        3.  PC端页面，1个px等于一个物理像素，移动端不尽相同。
+        4.  一个px能显示的物理像素点的个数为物理像素比或屏幕像素比。
+        5.  Retina（视网膜屏幕）显示技术，可以将更多的物理像素点压缩至一块屏幕里，从而达到高分辨率。
+    8.  `background-size：背景图片宽度  背景图片高度`：设置背景图片宽高（背景图没有填充盒子的宽高时可设置）
+        1.  单位：长度，百分比，cover，contain
+        2.  适用场景：图片过大，或者图片过小
+70.  CSS3盒子模型`box-sizing`
+    9.  传统模式宽度计算，<strong>盒子宽度 = CSS中设置的width + border + pading</strong>
+        1.  默认传统盒子：`box-sizing:content-box`
+    10. CSS3盒子模型，<strong>盒子宽度 = CSS中设置的宽度width里面包含了 border 和 padding</strong>
+        1.  转变成CSS3盒子：`box-sizing:border-box`
+        2.  移动端考虑使用CSS3盒子模型
+    11. 特殊样式：移动端技术解决方案
+```CSS
+/*CSS3 盒子模型 */
+box-sizing:border-box;
+-webkit-box-sizing:border-box;
+/* 点击高亮我们需要清楚 设置transparent完成透明 */
+-webkit-tap-highlight-color:transparent;
+/* 在移动端默认浏览器的外观在ios上加上这个属性才能给按钮和输入框自定义样式 */
+-webkit-apperance:none;
+/* 禁用长安页面时弹出的菜单 */　　
+img,a{-webkit-touch-callout:none;}
+```
 
-
-
-
-
-
+71. 京东案例大致笔记：流式布局（全部百分比布局）
+    1.  设置根元素100%，并且设置`max-width:640px`和`min-width:320px`.
+    2.  图片居中两种方式：`line-height`,`vertical-align:middle`
+    3.  搜索栏左右两端菜单固定，中间搜索栏可伸缩
+        1.  处理方法：两边小菜单和登录框使用 绝对定位，指定尺寸大小。
+        2.  中间搜索栏使用自动宽（100%或不指定宽度）再使用margin左右。
+    4.  二倍精灵图做法
+        1.  在`firework`把精灵图等比例缩放为原来的一半
+        2.  之后根据大小测量坐标，然后写在`background`的图片坐标
+        3.  在`background-size`写：精灵图原来宽度的一半
 
 
 

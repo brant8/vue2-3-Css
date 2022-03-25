@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title</title>
+    <style>
+        div {
+            width: 500px;
+            height: 500px;
+            background-color: pink;
+            position: relative;
+        }
+        
+        p {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200px;
+            height: 200px;
+            background-color: purple;
+            /*水平垂直居中写法一：根据自身长度一半进行位移*/
+            /* margin-top: -100px;
+            margin-left: -100px; */
+            /*水平垂直居中写法二：根据自身长度50%进行位移*/
+            transform: translate(-50%, -50%);
+            /*注意transform有默认内外边距，必要时需要清除*/
+        }
+        
+        span {
+            /*translate对于行内元素时无效的*/
+            transform: translate(300px, 300px);
+        }
+        
+        .cl {
+            width: 500px;
+            height: 500px;
+            background-color: pink;
+            margin: 100px auto;
+            transition: all 1s;
+            /*可以跟方位名词*/
+            /* transform-origin: left bottom; */
+            /*默认50% 50% 等价于center center*/
+            /* 可以是像素  */
+            transform-origin: 50px 50px;
+        }
+        
+        .cl:hover {
+            transform: rotate(360deg);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div>
+        <p></p>
+    </div>
+    <div class="cl"></div>
+
+</body>
+
+</html>
