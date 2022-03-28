@@ -616,7 +616,7 @@ animation-fill-mode | 规定动画结束后状态，保持在结束状态forward
         4.  一个px能显示的物理像素点的个数为物理像素比或屏幕像素比。
         5.  Retina（视网膜屏幕）显示技术，可以将更多的物理像素点压缩至一块屏幕里，从而达到高分辨率。
     8.  `background-size：背景图片宽度  背景图片高度`：设置背景图片宽高（背景图没有填充盒子的宽高时可设置）
-        1.  单位：长度，百分比，cover，contain
+        1.  单位：长度，百分比，cover，contain（整张图）
         2.  适用场景：图片过大，或者图片过小
 70.  CSS3盒子模型`box-sizing`
     9.  传统模式宽度计算，<strong>盒子宽度 = CSS中设置的width + border + pading</strong>
@@ -647,16 +647,124 @@ img,a{-webkit-touch-callout:none;}
         1.  在`firework`把精灵图等比例缩放为原来的一半
         2.  之后根据大小测量坐标，然后写在`background`的图片坐标
         3.  在`background-size`写：精灵图原来宽度的一半
+    5. 在盒子里面切图圆角方式：
+       1. 在父级盒子切完盒子圆角`border-radius`后，使用`overflow:hidden`隐藏溢出的图片直角
+       2. 子级元素`img`宽度`100%`
+       3. 若图片距离盒子或者盒子距离前(上)一个盒子有距离/顶部有空隙，尝试使用`vertical-align:top`
+    6. 左/右浮动之后，可以设置宽度等长度单位，浮动之后元素变成行内块元素。
+    7. 按尺寸左右调整距离后再加竖线`border-left:1px solid #ccc`撑开盒子造成最后一个元素溢出，可以使用`box-sizing:border-box`
+       1. 原因：多添加了一个border的宽度撑出盒子，使用border-box可以把border宽度计算在内。
 
+72. 传统布局与flex布局
+    1.  传统布局：兼容性好，布局繁琐，局限性，不能再移动端很好的布局
+    2.  flex弹性布局：布局极为简单，移动端应用广泛，PC端浏览器支持较差，IE11或更低版本不支持。
+    3.  父元素使用`display:flex`
+        1.  注意：子元素的float, clear和vertical-align属性将失效
+        2.  子元素`<span>`等可以设置宽高，并且有效
+        3.  伸缩布局 = 弹性布局 = 伸缩盒布局 =弹性盒布局 = flex布局
+    4.  `flex`属性:定义子项目分配<strong>剩余空间</strong>，flex表示占多少份数
+        1.  语法：`.item{ flex: <number>; }`默认值为0. 
+          
+6个属性对父元素设置的 | 描述
+---- | ---
+flex-direction | 设置主轴（x轴）方向，参数`row`等
+justify-content | 设置主轴上的子元素排列方式
+flex-wrap | 设置子元素是否换行，默认`nowrap`不换行并且缩小子元素宽度，其他参数`wrap`
+align-content | 设置侧轴上（y轴）的子元素的排列方式（多行）
+align-items | 设置侧轴上的子元素排列方式（单行）
+flex-flow | 复合属性，相当于同时设置了flex-direction和flex-wrap，语法`flex-flow:row wrap`
+flex | 分到的份数
+align-self | 控制子项自己在侧轴上的排列方式
 
+flex-direction(属性值) | 可设置主轴，余下为侧轴
+---- | ---
+row | 默认值从左到右(相当于主轴为x轴)
+row-reverse | 从右到左
+column | 从上到下
+column-reverse | 从下到上
 
+justify-content(属性值) | 可设置主轴上子元素排列/对齐方式
+---- | ---
+flex-start | 默认值，从头部开始，如果主轴x轴，左到右
+flex-end | 从尾部开始排列
+center | 在主轴居中对齐（如果主轴是x轴则水平居中）
+space-around | 评分剩余空间
+space-between | 先两边贴边，再平分剩余空间（重要）
 
+align-items/align-content(属性值) | 可设置侧轴上子元素排列方式，再子项为单项（单行）时使用(items)  | 只能用与子项出现换行的情况（多行，可通过flex-wrap设置wrap换行），单行效果无效(content)
+---- | --- | ----
+flex-start | 默认值，从上到下  | 默认值在侧轴的头部开始排列
+flex-end | 从下到上  |  在侧轴的尾部开始排列
+center | 挤再一起居中（垂直居中） |  在侧轴中间显示
+stretch | 拉伸(items) | 设置子元素高度评分父元素高度（contents多行）
+space-around |  --  |  子项在侧轴平分剩余空间
+space-between | --  |  子项在侧轴先分布在两头，再平分剩余空间
 
+73. 常见flex布局思路
+    1. 图片居于文字正下方使用大盒包两个小盒，小盒常用`<span>`，[b站教程](https://www.bilibili.com/video/BV14J4114768?p=432&spm_id_from=pageDriver)
+       1. 默认主轴X轴，`<a><span1><span2></a>`为横向span1和span2处于左右
+       2. 把主轴设为Y轴，则span1和span2上下分布
+       3. 把侧轴设为居中对齐，则span1和span2位于盒子中间对齐
+    2. 快速设置子元素样式，前提设置通用class名。
+       1. 先通过属性选择器设置通用样式及图片`url`，如`.local-nav li [class^="local-nav-icon"] {。。}`([]前右空格)
+       2. 通过背景位置对图标进行校正`.local-nav li .local-nav-icon-ico2{ background-position: 0 -32px;} `
+    3. 给相邻盒子之间加竖线，比如三个盒子相邻，中间加两条竖线
+       1. `.nav-items:nth-child(-n+2)`选择为前面两个元素
+       2. 样式`{border-right:1px solid #fff}`
+       3. 选择flex后，边框加`1px`不会影响，因为flex包含边框计算在内为盒子尺寸
+    4. 背景颜色渐变色,<strong>背景渐变必须添加浏览器私有前缀</strong>。
+       1. 背景线性渐变
+          1. `background:linear-gradient(起始方向，颜色1，颜色2)`;
+          2. `background:-webkit-liner-gradient(left, red, blue)`;
+          3. `background:-webkit-linear-gradient(left top, red, blue)`;
 
+74. 移动端之`rem`适配布局及Less语法
+    1.  目的：解决不同尺寸移动端根据比例适配文字、图片、行高的大小
+    2.  rem（root em）是一个相对单位，类似于em，em是父元素字体大小。
+    3.  rem的基准是相对于html元素的字体大小。
+    4.  如：根元素`html`设置`font-size=12px`，非根元素设置`width:2rem`；则换算`px`就是`24px`。
+75. 媒体查询`Media Query`为CSS3新语法
+    1.  `@media`可以设置不同尺寸不同样式
+    2.  格式：`@media mediaType and|not|only (media feature){css code}`
+        1.  mediaType查询类型：`all` - 所有设备； `print` - 打印机和打印预览； `screen` - 电脑屏幕，平板手机等。<strong>必须写</strong>。
+        2.  关键字将媒体类型或多个媒体特性连接到一起作为媒体查询的条件。
+            1.  `and` - 将多个媒体特性链接一起，<strong>必须写</strong>； `not` - 排除某个媒体类型，可省略； `only` - 指定某个特定媒体类型，可省略。
+        3.  媒体特性，目前只需要了解三个：`max-width | min-width | width`
+        4.  如`@media screen and (max-width:800px){..}`：在屏幕上并且最大宽度是800像素的样式。
+        5.  可以使用`and`使用多个条件如配合max-width和min-width。
+    3.  `@media`一般设置高度不设置宽度，且加`transition`可以让效果拉满。
+    4.  通过`<link>`方式添加不同尺寸的`media`的CSS文件格式如下
+        1.  `<link rel="stylesheet" media="mediatype and|not|only (media feature)" href="mystylesheet.css">`
+        2.  推荐媒体查询方式：从小到大
 
+76. Less基础
+    1.  CSS是一门非程序式语言，没有变量、函数、SCOPE（作用域）等概念。
+    2.  Less(learner Style Sheets)为CSS扩展语言，成为CSS预处理器。常见CSS预处理器：Sass、Less、Stylus。
+        1.  Less变量：`@变量：值；`，常用于CSS中的一些颜色和数值。
+            1.  必须@前缀、不能包含特殊字符、不能以数字开头、大小写敏感
+        2.  Less编译：Less包含一套自定义语法及解析器，根据自定义样式规则，通过解析器，编译生成对应的CSS文件。
+            1.  如vscode中的easy-less插件；保存后自动生成css文件。
+        3.  Less嵌套：原CSS中的标签选择器如`.div a{ .. }`
+            1.  Less使用：`.div{ a{..} }`直接嵌套
+            2.  若遇到（交集|伪类|伪类选择器）
+                1.  内层选择器的前面没有 & 符号，则被解析为夫选择器的后代；如`a{ :hover{..} }` => `a :hover{..}`为a的后代某个hover
+                2.  如果有 & 符号，则被解析为父元素自身或父元素的伪类；如`a{ &:hover{..} }` => `a:hover{..}`自身hover
+        4.  Less运算：任何颜色、数字或者变量都可以参与运算。运算符号：加、减、乘、除。
+            1.  注意：运算符号需要空格隔开。除号多单位运算时额外注意。如(10rem / 50)
+            2.  两个参数运算，只有一个数有单位，结果以这个单位为准。
+            3.  两个参数运算，且2个数都有单位，且不一样的单位，最后的结果以第一个单位为准。
 
+77. rem实际开发适配方案：rem + 媒体查询 + less技术
+    1.  一般移动端使用`750px`为准。
+    2.  假设把整个屏幕划分`15`等份（也可以是20、10等份），每一份作为html字体大小，这里`750px/15`就是`50px`
+    3.  那么在`320px`设备时，字体大小为`320px/15`就是`21.33px`
+    4.  页面元素的大小初一不同html字体大小，他们的比例还是相同的
+    5.  设计一个`100*100像素div`的页面元素在750屏幕下，就是`100/50`转换为rem时宽高就是`2rem * 2rem`比例
+    6.  320屏幕下，html字体大小为21.33，则2rem = 42.66px，此时宽和高都是42.66
 
-
-
-
-
+78. 苏宁模板
+    1.  注意：做less运算除法时，需要用括号括起来如：`font-size: (360px / @no);`
+    2.  固定定位，必须要有宽度，如导航
+    3.  页面元素rem计算公式： 页面元素的px / html 字体的大小 50.
+        1.  注意：若要得到rem则要在计算里至少有一个rem。
+    4.  `<a>`图片会缩放，使用背景图片，以及背景图片的`background-size`进行背景图片缩放，宽高让其与自身宽高对等即可

@@ -1,0 +1,19 @@
+/*定义一个变量*/
+body {
+  background-color: pink;
+}
+/*Less嵌套 如CSS中的.header a{..}*/
+.header {
+  width: 200px;
+  height: 200px;
+  background-color: pink;
+}
+.header a {
+  color: red;
+}
+/*less运算*/
+.test {
+  width: 200px;
+  height: 200px;
+  border: 10px solid red;
+}

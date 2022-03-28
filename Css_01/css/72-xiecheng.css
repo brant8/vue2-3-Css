@@ -1,0 +1,134 @@
+/*body初始化样式*/
+
+body {
+    max-width: 540px;
+    min-width: 320px;
+    margin: 0 auto;
+    font: normal 14px/1.5 Tahoma, "Lucida Grande", Verdana, "Microsoft Yahei", STXihei, hei;
+    color: #000;
+    background: #f2f2f2;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+    color: #222;
+}
+
+
+/*搜索模块*/
+
+.search_index {
+    /*固定定位跟父级没有关系，它以屏幕为准*/
+    position: fixed;
+    display: flex;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%);
+    /*兼容*/
+    -webkit-transform: translateX(-50%);
+    /* left: auto; 也可以达到效果*/
+    width: 100%;
+    min-width: 320px;
+    max-width: 540px;
+    height: 44px;
+    /* background-color: pink; */
+    /*margin-auto无效，因为已经有fixed定位*/
+}
+
+.search {
+    height: 26px;
+    border: 1px solid #ccc;
+    flex: 1;
+    margin: 6px 10px;
+    border-radius: 5px;
+}
+
+.search::before {
+    content: "";
+    /* display: block; */
+    width: 15px;
+    height: 15px;
+    /*绝对定位不占位置*/
+    position: absolute;
+}
+
+.user {
+    width: 44px;
+    height: 44px;
+    /* background-color: purple; */
+    font: 12px;
+    text-align: center;
+}
+
+.user::before {
+    content: "";
+    display: block;
+    width: 23px;
+    height: 23px;
+    background: url(../img/sprite.png) no-repeat -59px -194px;
+    background-size: 104px auto;
+    margin: 4px auto -2px;
+}
+
+.slider {
+    margin-top: 50px;
+    height: 50px;
+    background-color: pink;
+}
+
+.local-nav {
+    padding-top: 60px;
+    display: flex;
+    height: 64px;
+    margin: 3px 4px;
+    background-color: #fff;
+    border-radius: 8px;
+}
+
+.local-nav li {
+    list-style: none;
+    flex: 1;
+}
+
+.local-nav a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+/*所有子元素通用做法*/
+
+.local-nav li [class^="local-nav-icon"] {
+    width: 32px;
+    height: 32px;
+    background-color: pink;
+    background: url(../img/localnav_bg.png) no-repeat 0 0;
+    background-size: 100%;
+}
+
+
+/*每个图片通过精灵图位置进行矫正*/
+
+.local-nav li .local-nav-icon-ico2 {
+    background-position: 0 -32px;
+}
+
+.local-nav li .local-nav-icon-ico3 {
+    background-position: 0 -64px;
+}
+
+.local-nav li .local-nav-icon-ico4 {
+    background-position: 0 -96px;
+}
+
+.local-nav li .local-nav-icon-ico5 {
+    background-position: 0 -128px;
+}

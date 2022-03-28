@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title</title>
+    <!-- <link rel="stylesheet" media="mediatype and|not|only (media feature)" href="mystylesheet.css"> -->
+    <style>
+        @media screen and (min-width:320px) {
+            html {
+                font-size: 50px;
+            }
+        }
+        
+        @media screen and (min-width:640px) {
+            html {
+                font-size: 100px;
+            }
+        }
+        
+        .top {
+            height: 1rem;
+            font-size: .5rem;
+            background-color: green;
+            color: #fff;
+            transition: all .3s;
+        }
+        /*当屏幕大于等于640px以上的，让div一行显示2个*/
+        /*当屏幕小于640px 我们让div一行显示一个*/
+        
+        .div {
+            width: 50%;
+            height: 100px;
+        }
+        
+        .div:nth-child(1) {
+            background-color: pink;
+        }
+        
+        .div:nth-child(2) {
+            background-color: blue;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="top">Dao Hang Lan</div>
+
+    <!-- 显示一行2个和一行一个 -->
+
+    <div class="div">1</div>
+    <div class="div">2</div>
+
+</body>
+
+</html>
