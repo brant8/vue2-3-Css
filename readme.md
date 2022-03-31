@@ -762,9 +762,73 @@ space-between | --  |  子项在侧轴先分布在两头，再平分剩余空间
     5.  设计一个`100*100像素div`的页面元素在750屏幕下，就是`100/50`转换为rem时宽高就是`2rem * 2rem`比例
     6.  320屏幕下，html字体大小为21.33，则2rem = 42.66px，此时宽和高都是42.66
 
-78. 苏宁模板
+78. 苏宁模板 - rem适配方案- 手动计算
     1.  注意：做less运算除法时，需要用括号括起来如：`font-size: (360px / @no);`
     2.  固定定位，必须要有宽度，如导航
     3.  页面元素rem计算公式： 页面元素的px / html 字体的大小 50.
         1.  注意：若要得到rem则要在计算里至少有一个rem。
     4.  `<a>`图片会缩放，使用背景图片，以及背景图片的`background-size`进行背景图片缩放，宽高让其与自身宽高对等即可
+
+79. rem适配方案 - flexible.js简洁高效版
+    1.  手机淘宝出的简介搞笑移动端适配库，不需要写不同媒体查询，因为里面做了js处理。
+    2.  其把当前设备划分`10等份`。只需设置当前`html`文字大小即可。
+    3.  比如设计稿时`750px`，只需要把html文字设置为`75px`（750px/10）即可，页面元素`rem值`：`页面元素的px值/75`，余下`flexible.js`计算。
+    4.  使用插件让用户输入px自动转换成rem。
+        1.  VSCode 插件： `cssrem`。
+        2.  注意：cssrem插件默认使用html文字大小为16px。可在VSCode设置搜cssrem设置大小。
+    5.  若超出750px可以参考使用`！Important`进行提权。
+    6.  避免使用id选择器，权重太高。
+    7.  `display:flex`多个子元素让其换行使用`flex-wrap:wrap`
+    8.  图片自动缩放：使用`img{ width: XXrem }`用等比例方式缩放
+    9.  水平居中显示；使用flex方式。`{ flex-direction:column; align-items:center }`
+
+80. 移动端响应式布局：使用媒体查询
+    1.  响应式屏幕常用分档：
+        1.  超小屏幕（手机）< 768px ：设置宽度100%
+        2.  小屏设备（平板） >= 768px ~ < 992px ： 设置宽度750px
+        3.  中等屏幕（桌面显示器） >= 992px ~ < 1200px ： 宽度设置为970px 
+        4.  宽屏设备（大桌面显示器） >= 1200px ： 宽度设置为1170px
+    2.  使用父级布局容器，来配合子元素实现效果
+    3.  要求当前网页使用IE浏览器最高版本内核来渲染： `<meta http-equiv="X-UA-Compatible" content="IE=edge">`
+
+81. Bootstrap框架 <strong>v3版本</strong>
+    1.  布局容器 `.container`响应式布局、`container-fliud`流式布局（适合于单独做移动端开发）。所有`container`左右各有15px空隙
+    2.  一般用来分成几等份的才会用到container。
+    3.  container下包裹1行`row`和列`column`12等份：格式： `container -> row（去除15px） -> col`
+        1.  手机100% 小于768px - `col-xs-`
+        2.  平板 大等于768px - `col-sm-`
+        3.  中等屏幕 大等于992px - `col-md-`
+        4.  大屏幕 大等于1200px - `col-lg`
+        5.  注意：行使用`row`可以去除父容器作用`15px`的边距； 每一列默认有左右`15px`的`padding`。
+    4.  列嵌套：`container -> row1 -> col -> row2 -> col`: row2可以取消父元素的padding值，而且高度自动和父级一样高。
+    5.  列偏移：`col-md-offset-*`：让盒子靠左右中间空。列偏移写在后面想要偏移的盒子。row -> col还是正常写。
+        1.  可作用于一个row一个盒子居中对齐。
+    6.  列排序：使用`col-md-push-*`和`col-md-pull-*`让左侧右侧对调更改顺序。
+        1.  作用于整体布局，如中屏幕菜单左侧，内容居中，右侧侧边栏，小屏幕切换位置。
+    7.  `.hidden-xs`等隐藏。`visible-xs`显示。
+
+82. 阿里百秀案例[bootstrap 3 参考手册](https://getbootstrap.com/docs/3.3/css/#helper-classes)
+    1.  策略：先布局md以上的pc端布局，最后根据实际需求在修改小屏幕和嘲笑屏幕的特殊布局样式。
+    2.  本案例实际开发z最大宽度`1280px`。bootstrap的`container`宽度为`1170px`。可以手动修改container宽度。
+    3.  消除`container`里面的`padding值`，加`row`。
+    4.  `row`里面的列`col-xx`也有默认左右`padding值`，消除方法：使用选择器如自身标签选择器`<header>`或者添加元素选择器`.header`控制样式。
+        1.  注：若标签/元素选择器自定义样式不起作用，尝试权重更改。
+    5.  注意`ul`清除`padding`和`margin`以及`list-style`，也可以设置`<a>`的显示样式如`color:#666; text-decoration:none;`以及`a:hover{text-decoration:none}`
+    6.  bootstrap的icon位置错位，可以通过`XX::before{vertical-align: middle;}`修正。
+        1.  注意：官方推荐利用`<span>`添加图标。
+    7.  子元素浮动，为防止影响父元素的下一个盒子位置，需要在父元素清除浮动，可以直接在`class`添加`clearfix`。
+    8.  图片缩放问题：若子元素图片没有按父元素一样进行缩放如`col-sm`，设置子元素`img{width：100%}`即可(为区分可添加一个`pic`元素在父元素)。
+        1.  注意：若图片宽度`width:100%`后小屏幕会撑大盒子
+        2.  此时可以用`img{ max-width:100% }`。
+    9.  测量像素软件，[像素大厨](https://www.fancynode.com.cn/pxcook)
+
+
+83. `vw`和`vh`：是一个相对单位（类似em和rem相对单位）
+    1.  vw：viewport width 视口宽度单位； 1vw = 1/100视口高度
+    2.  vh：viewport height 视口高度单位； 1vh = 1/100视口高度
+    3.  如：视口时375px，则1vw时3.75像素。
+        1.  注意：和百分比区别，百分比相对于父元素，vw和vh总是针对于当前视口。
+    4.  视口时375px，如果需要一个`50px * 50px`的盒子，则需要`50px / 3.75 = 13.333vw`，然后其按尺寸大小等比缩放
+    5.  注意使用2x模式。
+    6.  vh做滚动高度时会使用
+    7.  插件自动转换：`px2vw`,可设置宽度转换

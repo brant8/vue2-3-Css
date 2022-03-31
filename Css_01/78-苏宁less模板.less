@@ -129,8 +129,34 @@ body{
 .ad{
   width: (750rem / @baseFont);
   display: flex;
-  a{
+  a {
     flex: 1;
-    width: 100%;
+    img{
+      width: 100%;
+    }
+  }
+}
+
+
+/*nav*/
+nav{
+  width: (750rem / @baseFont);
+  a{
+    float: left;
+    width: (150rem / @baseFont);
+    height: (140rem / @baseFont);
+    // background-color: pink;
+    text-align: center;
+    img{
+      display: block;
+      width:(82rem / @baseFont);
+      height: (82rem / @baseFont);
+      margin: (10rem / @baseFont) auto 0;
+    }
+    span{
+      display: block;
+      font-size: (25rem / @baseFont);
+      columns: #333;
+    }
   }
 }
