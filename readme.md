@@ -1,5 +1,69 @@
-### 学习Vue2 
-1. console输入Vue.config查看vue配置。
+### 学习Vue2 [其他笔记链接](https://github.com/brant8/Vue2Study)
+1. webpack前端工程化具体解决方案：模块化开发，代码压缩混淆，处理浏览器端JS兼容性如ES6等。
+   1. webpack基本使用：
+      1. 在新建空白目录下运行：`$ npm init -y`
+      2. 步骤一命令会初始化管理配置文件`package.json`
+      3. 新建src源代码目录：`src->index.html`和`src->index.js`
+      4. 安装jQuery：`$ npm install jquery -S`或`$ npm nstall jquery --save`命令, `-S/--save`记录到.json下的`dependencies`。webpack生成后会用到。
+      5. 自行导入`<script src="xx.js">`导入；或在.js中使用ES6导入`import $ from 'jquery'`(ES6直接运行会出错)
+      6. jQuery入口函数：`$(function(){...})`；如`..{ $('li:odd').css('background-color','red') }`奇数行背景色红色
+      7. 安装webpack：`npm install webpack@5.42.1 webpack-cli@4.7.2 -D`, `-D`记录当前webpack版本信息到`.json`的`devDeendencies`，dev开发，webpack生成后不会用到。
+      8. 官方命令：`npm install --save-dev webpack`
+   2. 项目中配置webpack
+      1. 项目根目录：创建配置文件`webpack.config.js`
+         1. 基本配置内容：
+            1. `module.exports = { mode: 'development'}` ；mode用来指定构建模式，可选择<strong>development|production</strong>.
+            2. `"script": { "dev": "webpack" } `; script节点下的脚本，可以通过npm run执行，如`npm run dev`(相当于npm run webpack)
+         2. 使用：
+            1. 运行`npm run dev`后生成`dist->main.js`
+            2. 在页面引用`main.js`；main.js包含index.js和jquery.js两个文件。
+         3. 运行流程：
+            1. <strong>npm run dev</strong>中的dev找.json的webpack
+            2. 然后webpack找webpack.config配置
+      2. webpack默认约定
+         1. 版本4.x和5.x中默认约定
+            1. 默认打包入口文件为`src->index.js`
+            2. 默认输出路径为`dist-main.js`
+            3. 可在webpack.config.js中修改默认；修改需要使用node.js的一些代码，如`__dirname`为node中的当前文件所处目录。下方自定义生成bundle.js替代main.js。
+               1. `module.exports = { ` 
+               2. ` entry: path.join(__dirname, 'src/index1.js),`  //entry:指定要处理哪个文件夹
+               3. ` output: { path: path.join(__dirname, 'dist'),` //指定生成的文件放哪里，此处存放的目录
+               4. `       filename: bundle.js } }`      //生成的文件名
+      3. webpack中的插件
+         1. `webpack-dev-server`：类似于node.js中的nodemon工具。每当修改源代码，webpack自动对项目进行打包和构建。
+            1. 安装命令：`npm install webpack-dev-server@3.11.2 -D`
+            2. 配置该插件：
+               1. 修改package.json -> scripts -> 添加`"dev": "webpack serve",`。
+               2. 再次运行`npm run dev`，重新进行项目打包。运行命令后会<strong>热部署</strong>直到用户结束命令。
+            3. 注意事项：
+               1. 每次自动保存，保存在内存里（否则每次保存都会读写磁盘造成磁盘寿命减短），实际目录还未生成。与webpack.config配置有关，或默认配置。
+               2. 运行命令后注意查看'output is served from /'，index.html引用地址要相应改变。
+         2. `html-webpack-plugin`：webpack中的HTMl插件，类似于一个模板引擎插件。此插件可以自定制index.html页面的内容。
+            1. 安装命令：`npm install html-webpack-plugin@5.3.2 -D`
+            2. 配置该插件webpack.config.js：
+               1. 导入HTMl插件，得到一个构造函数`const HtmlPlugin = require('html-webpack-plugin')`
+               2. 创建HTML插件的实例对象
+                  1. `const htmlPlugin = new HtmlPlugin({ `
+                  2. `  template: './src/index.html' ,` //指定源文件的存放路径
+                  3. `  filename: './index.html',  })`  //指定生成的文件的存放路径
+               3. 通过plugins节点，使htmlPlugin插件生效
+                  1. `module.export = { mode: 'development',`  
+                  2. `     plugins: [htmlPlugin], }` //
+            3. 通过HTML插件负值到项根目录中的index.html也被放到了内存中。
+            4. HTML插件生成的的index.html页面自动注入打包的bundle.js文件。
+         3. 修改端口号：`devServer:{ open:true,  port:80}`
+         4. 凡是修改了package.json/webpack.config，均需要重启。
+      4. loader概述：webpack默认只能打包`.js`后缀结尾的模块，其他非`.js`结尾模块需要`loader`加载器才能正常打包，否则报错。
+         1. `css-loader`打包.css
+            1. 安装loader命令：`npm i style-loader@3.0.0 css-loader@5.2.6 -D`
+            2. <strong>webpack.config.js</strong>添加load规则：
+               1. `module:{ ` //所有第三方文件模块匹配规则
+               2. ` rules: [` //文件后缀名匹配规则
+               3. ` {test: /\.css$/, use:['style-loader', 'css-loader'] }] }`
+         2. `less-loader`打包.less
+         3. `babel-loader`打包高级JS语法。
+
+2. console输入Vue.config查看vue配置。
 
 
 
