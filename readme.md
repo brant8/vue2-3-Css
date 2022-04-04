@@ -43,12 +43,19 @@
             2. 配置该插件webpack.config.js：
                1. 导入HTMl插件，得到一个构造函数`const HtmlPlugin = require('html-webpack-plugin')`
                2. 创建HTML插件的实例对象
-                  1. `const htmlPlugin = new HtmlPlugin({ `
-                  2. `  template: './src/index.html' ,` //指定源文件的存放路径
-                  3. `  filename: './index.html',  })`  //指定生成的文件的存放路径
-               3. 通过plugins节点，使htmlPlugin插件生效
-                  1. `module.export = { mode: 'development',`  
-                  2. `     plugins: [htmlPlugin], }` //
+                ```JS
+                const htmlPlugin = new HtmlPlugin({ 
+                template: './src/index.html' , //指定源文件的存放路径
+                ` filename: './index.html',  })  //指定生成的文件的存放路径
+                ```  
+
+               3. 通过plugins节点，使htmlPlugin插件生效   
+   
+                    ```JS
+                    module.export = { mode: 'development', 
+                    plugins: [htmlPlugin], } //
+                    ```   
+
             3. 通过HTML插件负值到项根目录中的index.html也被放到了内存中。
             4. HTML插件生成的的index.html页面自动注入打包的bundle.js文件。
          3. 修改端口号：`devServer:{ open:true,  port:80}`
@@ -57,9 +64,14 @@
          1. `css-loader`打包.css
             1. 安装loader命令：`npm i style-loader@3.0.0 css-loader@5.2.6 -D`
             2. <strong>webpack.config.js</strong>添加load规则：
-               1. `module:{ ` //所有第三方文件模块匹配规则
-               2. ` rules: [` //文件后缀名匹配规则
-               3. ` {test: /\.css$/, use:['style-loader', 'css-loader'] }] }`
+               ```JS
+               module:{  //所有第三方文件模块匹配规则
+                rules: [ //文件后缀名匹配规则
+                    {  test: /\.css$/, use:['style-loader', 'css-loader'] }
+                        ] 
+                }
+                // test文件类型，use表示对应要调用的loader
+               ``` 
          2. `less-loader`打包.less
          3. `babel-loader`打包高级JS语法。
 
@@ -69,7 +81,8 @@
 
 ___
 
-### CSS学习
+
+## CSS学习
 1. 选择器：选择标签。
     1. 标签（元素）选择器如`<div>`,`<p>`。
     2. class类选择器。`.class`
