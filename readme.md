@@ -8,7 +8,8 @@
       5. 自行导入`<script src="xx.js">`导入；或在.js中使用ES6导入`import $ from 'jquery'`(ES6直接运行会出错)
       6. jQuery入口函数：`$(function(){...})`；如`..{ $('li:odd').css('background-color','red') }`奇数行背景色红色
       7. 安装webpack：`npm install webpack@5.42.1 webpack-cli@4.7.2 -D`, `-D`记录当前webpack版本信息到`.json`的`devDeendencies`，dev开发，webpack生成后不会用到。
-      8. 官方命令：`npm install --save-dev webpack`
+      8. 官方命令：`npm install --save-dev webpack` 
+      9. `--save-dev` 等同于 `-D`
    2. 项目中配置webpack
       1. 项目根目录：创建配置文件`webpack.config.js`
          1. 基本配置内容：
@@ -20,16 +21,20 @@
          3. 运行流程：
             1. <strong>npm run dev</strong>中的dev找.json的webpack
             2. 然后webpack找webpack.config配置
-      2. webpack默认约定
+   3. webpack默认约定
          1. 版本4.x和5.x中默认约定
             1. 默认打包入口文件为`src->index.js`
             2. 默认输出路径为`dist-main.js`
             3. 可在webpack.config.js中修改默认；修改需要使用node.js的一些代码，如`__dirname`为node中的当前文件所处目录。下方自定义生成bundle.js替代main.js。
-               1. `module.exports = { ` 
-               2. ` entry: path.join(__dirname, 'src/index1.js),`  //entry:指定要处理哪个文件夹
-               3. ` output: { path: path.join(__dirname, 'dist'),` //指定生成的文件放哪里，此处存放的目录
-               4. `       filename: bundle.js } }`      //生成的文件名
-      3. webpack中的插件
+               ```JS
+               module.exports = {  
+                entry: path.join(__dirname, 'src/index1.js'),  //entry:指定要处理哪个文件夹
+                output: { 
+                    path: path.join(__dirname, 'dist'),  //指定生成的文件放哪里，此处存放的目录
+                    filename: bundle.js }  //生成的文件名
+                 }
+               ``` 
+   4. webpack中的插件
          1. `webpack-dev-server`：类似于node.js中的nodemon工具。每当修改源代码，webpack自动对项目进行打包和构建。
             1. 安装命令：`npm install webpack-dev-server@3.11.2 -D`
             2. 配置该插件：
@@ -51,16 +56,24 @@
 
                3. 通过plugins节点，使htmlPlugin插件生效   
    
-                    ```JS
-                    module.export = { mode: 'development', 
-                    plugins: [htmlPlugin], } //
-                    ```   
+                ```JS
+                module.export = { mode: 'development', 
+                plugins: [htmlPlugin], } //
+                ```   
 
             3. 通过HTML插件负值到项根目录中的index.html也被放到了内存中。
             4. HTML插件生成的的index.html页面自动注入打包的bundle.js文件。
-         3. 修改端口号：`devServer:{ open:true,  port:80}`
-         4. 凡是修改了package.json/webpack.config，均需要重启。
-      4. loader概述：webpack默认只能打包`.js`后缀结尾的模块，其他非`.js`结尾模块需要`loader`加载器才能正常打包，否则报错。
+            5. webpack.config.js配置，devServer节点修改端口号：
+                ```JS
+                devServer:{ 
+                    open:true,  //初次打包完成后，自动打开浏览器
+                    port:80 //试试打包所使用的端口好
+                    host: '127.0.0.1' // 是是打包所使用的主机地址
+                    }
+                ```
+         3. 凡是修改了package.json/webpack.config，均需要重启。
+          
+   5. loader概述：webpack默认只能打包`.js`后缀结尾的模块，其他非`.js`结尾模块需要`loader`加载器才能正常打包，否则报错。
          1. `css-loader`打包.css
             1. 安装loader命令：`npm i style-loader@3.0.0 css-loader@5.2.6 -D`
             2. <strong>webpack.config.js</strong>添加load规则：
@@ -71,11 +84,244 @@
                         ] 
                 }
                 // test文件类型，use表示对应要调用的loader
+                //
+                // 流程：
+                // 1. 打包处理css文件，处理不了
+                // 2. 查找webpack.config.js配置，看module.rules数组是否配置了对应loader加载器
+                // 3. webpack把index.css先交给最后一个loader处理（先转交给css-loader）
+                // 4. css-loader处理完后把结果转交给下一个loader（转交给style-loader）
+                // 5. style-loader处理完后发现没有下一个loader就把结果转交给webpack
+                // 6. webpack把style-loader处理结果合并到/dist/bundle.js中。最终生成打包好的文件。
                ``` 
          2. `less-loader`打包.less
+            1. 安装命令：`npm i less-loader@10.0.1 less@4.1.1 -D`
+            2. webpack.config声明规则
+            ```JS
+            module:{
+                rules:[
+                    {test: /\.less$/, use;['style-loader','css-loader','less-loader']}
+                ]
+            }
+            //注：less@4.1.1.1为内置依赖项，不需要额外声明；less-loader依赖于less。
+            ``` 
+            1. <strong>rules调用顺序规则，从后往前调</strong>。
          3. `babel-loader`打包高级JS语法。
+            1. 安装命令：`npm i babel-loader@8.2.2 @babel/core@7.14.6 @babel/plugin-proposal-decorators@7.14.5 -D`
+            2. 配置webpack.config规则：
+               1. `{ test: /\.js$/, use: 'babel-loader', exclude:/node_modules/ }`
+               2. 说明：必须使用exclude指定排除想；因为node_modules目录下的第三方包不需要被打包。
+            3. 在项目根目录下，创建名为`babel.config.js`的配置文件，定义Babel配置项如下
+            ```JS
+            module.exports = {
+                //声明babel可用的插件
+                plugins:[['@babel/plugin-proposal-decorators',{ legacy:true }],]
+            }
+            /*plugin-proposal-decorators告诉babel如何解析高级js语法
+            webpack先加载plugins插件来使用再调用babel-loader*/
+            ``` 
+         4. 打包<strong>url路径相关</strong>的文件
+            1. 安装命令：`npm i url-loader@4.1.1 file-loader@6.2.0 -D`
+            2. webpack.config配置规则
+            ```JS
+            module:{
+                rules:[
+                    {test: /\.jpg|png|gif$/, use:'url-loader?limit=22229&outputPath=images'},
+                ]
+            }
+            //?之后的使loader的参数选项
+            //只有小于等于limit大小（字节bytes）的图片才会被转为base64的图片
+            //&outputPath=images：指定图片在production后的存放路径，也可以像下面的一一写(步骤7优化写法)
+            //案例jQuery的js设置属性：
+            /* import logo from './images/logo.jpg'
+            $('.box').attr('src',logo)
+            */
+            ```
+         5. 在webpack中一切皆模块，都可以通过ES6导入语法进行导入和使用。
+            1. 如果某个模块中，使用from接收到的成员为undefined，则美必要进行接收，如 `import a from './css/index.css'`直接写成`import './css/index.css'`
+   6. 配置webpack的打包发布（判断文件打包状态可查看输出目录有无生成如dist）
+      1. 在jackson.json添加scripts节点
+         1. `"scripts": { "build": "webpack --mode production" }`
+         2. --mode是一个参数项，指定webpack运行模式(webpack.config中有mode)。
+         3. production代表生产环境，会生成的文件进行代码压缩和性能优化。
+   7. 优化打包路径，否则打包的所有文件默认都在同一目录dist下。
+   ```JS
+    output:{ //output与mode同级
+        path:path.join(__dirname,'dist'),
+        filename:'js/bundle.js' //修改js生成路径
+    }
 
-2. console输入Vue.config查看vue配置。
+    //图片统一生成到image目录中
+    rules:[ //图片目录在规则中声明
+        {
+        test: /\.jpg|png|gif$/,
+        use: {
+            loader: 'url-loader',
+            options: {
+                limit:22222,
+                //明确指定目录给图片
+                outputPath:'image',
+                }
+            }
+        },
+    ]
+   ``` 
+   8. 自动清理dist目录下的旧文件插件。
+      1. 安装命令`npm install clean-webpack-plugin@3.0.0 -D`
+      2. 导入插件得到插件的构造函数后创建插件实例对象
+         1. `const { CleanWebpackPlugin } = require('clean-webpack-plugin)`
+            1. CleanWebpackPlugin首字母大写一般是构造函数
+            2. `{}`表示解构赋值
+         2. `const cleanPlugin = new CleanWebpackPlugin()`
+      3. 把创建的cleanPlugin插件实例对象挂在到plugins节点中
+         1. `plugins:[htmlPlugin, cleanPlugin]`
+   9. SourceMap：信息文件，让其原文件代码行的位置转换对应的压缩后的代码行，方便纠错。
+      1.  webpack.config.js中开启：`devtool: 'eval-source-map'`（开发环境时可用）
+      2.  devtool与mode同级，开发环境可以开启，生产环境推荐关闭提高安全性。
+      3.  只定位行数不暴露源码：`devtool: 'nosources-source-map'`
+      4.  暴露行数与代码：`devtool: 'source-map'`（开发环境时可用）
+   10. 使用@表示src源代码目录。如`@/msg.js`表示src/msg.js。
+       1.  webpack.config配置
+       ```JS
+       resolve:{ //与mode平级
+           alias:{
+               '@':path.join(__dirname,'/src')
+           }
+       }
+       ```  
+
+
+2.  Vue入门：数据驱动视图（数据变化引起视图变化 -- 单向）、双向数据绑定（采集数据）。
+    1.  MVVM：
+        1.  Model-当前页面渲染时所依赖的数据源
+        2.  View当前页面所渲染的DOM结构
+        3.  ViewModel为vue实例，MVVM的核心
+
+3. vue基本使用
+   1. 导入vue.js
+   2. 在页面中声明一个被vue所控制的DOM区域
+   3. 创建vm实例对象
+   ```HTML
+    <div id="app">{{username}} </div>
+    <script src="vue.js"></script>
+    <script>
+        const vm=new Vue({
+            el:'#app',
+            data：{
+                username:'zhangsan',
+            },
+        })
+    </script>
+   ``` 
+
+4. vue指令与过滤器
+   1. 指令Directives - 模板语法，用于辅助开发者渲染页面的基本结构，如下6大类指令。
+      1. 内容渲染
+      2. 属性绑定
+      3. 事件绑定
+      4. 双向绑定
+      5. 条件渲染
+      6. 列表渲染
+   2. 内容常用指令：
+      1. `v-text`：缺点 - 会覆盖原本标签的内容,只渲染纯文本；几乎不用
+      2. `{{}}`插值表达式（Mustache）：内容占位符，使用多。不能用在属性节点如~~`<input type="text" placeholder="{{tips}}"/>`~~。支持JS运算如三元表达式。
+      3. `v-html`：将带有标签的字符串，渲染成真正HTML内容。
+        ```HTML
+        <div id="app">
+            <p v-text="username"></p>
+            <!-- 性别被覆盖 -->
+            <p v-text="gender">性别</p>
+            <!-- 可计算 -->
+            <p>{{ age }}反转结果是{{ (age+"").split("").reverse().join("") }}</p>
+            <p v-html="info"></p>
+        </div>
+        <script>
+            const vm=new Vue({
+            el:'#app',
+            data：{
+                username:'zhangsan',
+                gender:'nv',
+                age:17,
+                info:'<h4 style="color:red">高三二班</h4>'
+            }
+            })
+        </script>
+        ``` 
+    3. 属性绑定指令`v-bind`。动态绑定,可简写如`:placeholder`。
+       1. 支持运算
+        ```HTML
+        <div id="app">
+            <input type="text" v-bind:placeholder="username">
+            <!-- 可计算 -->
+            <div :title="'box' + index"></div>
+        </div>
+        <script>
+            const vm=new Vue({
+            el:'#app',
+            data：{
+                username:'zhangsan',
+                index:2,
+            }
+            })
+        </script>
+        ```  
+    4. 事件绑定`v-on`。辅助程序员DOM元素绑定事件监听。可以简写成如`@click`
+       1. 常用参数：click | input | keyup
+       2. 事件绑定`$event`：不传参时，默认传入到方法有个`e`对象。如`add(e)`。
+       3. 可以在方法内`方法(e)`查看`console.log(e)`，触发对象`target:xxx`。或者在HTML里传入`$event`
+       4. 其他扩展：`$event.preventDefault()`&`@click`阻止点击跳转；Vue写法`@click.prevent="方法"`。
+       5. 常用事件修饰符：
+          1. `prevent`（阻止默认行为）等同于JS的event.preventDefault()；
+          2. `stop`（阻止事件冒泡,类似嵌套）等同于event.stopPropagation()。
+        ```HTML
+        <div id="app">
+            {{ Count }}
+            <button v-on:click="add">++</button>
+            <button v-on:click="sub">--</button>
+            <!-- 可以传参add(1) ,methods也要传add(n){..}-->
+            <!-- 此处changeColor不能传e，只能在方法中放入e -->
+            <button @click="changeColor">--</button>
+            <!-- 若需要传入，可单独加入$event -->
+            <button @click="changeColor2(1,$event)">--</button>
+        </div>
+        <script>
+            const vm=new Vue({
+            el:'#app',
+            data：{
+                Count:0
+            },
+            methods:{
+                add: function(){
+                    console.log(vm); //显示所有vue属性
+                    vm.Count++; //不推荐用vm方式
+                },
+                sub(){ //简写
+                    console.log(vm == this); //true
+                    this.Count--;//推荐用this方式写
+                },
+                changeColor(e){ //奇偶改变背景颜色
+                    if(this.count % 2 == 0){
+                        e.target.style.backgroundColor = 'red'
+                    }else{
+                        e.target.style = 'backgroundColor: yellow'
+                    }
+                },
+                changecolor2(n,e){ //用e接收$event
+                    //...
+                }
+            }
+            })
+        </script>
+        ``` 
+        6. 按键修饰符，监听键盘事件。
+        ```HTML
+        <!-- 只有在key时Enter时调用submit（） -->
+        <input @keyup.enter="submit">
+        <!-- 只有在key时Esc时调用clearInput() -->
+        <input @keyup.esc="clearInput">
+        ``` 
+      
+
+5.  console输入Vue.config查看vue配置。
 
 
 
