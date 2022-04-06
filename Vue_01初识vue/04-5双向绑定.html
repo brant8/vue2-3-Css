@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+
+        <select v-model="city">
+            <option value="0">请选择城市</option>
+            <option value="1">北京</option>
+            <option value="2">上海</option>
+            <option value="3">厦门</option>
+        </select>
+
+        <h4>字符串</h4>
+        <input type="text" v-model="n1"> + <input stype="text" v-model="n2"> = <span v-model="n3">{{ n1+n2 }}</span>
+
+        <h4>字符串转数值</h4>
+        <input type="text" v-model="n3"> + <input stype="text" v-model.number="n4"> = <span v-model.number="n3">{{ n3+n4 }}</span>
+
+        <h4>lazy</h4>
+        <input type="text" v-model.lazy="name">
+        <span>{{ name }}</span>
+
+    </div>
+
+
+    <!-- 开发环境版本，包含了有帮助的命令行警告 -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script>
+        const app = new Vue({
+            el: '#app',
+            data: {
+                city: '2',
+                n1: 11,
+                n2: 22,
+                n3: 11,
+                n4: 22,
+                name: "",
+            }
+        })
+    </script>
+
+</body>
+
+</html>

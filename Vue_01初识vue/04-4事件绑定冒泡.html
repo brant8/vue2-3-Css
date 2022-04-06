@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        <!-- 冒泡，console.log先显示btn再显示div -->
+        <div style="height: 150px;background-color: orange;padding-left: 100px;line-height: 150px;" @click="divHandler">
+            <button @click="btnHandler">按钮</button>
+        </div>
+        <!-- 阻止冒泡JS方式 -->
+        <div style="height: 150px;background-color: pink;padding-left: 100px;line-height: 150px;" @click="divHandler2">
+            <button @click="btnHandler2">按钮</button>
+        </div>
+        <!-- 阻止冒泡Vue方式 -->
+        <div style="height: 150px;background-color: blue;padding-left: 100px;line-height: 150px;" @click="divHandler3">
+            <button @click.stop="btnHandler3">按钮</button>
+        </div>
+
+    </div>
+
+
+    <!-- 开发环境版本，包含了有帮助的命令行警告 -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script>
+        const app = new Vue({
+            el: '#app',
+            data: {
+
+            },
+            methods: {
+                divHandler() {
+                    console.log("divHandler..")
+                },
+                btnHandler() {
+                    console.log("btnHandler...")
+                },
+                divHandler2() {
+                    console.log("divHandler2..")
+                },
+                btnHandler2(e) {
+                    e.stopPropagation(); //阻止冒泡
+                    console.log("btnHandler2...")
+                },
+                divHandler3() {
+                    console.log("divHandler3..")
+                },
+                btnHandler3(e) {
+                    //在HTMl上阻止冒泡
+                    console.log("btnHandler3...")
+                },
+            }
+        })
+    </script>
+
+</body>
+
+</html>

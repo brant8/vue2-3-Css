@@ -223,7 +223,7 @@
       6. 列表渲染
    2. 内容常用指令：
       1. `v-text`：缺点 - 会覆盖原本标签的内容,只渲染纯文本；几乎不用
-      2. `{{}}`插值表达式（Mustache）：内容占位符，使用多。不能用在属性节点如~~`<input type="text" placeholder="{{tips}}"/>`~~。支持JS运算如三元表达式。
+      2. `{{}}`插值表达式（Mustache）：内容占位符，使用多。不能用在属性节点如~~`<input type="text" placeholder="{{tips}}"/>`~~。支持JS运算如三元表达式等简单运算，不能处理业务逻辑，如~~`if(..){document.write("启用")}`~~。
       3. `v-html`：将带有标签的字符串，渲染成真正HTML内容。
         ```HTML
         <div id="app">
@@ -233,6 +233,10 @@
             <!-- 可计算 -->
             <p>{{ age }}反转结果是{{ (age+"").split("").reverse().join("") }}</p>
             <p v-html="info"></p>
+            <!-- 插值表达高级用法，三个input凑个rgb颜色,:style里的属于JS表达式 -->
+            <div class="box" :style="{backgroundColor: 'rgb(${r}, ${g}, ${b})' }">
+                {{ 'rgb(${r}, ${g}, ${b})' }}
+            </div>
         </div>
         <script>
             const vm=new Vue({
@@ -246,7 +250,7 @@
             })
         </script>
         ``` 
-    3. 属性绑定指令`v-bind`。动态绑定,可简写如`:placeholder`。
+    3. 属性绑定指令`v-bind`。单向动态绑定,可简写如`:placeholder`。
        1. 支持运算
         ```HTML
         <div id="app">
@@ -272,6 +276,7 @@
        5. 常用事件修饰符：
           1. `prevent`（阻止默认行为）等同于JS的event.preventDefault()；
           2. `stop`（阻止事件冒泡,类似嵌套）等同于event.stopPropagation()。
+          3. `@submit.prevent=""`常用于表单提交后的默认行为(<strong>提交表单会刷新页面</strong>)。
         ```HTML
         <div id="app">
             {{ Count }}
@@ -312,17 +317,219 @@
             })
         </script>
         ``` 
-        6. 按键修饰符，监听键盘事件。
+        1. 按键修饰符，监听键盘事件。
         ```HTML
         <!-- 只有在key时Enter时调用submit（） -->
         <input @keyup.enter="submit">
         <!-- 只有在key时Esc时调用clearInput() -->
         <input @keyup.esc="clearInput">
         ``` 
+    5. 双向绑定指令`v-model`。只有表单元素使用v-model才有意义，实现交互，否则普通div显示数据无交互意义。
+       1. 表单元素：input、textarea、select
+       2. v-model修饰符： 
+          1. `.number` ：输入值自动转为数值类型
+          2. `.trim` ：自动过滤用户输入的首位空白字符
+          3. `.lazy`：在"change"时而非“input”时更新，即不同步更新过程。
+    ```HTML
+        <div id="app">
+            <p>{{ username }}</p>
+            <input type="text" v-bind:value="username">
+            <!-- 不用写value，底层v-model包含 -->
+            <input type="text" v-model="username">
+            <div v-model="username">无意义</div>
+        </div>
+        <script>
+            const vm=new Vue({
+            el:'#app',
+            data：{
+                username:'zhangsan',
+            }
+            })
+        </script>
+    ```  
+    6. 条件渲染指令：
+       1. `v-if`：隐藏数据时HTML不显示任何内容，移除。
+       2. `v-show`：隐藏时v-show实际为`display:none`；频繁切换显示状态时使用。
+       3. `v-else-if` | `v-else`：需要与v-if使用。
+       4. 扩展：JS里``==``操作符会先将两边的值进行强制类型转换再比较是否相等，而``===``操作符不会进行类型转换
+    ```HTML
+        <div id="app">
+            <p v-if="flag">这是v-if元素</p>
+            <p v-show="flag">这是v-show元素</p>
+        </div>
+        <script>
+            const vm=new Vue({
+            el:'#app',
+            data：{
+                flag:true
+            }
+            })
+        </script>
+    ```   
+    7. 列表渲染指令：`v-for`，基于一个数组来循环渲染一个列表结构。常使用`item in items`结构。
+       1. 支持可选第二个参数，即当前项的索引。`(item,index) in items`
+       2. 官方建议，使用v-for，最好绑定一个`:key`属性，并且把id作为key值，可以提升性能，防止列表状态紊乱。
+       3. 实际开发vue组件（xx.vue），若没有`:key`属性终端console会报错。key值不能重复。key值只能是字符串或数字类型。
+       4. index的值当作key的值没有任何意义，因为index不具有唯一性。比如勾选框，勾选后再添加内容会错位。
+       5. 扩展：JS的unshift可以追加数据到数组。
+       6. `v-model`会根据表单的形式如`type="text"`或者`type="radio"`来做相对应控制。
+       7. 若只能控制第一个item，可查看是否表单的`label-for`有无设置动态及`item.id`。
+    ```HTML
+    <script>
+     ...   
+    data:{
+        list:[
+            {id:1, name:'zs'},
+            {id:2, name:'ls'}
+        ],
+    }
+    </script>
+    <ul>
+        <li v-for="item in list" :key="item.id">姓名是: {{ item.name }} </li>
+    </ul>
+
+    <!-- JS代码追加内容到数组末尾，使用push -->
+    ```
       
+5. 过滤器(Filters)用于文本的格式化。<strong>只支持Vue2，Vue3已剔除。</strong>
+   1. 用的地方：插值表达式，v-bind属性绑定
+   2. 添加在JS表达式微博，由管道符进行调用。实际将方法放在filters下。必须要有返回值。
+   3. `<p>{{ message | capitalize }}</p>`
+   4. `<div v-bind:id = "rawId | formatId"></div>`
+   5. 私有过滤去、全局过滤器->`Vue.filter()`
+   6. 私有过滤器&全局过滤器名字重复，按照就近原则，调用私有过滤器。
+   7. 扩展：日期格式化，[day.js](https://day.js.org/docs/en/installation/browser) (==好用==) (例子07-品牌案例)
+   8. 过滤器可以连续调用`<p>{{ message | filterA(arg1,arg2) | xx | yy }}</p>`
+      1. `Vue.filter('filterA',(msg,arg1,arg2)=>{})`：接收参数永远在msg后面。
+   ```HTML
+    <div id="app">
+            <p> message 的值时{{ message | capi }}</p>
+        </div>
+        <script>
+            //全局过滤器 - 独立于每个vm实例之外
+            //Vue.filter()方法接收两个参数
+            //参数1：全局过滤器的名字
+            //参数2：全局过滤器的处理函数
+            Vue.filter('capitalize',(str)=>{  //str用来接收前面的值
+                return str.charAt(0).toUpperCase() + str.slice(1) + '~~'
+            }) //全局过滤器要写在局部之前
 
-5.  console输入Vue.config查看vue配置。
+            const vm=new Vue({
+            el:'#app',
+            data：{
+                message:"hello vue"
+            },
+            filters:{ //此处为私有过滤器，仅在#app下有效
+                capi:function(val){ //形参val永远都是竖线‘|’前面的内容
+                    const first = val.charAt(0).toUpperCase() 
+                    const other = val.splice(1)
+                    return first+other
+                }
+            }
+            })
+    </script>
+   ``` 
 
+6. 侦听器：侦测数据变化`watch`并针对性操作
+   1. 要监听哪个数据的变化，就把数据名作为watch方法名即可。
+   2. 举例：用户注册，判断用户名是否占用（非实际操作，否则服务器交互频繁）
+   3. ‘06-侦听器.html’使用`jQuery`&`Ajax`判断用户名是否占用
+   4. 方法格式的侦听器：
+      1. 缺点：无法在刚进入页面的时候自动触发
+      2. 如果侦听的是一个对象，如果对象中属性发生变化，不会触发侦听器，需要使用对象格式
+   5. 对象格式的侦听器
+      1. 好处：可以通过`immediate`选项，让侦听器自动触发。
+      2. 使用`handler`属性处理函数。
+      3. 可以通过deep选项，深度监听对象属性的变化，如下面的info。
+   6. 深度监听`deep`，仅适用于对象侦听。
+   ```HTML
+    <div id="app">
+        <!-- 双向绑定v-model 单项v-bind:value="username"-->
+        <input type="text" v-model="username"/>
+        <input type="text" v-model="info.username"/>
+    </div>
+    <script>
+        const vm=new Vue({
+        el:'#app',
+        data：{ 
+            username:'', 
+            info:{ username:''},
+        }, 
+        watch: {
+            //方法格式
+            //监听username值的变化
+            //newVal 是'变化后的新值'，oldVal是'变化之前的旧值'
+            username(newVal,oldVal){
+                console.log(newVal,oldVal)
+            }，
+            //侦听器处理函数，对象形式
+            username：{
+                handler:function(newVal,oldVal){
+                    console.log(newVal,oldVal)
+                },
+                immediate:true //进入页面立即触发，默认false
+            },
+            /*方法格式不会触发*/
+            info(newVal){
+                console.log(newVal)
+            }，
+            //对象格式可以触发
+            info: {
+                handler(newVal){
+                console.log(newVal)
+                },
+                deep:true //开启深度监听，只要对象中任何一个属性变化，都会触发对象侦听器
+            }
+            //如果要监听的是对象的子属性，则必须包裹一层单引号
+            'info.username'(newVal){ console.log(newVal) }
+        }
+        })
+    </script>
+   ```
+7. 计算属性`computed`：定义计算属性的时候要定义成“方法格式”。
+   1. 代码可复用
+   2. 计算属性有缓存，只会计算一次。
+
+8. `axios`是一个专注网络请求的库。
+   1. axios在请求得到数据之后，在真正的数据之外，套了一层壳。
+   2. axios实际返回了：{config:{}, data{<strong>真实数据</strong>}, headers:{}, status:xxx, statusText:''}
+    ```JS
+    //基本语法一
+    const result = axios({
+        method:'请求类型',
+        url:'请求的URL地址'
+    })
+    //基本语法二
+    axios({
+        method:'请求类型',
+        url:'请求的URL地址',
+        params:{}, //可选，URL中查询的参数
+        data:{}, //可选，请求体参数，GET没有请求体
+    }).then((result)=>{
+        //.then用来指定请求成功之后的回调函数
+        //形参中的result是请求成功之后的结果
+    })
+    ```
+
+9.  console输入Vue.config查看vue配置。
+   ```HTML
+    <div id="app">
+        
+    </div>
+    <script>
+        const vm=new Vue({
+        el:'#app',
+        data：{
+            r:'',
+        }，
+        computed:{//${} 模板字符串解析变量的写法
+            rgb:function(){
+                //return '${this.r}'
+            }
+        }
+        })
+    </script>
+   ```
 
 
 ___

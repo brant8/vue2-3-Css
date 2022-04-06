@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container">
+        <div id="app">
+            <!-- 卡片区域 -->
+            <div class="card ">
+                <div class="card-header">
+                    添加品牌
+                </div>
+                <!-- .align-self-end让自身居右 -->
+                <div class="card-body align-self-end">
+                    <!-- form表单有submit事件 防止刷新页面-->
+                    <form @submit.prevent="add">
+                        <div class="form-row align-items-center">
+                            <div class="col-auto">
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">品牌名称
+                                        </div>
+                                    </div>
+                                    <input type="text" class="form-control" placeholder="请输入品牌名称" v-model.trim="brand">
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-primary mb-2">添加</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- 表格区域 -->
+            <table class="table table-hover table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">姓名</th>
+                        <th scope="col">状态</th>
+                        <th scope="col">日期</th>
+                        <th scope="col">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="item in list" :key="item.id">
+                        <th scope="row">{{ item.id }}</th>
+                        <td>{{ item.name }}</td>
+                        <td>
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" :id="'sw'+item.id" v-model="item.status">
+                                <label class="custom-control-label" v-bind:for="'sw'+item.id" v-if="item.status">已启用</label>
+                                <label class="custom-control-label" :for="'sw'+item.id" v-else>已禁用</label>
+                            </div>
+                        </td>
+                        <!-- 使用过滤器过滤时间格式 -->
+                        <td>{{ item.time | dateFormat}}</td>
+                        <td>
+                            <a href="#" @click="remove(item.id)">删除</a>
+                            <!-- 视频写法 ↓  -->
+                            <!-- <a href="javascript:;" @click="remove()">删除</a>  -->
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">2</th>
+                        <td>N/A</td>
+                        <td>N/A</td>
+                        <td>N/A</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">3</th>
+                        <td colspan="2">N/A</td>
+                        <td>N/A</td>
+                        <td>N/A</td>
+                    </tr>
+                </tbody>
+            </table>
+
+
+        </div>
+    </div>
+
+    <!-- 开发环境版本，包含了有帮助的命令行警告 -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <!-- 日期格式化js -->
+    <script src="https://unpkg.com/dayjs@1.8.21/dayjs.min.js"></script>
+    <script>
+        //全局过滤器在局部之前声明
+        Vue.filter('dateFormat', function(time) {
+            // 1.对time进行格式化处理，得到YYYY-MM-DD HH:mm:ss
+            return dayjs(time).format('YYYY-MM-DD HH:mm:ss')
+
+        })
+
+        const app = new Vue({
+            el: '#app',
+            data: {
+                //添加完品牌后需要清空当前内容回到初始值空
+                brand: '',
+                //下一项可用ID，相当于nextID++等于可用的下一个ID
+                nextId: 4,
+                list: [{
+                    id: 1,
+                    name: '宝马',
+                    status: true,
+                    time: new Date()
+                }, {
+                    id: 2,
+                    name: '奔驰',
+                    status: false,
+                    time: new Date()
+                }, {
+                    id: 3,
+                    name: '奥迪',
+                    status: true,
+                    time: new Date()
+                }, ],
+            },
+            methods: {
+                remove(id) {
+                    console.log(id)
+                        //点击链接删除对应品牌
+                    this.list = this.list.filter(item => item.id !== id)
+                        //JS手册：
+                        //https://developer.mozilla.org/zh-CN/docs/Web/JavaScript
+                },
+                // 阻止表单的默认提交行为(刷新页面)之后，触发add方法
+                add() {
+                    console.log(this.brand)
+                        //判断brand的值是否空字符串，则return出去
+                    if (this.brand === '') {
+                        // alert('么有填写任何东西！')
+                        return
+                    }
+
+                    console.log("brand空值时不执行此输出")
+
+                    //1.先把添加的品牌对象整理出来
+                    const obj = {
+                            id: this.nextId,
+                            name: this.brand,
+                            status: true,
+                            time: new Date()
+                        }
+                        //2.往this.list数组中push步骤一得到的对象
+                    this.list.push(obj)
+                        //3.清空this.brand；让this.nextId自增    
+                    this.brand = ''
+                    this.nextId++
+                }
+            }
+        })
+    </script>
+
+</body>
+
+</html>
