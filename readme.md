@@ -255,7 +255,7 @@
         ```HTML
         <div id="app">
             <input type="text" v-bind:placeholder="username">
-            <!-- 可计算 -->
+                <!-- 可计算 -->
             <div :title="'box' + index"></div>
         </div>
         <script>
@@ -282,10 +282,10 @@
             {{ Count }}
             <button v-on:click="add">++</button>
             <button v-on:click="sub">--</button>
-            <!-- 可以传参add(1) ,methods也要传add(n){..}-->
-            <!-- 此处changeColor不能传e，只能在方法中放入e -->
+                <!-- 可以传参add(1) ,methods也要传add(n){..}-->
+                <!-- 此处changeColor不能传e，只能在方法中放入e -->
             <button @click="changeColor">--</button>
-            <!-- 若需要传入，可单独加入$event -->
+                <!-- 若需要传入，可单独加入$event -->
             <button @click="changeColor2(1,$event)">--</button>
         </div>
         <script>
@@ -319,9 +319,9 @@
         ``` 
         1. 按键修饰符，监听键盘事件。
         ```HTML
-        <!-- 只有在key时Enter时调用submit（） -->
+            <!-- 只有在key时Enter时调用submit（） -->
         <input @keyup.enter="submit">
-        <!-- 只有在key时Esc时调用clearInput() -->
+            <!-- 只有在key时Esc时调用clearInput() -->
         <input @keyup.esc="clearInput">
         ``` 
     5. 双向绑定指令`v-model`。只有表单元素使用v-model才有意义，实现交互，否则普通div显示数据无交互意义。
@@ -334,7 +334,7 @@
         <div id="app">
             <p>{{ username }}</p>
             <input type="text" v-bind:value="username">
-            <!-- 不用写value，底层v-model包含 -->
+                <!-- 不用写value，底层v-model包含 -->
             <input type="text" v-model="username">
             <div v-model="username">无意义</div>
         </div>
@@ -406,10 +406,10 @@
             <p> message 的值时{{ message | capi }}</p>
         </div>
         <script>
-            //全局过滤器 - 独立于每个vm实例之外
-            //Vue.filter()方法接收两个参数
-            //参数1：全局过滤器的名字
-            //参数2：全局过滤器的处理函数
+                //全局过滤器 - 独立于每个vm实例之外
+                //Vue.filter()方法接收两个参数
+                //参数1：全局过滤器的名字
+                //参数2：全局过滤器的处理函数
             Vue.filter('capitalize',(str)=>{  //str用来接收前面的值
                 return str.charAt(0).toUpperCase() + str.slice(1) + '~~'
             }) //全局过滤器要写在局部之前
@@ -444,7 +444,7 @@
    6. 深度监听`deep`，仅适用于对象侦听。
    ```HTML
     <div id="app">
-        <!-- 双向绑定v-model 单项v-bind:value="username"-->
+            <!-- 双向绑定v-model 单项v-bind:value="username"-->
         <input type="text" v-model="username"/>
         <input type="text" v-model="info.username"/>
     </div>
@@ -456,31 +456,31 @@
             info:{ username:''},
         }, 
         watch: {
-            //方法格式
-            //监听username值的变化
-            //newVal 是'变化后的新值'，oldVal是'变化之前的旧值'
+                //方法格式
+                //监听username值的变化
+                //newVal 是'变化后的新值'，oldVal是'变化之前的旧值'
             username(newVal,oldVal){
                 console.log(newVal,oldVal)
             }，
-            //侦听器处理函数，对象形式
+                //侦听器处理函数，对象形式
             username：{
                 handler:function(newVal,oldVal){
                     console.log(newVal,oldVal)
                 },
-                immediate:true //进入页面立即触发，默认false
+                immediate:true //进入页面立即触发handler函数，默认false
             },
-            /*方法格式不会触发*/
+                /*方法格式不会触发*/
             info(newVal){
                 console.log(newVal)
             }，
-            //对象格式可以触发
+                //对象格式可以触发
             info: {
                 handler(newVal){
                 console.log(newVal)
                 },
                 deep:true //开启深度监听，只要对象中任何一个属性变化，都会触发对象侦听器
             }
-            //如果要监听的是对象的子属性，则必须包裹一层单引号
+                //如果要监听的是对象的子属性，则必须包裹一层单引号
             'info.username'(newVal){ console.log(newVal) }
         }
         })
@@ -493,25 +493,84 @@
 8. `axios`是一个专注网络请求的库。
    1. axios在请求得到数据之后，在真正的数据之外，套了一层壳。
    2. axios实际返回了：{config:{}, data{<strong>真实数据</strong>}, headers:{}, status:xxx, statusText:''}
+   3. 如果调用某个方法的返回值是`Promise`实例，则前面可以加`await`。
     ```JS
-    //基本语法一
+        //基本语法一
     const result = axios({
         method:'请求类型',
         url:'请求的URL地址'
     })
-    //基本语法二
+        //基本语法二
     axios({
         method:'请求类型',
         url:'请求的URL地址',
-        params:{}, //可选，URL中查询的参数
+        params:{}, //可选，URL中查询的参数 如{ id: 1 }查询id为1的
         data:{}, //可选，请求体参数，GET没有请求体
     }).then((result)=>{
         //.then用来指定请求成功之后的回调函数
         //形参中的result是请求成功之后的结果
     })
+        //基本语法三, await只能在被async修饰的方法中，如反调函数..('clic',async function(){ await axios({...})})
+    await axios({
+        method:'请求类型',
+        url:'请求的URL地址'
+    })
     ```
 
-9.  console输入Vue.config查看vue配置。
+9. 单页面程序：Single Page Application。只有一个HTML页面。
+10. Vue-cli：基于webpack创建工程化Vue项目；省去配置问题。
+    1.  安装vue-cli命令：`npm install -g @vue/cli`； `-g`全局安装。
+    2.  查看当前vue-cli版本：`vue -V`
+    3.  创建项目：`vue create demo`
+        1.  创建步骤个别提示：选择CSS-precessor的CSS预处理器。后面选择Less。
+        2.  Babel（ES6兼容）配置项使用各自的config files。
+    4.  vue目录src构成：
+        1.  assets：文件夹，存放项目中静态资源文件，如CSS、图片。
+        2.  components：文件夹，封装的、可以重复使用的vue组件。
+        3.  main.js：项目的入口文件，整个项目运行，先执行main.js。
+        4.  App.vue：项目的根组件。
+    5.  vue项目运行流程：vue通过`src/main.js`把`src/App.vue`渲染到`public/index.html`指定的区域中。
+        1.  main.js：末尾$mount('#app')可以复用，比如`vm.\$mount('#app')`
+    ```JS
+    //---main.js---
+        //导入vue包，得到Vue构造函数
+    import Vue from 'vue'
+        //导入App.vue根组件，将来要把App.vue中的模板，渲染到HTML页面中
+    import App from './App.vue'
+
+    Vue.config.productionTip = false
+
+        //创建Vue实例
+    new Vue({
+        // el:'#app',  => 相当于末尾的.$mount('#app') ; 二选一
+            //把render函数指定的组件，渲染到HTMl页面中
+        render: h => h(App), //render把App替换到index.html中#app的内容
+    }).$mount('#app')
+    ```
+
+11. 组件，vue组件的三个组成部分，组件中的data不能是对象`data:{}`，必须函数`data(){}`，且必须`return{}`出去。
+    1.  `<template>`：组件的模板结构，DOM标签
+        1.  只能出现一个`div`根节点
+    2.  `<script>`：组件的JS行为
+        1.  默认导出：`export default{}`；固定写法。
+        2.  export default{}：可以放入如data数据源`export default{ data(){ return{ username:'zs'}} }`
+    3.  `<style>`：组件的样式。
+        1.  默认使用CSS语法，`<style lang="less">`使用less语法。
+    4.  在组件中的`this`是当前组件的实例对象。如`console.log(this)`
+    5.  打开VSCode终端：<strong>ctrl+`</strong>。
+
+
+12. 组件之间的父子关系。准备：src/App.vue、src/components/(Left.vue & Right.vue)。
+    1.  使用import语法在script导入需要的组件(@在webpack.config.hs的resolve里配置路径，此处默认配置好)
+        1.  `import Left from '@/components/Left.vue'`
+    2.  使用components节点在script注册组件
+        1.  `export default{ components:{ Left } }`
+    3.  以标签形式在template使用注册的组件(父子组件注册完成)
+        1.  `<Left></Left>`
+
+
+
+13. console输入Vue.config查看vue配置。
    ```HTML
     <div id="app">
         

@@ -11,11 +11,55 @@
 <body>
     <div id="app">
 
-
-
+        <button id="btnPost">发起Post请求</button>
 
     </div>
 
+
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+
+    <script>
+        //方法一
+        document.querySelector('#btnPost').addEventListener('click', function() {
+                axios({
+                    method: 'POST',
+                    url: 'http://www.liulongbin.top:3006/api/post',
+                    data: {
+                        name: 'zs',
+                        age: 20
+                    }
+                }).then(function(result) {
+                    console.log(result)
+                })
+            })
+            //方法二
+        document.querySelector('#btnPost').addEventListener('click', async function() {
+                const result = await axios({ //await与async -> Promise
+                    method: 'POST',
+                    url: 'http://www.liulongbin.top:3006/api/post',
+                    data: {
+                        name: 'zs',
+                        age: 20
+                    }
+                })
+            })
+            //方法三
+            /*1.调用axios之后，使用async/await进行简化
+             2.使用解构赋值，从axios解封的大对象中把dta属性解构出来
+             3.把结构出来的data属性使用冒号 进行重命名，一般重命名为{data:res}
+            */
+        document.querySelector('#btnPost').addEventListener('click', async function() {
+            const { //解构赋值的时候，使用冒号‘：’进行重命名，否则api返回数据返回data与axios重名‘data.data’
+                data: res
+            } = await axios({ //await与async -> Promise
+                method: 'GET',
+                url: 'https://www.escook.cn/api/finduser/',
+            })
+        })
+        console.log(res.data) //真正数据
+    </script>
 
     <!-- 开发环境版本，包含了有帮助的命令行警告 -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
