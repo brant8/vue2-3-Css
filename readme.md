@@ -567,10 +567,93 @@
         1.  `export default{ components:{ Left } }`
     3.  以标签形式在template使用注册的组件(父子组件注册完成)
         1.  `<Left></Left>`
+    4.  扩展：VSCode路径快速提示插件Path Autocomplete。[配置视频](https://www.bilibili.com/video/BV1zq4y1p7ga?p=93&spm_id_from=pageDriver)
+    5.  扩展2：快速生成vue模板插件：Vue 3 Snippets + Vuter。
+    6.  通过`components`注册的是<strong>私有子组件</strong>。
+    7.  注册<strong>全局组件</strong>。在`main.js`操作。
+        1.  步骤1：导入需要注册的组件
+            1.  `import Count from '@/components/Count.vue'`
+        2.  步骤2：通过Vue.components()方法注册组件。
+            1.  `Vue.component('MyCount', count)`
+            2.  注：参数1字符串格式，表示注册名称；参数2，需要全局注册的组件。
 
+13. 组件props，自定义属性，在封装通用组件的时候，合理的使用props极大的提高组件的复用性。
+    1.  比如不同组件复用同一个组件允许其设置不同初始值。
+    2.  全局组件设置为例，语法格式(以count为例数字加1)
+        ```JS
+        export default{
+                //组件的自定义属性，允许使用者为当前属性初始值。
+                //方式一：
+                //props:['自定义属性A','自定义属性B','自定义属性C'..],
+            props:['init'], //1.允许组件设置设置初始值
+                //方式二：
+            props: {
+                init: { //用default属性定义自定义init属性的默认值
+                    default: 0,
+                    type:Number, //可选，设置属性值类型，否则报错
+                    required: true, //可选，让用户强制填写数值，与默认值无关
+                }
+            }    
+                //组建的私有数据
+            data(){
+                return{
+                    //count: 0, //2. 默认初始值为0
+                    count: this.init, //2.因为init不能直接修改，可以赋值给count
+                }
+            }，
+            methods: {
+                add(){
+                    this.count= this.count +1
+                }
+            },
+        }
+        ``` 
+    3. 在组件使用该全局组件的template内设置：`<MyCount :init="9"></MyCount>`，设置初始值为9。
+       1. 使用`v-bind:init="9"`：<strong>表现为v-bind等号右边的内容为JS表达式。相当于"JS表达式"，若是字符串则:init="'9'"</strong>。或者直接init=9。
+    4. props中的数据，可以直接在模板结构中被使用。<strong>props是'只读'的</strong>，程序员不能直接修改props值。可通过赋值给data(){}数据源间接修改。
+    5. 可使用`default`来设置默认值。
 
+14. 组件样式的冲突问题：默认情况下，写在.vue组件中的样式会全局生效，造成多个组件之间的样式冲突。
+    1.  原因：
+        1.  一：单页面应用，所有组件的DOM结构都是基于唯一index.html页面呈现。
+        2.  二：每个组件中的样式，都会影响整个index.html页面中的DOM元素。
+    2.  扩展：`<h2 v-data-001>`中的h2为标签，v-data-001为自定义属性，如class。CSS样式写法：`h2[v-data-001]{。。}`
+    3.  解决冲突问题：在组件中的`<style>`添加`scoped`；如`<style lang="less" scoped>`
+    4.  当引用组件时，如Left.vue使用Count.vue组件，在Left.vue添加了scoped设置样式去影响Count.vue内容，无法影响到Count.vue下的样式(默认全局可以影响)。
+        1.  使用`/deep/`在Left.vue设置样式。如`/deep/ h5{...}`
+        2.  使用场景：使用第三方组件库修改<strong>默认</strong>样式的时候要用到`/deed/`
 
-13. console输入Vue.config查看vue配置。
+15. package.json中devDependencies下的vue-template-complier负责把vue组件转成js解析到浏览器HTML页面中。
+
+16. 组件生命周期及组件之间的数据共享。
+    1.  生命周期：创建->运行->销毁 的整个阶段。
+    2.  创建：new Vue() -> beforeCreate -> created(存在于内存) -> beforeMount(准备渲染到浏览器) -> mounted 
+    3.  运行：beforeUpdate -> updated
+    4.  销毁：beforeDestroy -> destroyed
+    5.  大致路线：：webpack打包-> main.js发现-> App.vue发现其他组件-> Left.vue/Right.vue ..-> 编译纯JS代码（chunk-vendors.js + app.js-> 放入index.html
+    6.  生命周期详细说明：[官网原图](https://v2.vuejs.org/v2/guide/instance.html?redirect=true)
+        1.  'new Vue()' - 创建组件的实例对象
+        2.  'init Events & Lifecycle' - 初始化事件和生命周期
+        3. `(beforeCreate)` - 组件的`props/data/methods`尚未被创建，<strong>处于不可用状态</strong>
+        4.  'Init injections & reactivit'y - 初始化`props、data、methods`
+        5.  `(created)` - 组件的`props/data/methods`已创建好，都<strong>处于可用</strong>的状态。但是组件的模板结构尚未生成 -> 不能操作DOM。<strong>此处一般用于Ajax请求拿数据（页面打开时显示）</strong>，调用methods方法并转存到data中给模板渲染使用。
+        6.  'el options / vm.$mount(el)' -> 有无'template'选项。
+        7.  'compile template into render function(有模板) / compile el's outerHTML as template(无模板)' - 基于数据和模板，在内存中编译生成HTML结构。vue-template-complier包 进行编译。
+        8.  `(beforeMount)`：将要把内存中编译好的HTML结构渲染到浏览器中。此时浏览器中还没有当前组件的DOM结构。（很少用到）
+        9.  'create vm.$el & replace el with it'：用内存中编译生成的HTML结构，替换掉el属性指定的DOM元素。`this.\$el`。渲染出DOM结构。
+        10. `mounted`：已经把内存中的HTML结构，成功渲染到浏览器中。此时浏览器已然包含了当前组件的DOM结构。要操作当前的DOM，最早只能在mounted阶段执行。
+        11. 创建👆（每次执行一次）  -  运行👇（可以执行0次~N次）
+        12. `(beforeUpdate)`：<- 数据变化触发。将包根据变化过后、最新的数据，重新渲染组件的模板结构。第一次拿到数据(刷新、加载页面)自动触发一次。data数据最新如`this.message`，DOM仍是旧的（页面仍是旧数据）如`document.querySelector('#message').innerHTML`。
+        13. 'Vvrtual DOM re-render & patch'：根据最新的数据，重新渲染组件的DOM结构。
+        14. `(updated)`：已经根据最新的数据，完成了组件DOM结构的重新渲染。
+        15. 销毁👇(执行一次)
+        16. 'vm.$destroy()' is called
+        17. `(beforeDestroy)`：将要销毁此组件，此时尚未销毁，组件还处于正常工作的状态
+        18. 'teardown watchers,child components and event listners'：销毁当前组件的数据侦听器、子组件、事件监听。可用v-if在组件标签中取反测试。
+        19. `(destroyed)`：组件已被销毁，此组件在浏览器中对应的DOM结构已被完全移除。
+        
+
+17. console输入Vue.config查看vue配置。
    ```HTML
     <div id="app">
         
