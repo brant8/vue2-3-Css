@@ -1,7 +1,7 @@
 ### 学习Vue2 [其他笔记链接](https://github.com/brant8/Vue2Study)
 1. webpack前端工程化具体解决方案：模块化开发，代码压缩混淆，处理浏览器端JS兼容性如ES6等。
    1. webpack基本使用：
-      1. 在新建空白目录下运行：`$ npm init -y`
+      1. 在新建空白目录下运行：`$ npm init -y`;（`npm i`在复制public和src等其他目录结构，没有node_modules时运行，i代表install）
       2. 步骤一命令会初始化管理配置文件`package.json`
       3. 新建src源代码目录：`src->index.html`和`src->index.js`
       4. 安装jQuery：`$ npm install jquery -S`或`$ npm nstall jquery --save`命令, `-S/--save`记录到.json下的`dependencies`。webpack生成后会用到。
@@ -165,7 +165,7 @@
         },
     ]
    ``` 
-   8. 自动清理dist目录下的旧文件插件。
+   1. 自动清理dist目录下的旧文件插件。
       1. 安装命令`npm install clean-webpack-plugin@3.0.0 -D`
       2. 导入插件得到插件的构造函数后创建插件实例对象
          1. `const { CleanWebpackPlugin } = require('clean-webpack-plugin)`
@@ -174,12 +174,12 @@
          2. `const cleanPlugin = new CleanWebpackPlugin()`
       3. 把创建的cleanPlugin插件实例对象挂在到plugins节点中
          1. `plugins:[htmlPlugin, cleanPlugin]`
-   9. SourceMap：信息文件，让其原文件代码行的位置转换对应的压缩后的代码行，方便纠错。
+   2. SourceMap：信息文件，让其原文件代码行的位置转换对应的压缩后的代码行，方便纠错。
       1.  webpack.config.js中开启：`devtool: 'eval-source-map'`（开发环境时可用）
       2.  devtool与mode同级，开发环境可以开启，生产环境推荐关闭提高安全性。
       3.  只定位行数不暴露源码：`devtool: 'nosources-source-map'`
       4.  暴露行数与代码：`devtool: 'source-map'`（开发环境时可用）
-   10. 使用@表示src源代码目录。如`@/msg.js`表示src/msg.js。
+   3.  使用@表示src源代码目录。如`@/msg.js`表示src/msg.js。
        1.  webpack.config配置
        ```JS
        resolve:{ //与mode平级
@@ -250,7 +250,7 @@
             })
         </script>
         ``` 
-    3. 属性绑定指令`v-bind`。单向动态绑定,可简写如`:placeholder`。
+    1. 属性绑定指令`v-bind`。单向动态绑定,可简写如`:placeholder`。
        1. 支持运算
         ```HTML
         <div id="app">
@@ -268,8 +268,8 @@
             })
         </script>
         ```  
-    4. 事件绑定`v-on`。辅助程序员DOM元素绑定事件监听。可以简写成如`@click`
-       1. 常用参数：click | input | keyup
+    2. 事件绑定`v-on`。辅助程序员DOM元素绑定事件监听。可以简写成如`@click`
+       1. 常用参数：click | input | keyup | blur
        2. 事件绑定`$event`：不传参时，默认传入到方法有个`e`对象。如`add(e)`。
        3. 可以在方法内`方法(e)`查看`console.log(e)`，触发对象`target:xxx`。或者在HTML里传入`$event`
        4. 其他扩展：`$event.preventDefault()`&`@click`阻止点击跳转；Vue写法`@click.prevent="方法"`。
@@ -277,6 +277,7 @@
           1. `prevent`（阻止默认行为）等同于JS的event.preventDefault()；
           2. `stop`（阻止事件冒泡,类似嵌套）等同于event.stopPropagation()。
           3. `@submit.prevent=""`常用于表单提交后的默认行为(<strong>提交表单会刷新页面</strong>)。
+       6. `@click="show"`与`@click="show(传参)"`以及`@click="show(3,$event)`防止e传参被覆盖。
         ```HTML
         <div id="app">
             {{ Count }}
@@ -324,7 +325,7 @@
             <!-- 只有在key时Esc时调用clearInput() -->
         <input @keyup.esc="clearInput">
         ``` 
-    5. 双向绑定指令`v-model`。只有表单元素使用v-model才有意义，实现交互，否则普通div显示数据无交互意义。
+    3. 双向绑定指令`v-model`。只有表单元素使用v-model才有意义，实现交互，否则普通div显示数据无交互意义。
        1. 表单元素：input、textarea、select
        2. v-model修饰符： 
           1. `.number` ：输入值自动转为数值类型
@@ -347,7 +348,7 @@
             })
         </script>
     ```  
-    6. 条件渲染指令：
+    1. 条件渲染指令：
        1. `v-if`：隐藏数据时HTML不显示任何内容，移除。
        2. `v-show`：隐藏时v-show实际为`display:none`；频繁切换显示状态时使用。
        3. `v-else-if` | `v-else`：需要与v-if使用。
@@ -366,7 +367,7 @@
             })
         </script>
     ```   
-    7. 列表渲染指令：`v-for`，基于一个数组来循环渲染一个列表结构。常使用`item in items`结构。
+    1. 列表渲染指令：`v-for`，基于一个数组来循环渲染一个列表结构。常使用`item in items`结构。
        1. 支持可选第二个参数，即当前项的索引。`(item,index) in items`
        2. 官方建议，使用v-for，最好绑定一个`:key`属性，并且把id作为key值，可以提升性能，防止列表状态紊乱。
        3. 实际开发vue组件（xx.vue），若没有`:key`属性终端console会报错。key值不能重复。key值只能是字符串或数字类型。
@@ -487,8 +488,9 @@
     </script>
    ```
 7. 计算属性`computed`：定义计算属性的时候要定义成“方法格式”。
-   1. 代码可复用
-   2. 计算属性有缓存，只会计算一次。
+   1. 代码可复用：在template模板结构中可以使用，也可以在methods中使用，this.计算属性。
+   2. 只要任何一个依赖的数据项发生了变化，计算属性就会重新求值
+   3. 要return一个计算结果
 
 8. `axios`是一个专注网络请求的库。
    1. axios在请求得到数据之后，在真正的数据之外，套了一层壳。
@@ -518,6 +520,7 @@
     ```
 
 9. 单页面程序：Single Page Application。只有一个HTML页面。
+    
 10. Vue-cli：基于webpack创建工程化Vue项目；省去配置问题。
     1.  安装vue-cli命令：`npm install -g @vue/cli`； `-g`全局安装。
     2.  查看当前vue-cli版本：`vue -V`
@@ -560,11 +563,20 @@
     5.  打开VSCode终端：<strong>ctrl+`</strong>。
 
 
-12. 组件之间的父子关系。准备：src/App.vue、src/components/(Left.vue & Right.vue)。
+12. 组件之间的父子关系。准备：src/App.vue、src/components/(Left.vue & Right.vue)。注册组件流程：
     1.  使用import语法在script导入需要的组件(@在webpack.config.hs的resolve里配置路径，此处默认配置好)
-        1.  `import Left from '@/components/Left.vue'`
+        ```JS
+        import Left from '@/components/Left.vue'
+        ```
     2.  使用components节点在script注册组件
-        1.  `export default{ components:{ Left } }`
+        ```JS
+        export default{
+            ... 
+            components:{ 
+                Left 
+            } 
+        }
+        ```
     3.  以标签形式在template使用注册的组件(父子组件注册完成)
         1.  `<Left></Left>`
     4.  扩展：VSCode路径快速提示插件Path Autocomplete。[配置视频](https://www.bilibili.com/video/BV1zq4y1p7ga?p=93&spm_id_from=pageDriver)
@@ -632,28 +644,175 @@
     4.  销毁：beforeDestroy -> destroyed
     5.  大致路线：：webpack打包-> main.js发现-> App.vue发现其他组件-> Left.vue/Right.vue ..-> 编译纯JS代码（chunk-vendors.js + app.js-> 放入index.html
     6.  生命周期详细说明：[官网原图](https://v2.vuejs.org/v2/guide/instance.html?redirect=true)
-        1.  'new Vue()' - 创建组件的实例对象
-        2.  'init Events & Lifecycle' - 初始化事件和生命周期
-        3. `(beforeCreate)` - 组件的`props/data/methods`尚未被创建，<strong>处于不可用状态</strong>
-        4.  'Init injections & reactivit'y - 初始化`props、data、methods`
-        5.  `(created)` - 组件的`props/data/methods`已创建好，都<strong>处于可用</strong>的状态。但是组件的模板结构尚未生成 -> 不能操作DOM。<strong>此处一般用于Ajax请求拿数据（页面打开时显示）</strong>，调用methods方法并转存到data中给模板渲染使用。
-        6.  'el options / vm.$mount(el)' -> 有无'template'选项。
-        7.  'compile template into render function(有模板) / compile el's outerHTML as template(无模板)' - 基于数据和模板，在内存中编译生成HTML结构。vue-template-complier包 进行编译。
-        8.  `(beforeMount)`：将要把内存中编译好的HTML结构渲染到浏览器中。此时浏览器中还没有当前组件的DOM结构。（很少用到）
-        9.  'create vm.$el & replace el with it'：用内存中编译生成的HTML结构，替换掉el属性指定的DOM元素。`this.\$el`。渲染出DOM结构。
-        10. `mounted`：已经把内存中的HTML结构，成功渲染到浏览器中。此时浏览器已然包含了当前组件的DOM结构。要操作当前的DOM，最早只能在mounted阶段执行。
-        11. 创建👆（每次执行一次）  -  运行👇（可以执行0次~N次）
-        12. `(beforeUpdate)`：<- 数据变化触发。将包根据变化过后、最新的数据，重新渲染组件的模板结构。第一次拿到数据(刷新、加载页面)自动触发一次。data数据最新如`this.message`，DOM仍是旧的（页面仍是旧数据）如`document.querySelector('#message').innerHTML`。
-        13. 'Vvrtual DOM re-render & patch'：根据最新的数据，重新渲染组件的DOM结构。
-        14. `(updated)`：已经根据最新的数据，完成了组件DOM结构的重新渲染。
-        15. 销毁👇(执行一次)
-        16. 'vm.$destroy()' is called
-        17. `(beforeDestroy)`：将要销毁此组件，此时尚未销毁，组件还处于正常工作的状态
-        18. 'teardown watchers,child components and event listners'：销毁当前组件的数据侦听器、子组件、事件监听。可用v-if在组件标签中取反测试。
-        19. `(destroyed)`：组件已被销毁，此组件在浏览器中对应的DOM结构已被完全移除。
+        1.  创建👇（每次执行一次）
+        2.  'new Vue()' - 创建组件的实例对象
+        3.  'init Events & Lifecycle' - 初始化事件和生命周期
+        4. `(beforeCreate)` - 组件的`props/data/methods`尚未被创建，<strong>处于不可用状态</strong>
+        5.  'Init injections & reactivit'y - 初始化`props、data、methods`
+        6.  `(created)` - 组件的`props/data/methods`已创建好，都<strong>处于可用</strong>的状态。但是组件的模板结构尚未生成 -> 不能操作DOM。<strong>此处一般用于Ajax请求拿数据（页面打开时显示）</strong>，调用methods方法并转存到data中给模板渲染使用。
+        7.  'el options / vm.$mount(el)' -> 有无'template'选项。
+        8.  'compile template into render function(有模板) / compile el's outerHTML as template(无模板)' - 基于数据和模板，在内存中编译生成HTML结构。vue-template-complier包 进行编译。
+        9.  `(beforeMount)`：将要把内存中编译好的HTML结构渲染到浏览器中。此时浏览器中还没有当前组件的DOM结构。（很少用到）
+        10. 'create vm.$el & replace el with it'：用内存中编译生成的HTML结构，替换掉el属性指定的DOM元素。`this.$el`。渲染出DOM结构。
+        11. `mounted`：已经把内存中的HTML结构，成功渲染到浏览器中。此时浏览器已然包含了当前组件的DOM结构。要操作当前的DOM，最早只能在mounted阶段执行。
+        12. 运行👇（可以执行0次~N次）
+        13. `(beforeUpdate)`：<- 数据变化触发。将包根据变化过后、最新的数据，重新渲染组件的模板结构。第一次拿到数据(刷新、加载页面)自动触发一次。data数据最新如`this.message`，DOM仍是旧的（页面仍是旧数据）如`document.querySelector('#message').innerHTML`。
+        14. 'Vvrtual DOM re-render & patch'：根据最新的数据，重新渲染组件的DOM结构。
+        15. `(updated)`：已经根据最新的数据，完成了组件DOM结构的重新渲染。
+        16. 销毁👇(执行一次)
+        17. 'vm.$destroy()' is called
+        18. `(beforeDestroy)`：将要销毁此组件，此时尚未销毁，组件还处于正常工作的状态
+        19. 'teardown watchers,child components and event listners'：销毁当前组件的数据侦听器、子组件、事件监听。可用v-if在组件标签中取反测试。
+        20. `(destroyed)`：组件已被销毁，此组件在浏览器中对应的DOM结构已被完全移除。
         
 
-17. console输入Vue.config查看vue配置。
+17. 组件数据共享：父子关系、兄弟关系。
+    1. 父组件向子组件共享数据需要使用自定义属性。子：通过`props`来自定义属性。父：数据通过`v-bind:`绑定给子组件。
+    ```JS
+    //父组件  - 父把userinfo的引用（地址）传给user,message直接传值给msg
+    <son :msg="message" :user="userinfo"></son>
+    data(){
+        return{
+            message:'hello vue',
+            userinfo:{ name: 'zs', age: '20'}
+        }
+    }
+    //子组件
+    <template>
+        <div>
+            <p>父组件传递过来的msg时：{{ msg }}</p>
+            <p>父组件传递过来的msg时：{{ user }}</p>
+        </div>
+    </template>
+
+    props:['msg','user']
+    //子组件通过props的userinfo接收父组件传递过来的引用，地址指向父组件的user。
+    //message字符串直接传值给msg
+    ``` 
+    1. 子向父组件传递数据需要在父组件使用自定义事件。子：通过`$emit()`触发自定义事件；参数1·字符串，表示自定义事件名称；参数2·值，要发送给父的数据。父：通过`v-on`来绑定自定义事件，并提供一个处理函数。
+    ```JS
+    //子组件    -> template的button加1
+    data(){
+        return{
+            count: 0, //子组件把count值传给父组件
+        }
+    },
+    methods:{
+        add(){
+            this.count += 1
+            //步骤三，修改数据的同时，通过$emit()触发自定义事件，向父组件发送数据
+            this.$emit('numChange', this.count) 
+        }
+    }
+    //父组件
+    <son @numChange="getNewCount"></son> //步骤一
+
+    data(){
+        return{
+            countFromSon: 0, //定义来接收子组件传递过来的值
+        }
+    },
+    methods:{
+        getNewCount(val){  //步骤二，自定义事件
+            this.countFromSon = val
+        }
+    }
+     ```
+    1. 兄弟组件之间的数据共享：vue2.x中使用EventBus(eventBus.js)。
+       1. 步骤一：创建`eventBus.js`模块，并向外共享一个Vue的实例对象
+       2. 步骤二：在数据发送方，调用`bus.$emit('事件名称'，要发送的数据)`方法触发自定义事件
+       3. 步骤三：在数据接收方，调用`bus.$on('事件名称'，事件处理函数)`方法注册一个自定义事件
+    ```JS
+    //组件A 数据发送方
+    <button @receiveMsg="sendMsg">发送</button>
+        ..
+    import bus from './eventBus.js'
+        ..
+    data(){
+        return{
+            msg: 'hello, this is sender.'
+        }
+    },
+    methods:{
+        sendMsg(){
+            bus.$emit('share',this.msg)
+        }
+    }
+
+    //组件B 数据接收方 //在components下创建
+    import bus from './eventBus.js' 
+        ..
+    data(){
+        return{
+            msgFromA:'',
+        }
+    },
+    //created考虑到生命周期
+    created(){ //类似jQuery使用$('.btn').on('click',Fn)通过on绑定事件
+        bus.$on('share',val=>{      //此处share形参，不放在方法下面
+            this.msgFromLeft = val
+        })
+        
+    }
+
+    //创建eventBus.js模块
+    import Vue from 'vue'
+    //向外共享Vue的实例对象->new Vue()
+    export default new Vue()
+    ``` 
+
+18. jQuery简化了操作DOM的过程。vue在MVVM中，不需要操作DOM。秩序维护数据（数据驱动视图）。因此在vue中不推荐安装和使用jQuery。
+    1.  `ref`用来辅助在不依赖于jQuery的情况下，获取DOM元素或组件的引用。
+    2.  每个vue组件实例都包含一个`$refs`对象，里面存储着对应的DOM元素或组件的引用。
+    3.  默认情况下，组件的`$refs`指向一个空对象。
+    4.  `methods:{ showThis(){ console.log(this) } }`；显示当前组件的vue实例对象。
+    ```JS
+    <h1 ref="myh1">APP组件</h1> //$refs从空变为 -> $refs: myh1:h1
+    <button @click="showThis">打印this</this>
+
+    methods:{ 
+        showThis(){ 
+            console.log(this)           //自身vue实例
+            console.log(this.$refs.myh12) //DOM输出：<h1>APP组件</h1>
+            this.$refs.myh12.style.color = 'red' //改变DOM颜色
+            } 
+    }
+    ```
+    5. 使用`ref`引用组件实例
+       1. 获取实例时出错需考虑声明周期。
+       2. 比如：获取不到`ref`因为数据已更新但是DOM没有更新则获取不到`ref`。
+       3. `this.$nextTick(callbackFn)`：延期执行；把callback回调推迟到下一个DOM更新周期之后执行。即当渲染完毕DOM以后再执行的函数，保证callback可以操作到最新的DOM元素。
+       4. 一般使用箭头函数`this.$nextTick( ()=>{ 执行逻辑 } )`
+       5. 若使用`updated(){}`，数据更新后可能状态不一样，比如DOM隐藏而获取不到DOM了。
+    ```JS
+    <A ref="counterRef"></A> //用ref属性，为组件A添加引用名称
+    <button @click="getRef">获取 $refs 引用</button>
+        ...
+    methods:{
+        getRef(){
+            console.log(this.$refs.counterRef) //通过this.$refs.引用名称，可以引用组件A的实例
+            this.$refs.counterRef.add() //引用到组件A的实例之后，可以调用组件上的methods方法。
+        }
+    }
+    ``` 
+       6. 扩展JS：数组中的方法 - some循环。
+          1. 找到对应项之后，可以通过return true固定语法种植 some 循环
+          2. 普通数组arr：`arr.some( (item,index)=>{ if(item === 'b'){ return true } } )`
+       7. 扩展JS：数组中的方法 - every循环
+          1. 判断数组中，水果状态是否一致（实际操作判断是否选中的全部都是水果）
+          2. 数组对象arr(对象里有status:true)：`const result = arr.every( item=>item.state )`
+       8. 扩展JS：数组中的方法 - reduce基本用法
+          1. 把购物车数组中，已勾选的水果，总价累加起来
+          2. 数组对象arr(做法一)：
+             1. 先过滤选中内容：`arr.filter( item=> item.state).forEach(..)`
+             2. forEach中循环：`.forEach( item=>{ total += item.price * item.count } )`；total要在循环外预先定义。
+          3. 使用reduce（做法二）：
+             1.  先过滤选中内容：`arr.filter( item=> item.state).reduce(..)`
+             2.  reduce中循环
+                 1.  语法：reduce( (累加结果,当前循环项)=>{}, 初始值)；一般情况 初始值：0 = 累加结果；若要累加结果，一般要{return 累加结果}让其在循环中一次次累加。
+                 2.  写法：`const result= .reduce( (total,item)=>{ return total+= item.price*item.count}， 0)`; total经过内部累加后最后一次循环reduce把值赋给result。
+
+19. console输入Vue.config查看vue配置。
    ```HTML
     <div id="app">
         
