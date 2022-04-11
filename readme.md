@@ -796,7 +796,7 @@
     }
     ``` 
        6. 扩展JS：数组中的方法 - some循环。
-          1. 找到对应项之后，可以通过return true固定语法种植 some 循环
+          1. 找到对应项之后'item===b'，可以通过return true固定语法终止 some 循环
           2. 普通数组arr：`arr.some( (item,index)=>{ if(item === 'b'){ return true } } )`
        7. 扩展JS：数组中的方法 - every循环
           1. 判断数组中，水果状态是否一致（实际操作判断是否选中的全部都是水果）
@@ -812,7 +812,29 @@
                  1.  语法：reduce( (累加结果,当前循环项)=>{}, 初始值)；一般情况 初始值：0 = 累加结果；若要累加结果，一般要{return 累加结果}让其在循环中一次次累加。
                  2.  写法：`const result= .reduce( (total,item)=>{ return total+= item.price*item.count}， 0)`; total经过内部累加后最后一次循环reduce把值赋给result。
 
-19. console输入Vue.config查看vue配置。
+19. 购物车案例
+    1.  知识扩展：APP组件使用子组件Goods循环，APP需要向Goods分享数据
+        1.  方法一：父组件在`<Goods>`使用:`:title="item.goods_name"`,`:pic="item.goods_img"`绑定子组件的接收传递`props:{ title , pic }`等
+        2.  方法二：父组件传递整个对象到子组件`:goods="item"`, 子组件通过对象形式接收数据`props:{ goods:{ type:Object, default:{} }}`
+        3.  对比方法，若普通商品列表'item.goods_title','item.goods_price'和促销商品列表'item.onsale_title','item.onsale_price'均传入Goods，Goods需要区别'goods.goods_title'和'goods.onsale_title'，造成子组件接收繁琐，非通用性。
+    2.  商品勾选状态
+        1.  查看，通过Vue插件在浏览器的`<Root>`查看商品列表，对数据的勾选状态`state:true`进行变更`state:false`会实时反馈到浏览器界面
+        2.  通过浏览器对商品勾选框进行'勾选'和'取消勾选'，可以观察到浏览器数据并没有变更。此时不能用`v-model`，因为此时的`state`为`props`。
+        3.  使用自定义事件，通过子组件状态变更同步到父组件数据状态。`this.$emit（'state-change',{id, value}）`子传父。
+        4.  子组件监听复选框状态变化，拿到最新的勾选状态`<input type="checkbox" @change="stateChange" />`，复选框变化则会自动触发change事件。
+        5.  父组件：`<Goods @state-change="getNewState"></Goods>` & `methods:{ getNewState(e){ .. } }`,`e`为该触发对象`this.$emit(传递对象值e）`
+            1.  "console.log(this.$emit)"输出： ‘ƒ (...args) {  const res = original.apply(this, args);   logEvent(this, method, args[0], args.slice(1));   return res; }’
+            2.  `console.log(e)`输出：Event..等所需内容； 比如获得勾选状态：‘const newState = e.target.checked  console.log(newState)’
+            3.  `console.log(this)`：获得当前Vue组件VueComponent{。。。}
+        6.  父组件在methods接收数据注意：`newStateChange(val){...}`，若要从子组件传递更新数据到父组件，需要形参val来接收数据。
+    3.  CSS补充笔记 , [链接参考](https://codepen.io/tianzi77/pen/aOrBdb)： 
+    ```CSS
+      html, body {
+        height: 100%; /*让页面撑满窗口*/
+      }
+    ```    
+20. 
+21. console输入Vue.config查看vue配置。
    ```HTML
     <div id="app">
         
