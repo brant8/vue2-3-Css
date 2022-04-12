@@ -798,6 +798,7 @@
        6. 扩展JS：数组中的方法 - some循环。
           1. 找到对应项之后'item===b'，可以通过return true固定语法终止 some 循环
           2. 普通数组arr：`arr.some( (item,index)=>{ if(item === 'b'){ return true } } )`
+          3. 案例场景：用于搜索当前数组数据更新项，确定后即可推出循环。
        7. 扩展JS：数组中的方法 - every循环
           1. 判断数组中，水果状态是否一致（实际操作判断是否选中的全部都是水果）
           2. 数组对象arr(对象里有status:true)：`const result = arr.every( item=>item.state )`
@@ -805,12 +806,12 @@
           1. 把购物车数组中，已勾选的水果，总价累加起来
           2. 数组对象arr(做法一)：
              1. 先过滤选中内容：`arr.filter( item=> item.state).forEach(..)`
-             2. forEach中循环：`.forEach( item=>{ total += item.price * item.count } )`；total要在循环外预先定义。
+             2. forEach中循环每一项：`.forEach( item=>{ total += item.price * item.count } )`；total要在循环外预先定义。
           3. 使用reduce（做法二）：
              1.  先过滤选中内容：`arr.filter( item=> item.state).reduce(..)`
              2.  reduce中循环
                  1.  语法：reduce( (累加结果,当前循环项)=>{}, 初始值)；一般情况 初始值：0 = 累加结果；若要累加结果，一般要{return 累加结果}让其在循环中一次次累加。
-                 2.  写法：`const result= .reduce( (total,item)=>{ return total+= item.price*item.count}， 0)`; total经过内部累加后最后一次循环reduce把值赋给result。
+                 2.  写法：`const result= .reduce( (total,item)=>{ return total+= item.price*item.count}， 0)`; total经过内部累加后最后一次循环有个<strong>return</strong>把结果传给reduce再值赋给result。
 
 19. 购物车案例
     1.  知识扩展：APP组件使用子组件Goods循环，APP需要向Goods分享数据
@@ -820,6 +821,7 @@
     2.  商品勾选状态
         1.  查看，通过Vue插件在浏览器的`<Root>`查看商品列表，对数据的勾选状态`state:true`进行变更`state:false`会实时反馈到浏览器界面
         2.  通过浏览器对商品勾选框进行'勾选'和'取消勾选'，可以观察到浏览器数据并没有变更。此时不能用`v-model`，因为此时的`state`为`props`。
+            1.  监听使用`e`:如`e.target.XXX`
         3.  使用自定义事件，通过子组件状态变更同步到父组件数据状态。`this.$emit（'state-change',{id, value}）`子传父。
         4.  子组件监听复选框状态变化，拿到最新的勾选状态`<input type="checkbox" @change="stateChange" />`，复选框变化则会自动触发change事件。
         5.  父组件：`<Goods @state-change="getNewState"></Goods>` & `methods:{ getNewState(e){ .. } }`,`e`为该触发对象`this.$emit(传递对象值e）`
@@ -827,12 +829,38 @@
             2.  `console.log(e)`输出：Event..等所需内容； 比如获得勾选状态：‘const newState = e.target.checked  console.log(newState)’
             3.  `console.log(this)`：获得当前Vue组件VueComponent{。。。}
         6.  父组件在methods接收数据注意：`newStateChange(val){...}`，若要从子组件传递更新数据到父组件，需要形参val来接收数据。
-    3.  CSS补充笔记 , [链接参考](https://codepen.io/tianzi77/pen/aOrBdb)： 
+    3.  父传子一般从子接收开始写代码。
+    4.  js让数字显示两位小数点： `num.toFixed(2)`
+    5.  CSS补充笔记 , [链接参考](https://codepen.io/tianzi77/pen/aOrBdb)： 
     ```CSS
       html, body {
         height: 100%; /*让页面撑满窗口*/
       }
     ```    
+    6. 组件数据的递进：孙组件Count获取数据 -> 子组件Goods获取数据 -> 父组件App，使用props递进数据传递。
+       1. 孙组件Count修改数量count的值并且赋予App数据更新。
+       2. 可以按照自定义事件，孙->子->父
+       3. 使用eventBus（适用于多级别父子关系），注：统一数据关系需要递进id。
+          1. 发送给App的数据格式为{id, value}; $emit('xx', {id,value} )
+       4. 使用eventBus步骤
+          1. 在components下创建eventBus.js： `import Vue from 'vue';         export default new Vue(); `
+          2. 在当前需要传递数据给App的组件内导入`import bus from '@/components/eventBus.js'`
+          3. 在当前组件内的方法中直接使用`bus.$emit('share', {id:this.id, value:this.num+1} )`
+             1. 其中num为props，此处this.num+1并没有更改props的值
+          4. 在被传递方APP下也导入同样的bus`import bus from '@/components/eventBus.js'`
+          5. 在`created`函数中使用`$on`函数：`bus.$on('share',()=>{  console.log("组件接收到了counter的值")  })`
+             1. `('share',(val)=>{})`：val用来接收传过来的值，案例如下
+             ```JS
+            bus.$on('share',(val)=>{
+                // console.log("组件接收到了counter的值")
+                this.list.some(item=>{
+                    if(item.id === val.id){
+                    item.goods_count = val.value
+                    return true
+                    }
+                })
+                })
+             ``` 
 20. 
 21. console输入Vue.config查看vue配置。
    ```HTML
