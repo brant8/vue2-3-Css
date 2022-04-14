@@ -861,8 +861,235 @@
                 })
                 })
              ``` 
-20. 
-21. console输入Vue.config查看vue配置。
+20. 动态组件，vue提供了一个内置的`<component>`组件（类似占位符），转么能用来实现动态组件的渲染。
+    ```JS
+    data(){
+        //1.当前要渲染的组件名称
+        return {
+            comName: 'Left'
+        }
+    }
+    //<!--2.通过 is 属性，动态指定要渲染的组件-->
+    <component :is="comName"></component> //:is使用data中的comName:Left
+    //若不工作使用<components>
+    //或者<component is="Left"></component> 
+
+    //<!--3.点击按钮，动态切换组件名称-->
+    <button @click="comName = 'Left'">展示Left组件</button>
+    <button @click="comName = 'Right'">展示Right组件</button>
+    ```
+21.  keep-alive保持活跃状态。当切换组件时不会被销毁；Vue调试工具状态显示inactive，被缓存。
+     1.  `<keep-alive> <组件></组件> </keep-alive>`
+     2.  keep-alive对应的生命周期函数
+         1.  组件被缓存时，自动触发组件的`deactivated（）{..}`生命周期函数。
+         2.  组件被激活时，自动触发组件的`activated（）{..}`生命周期函数。
+     3.  注：组件第一次创建会执行`created`和`activated`。被激活时只执行acitvated。
+     4.  keep-alive的`include`属性：只有匹配名称的组件会被缓存。
+         1.  `<keep-alive include="Myleft,MyRight"> <component :is="comName"></component> </keep-alive>`此处用变量切换组件。
+     5.  `exclude`属性，排除项。不能与`include`同时使用。
+22. 组件扩展：
+    1.  可在组件内设置属性名称，如`export default{ name: 'MyRight' }`；以组件内自定义名称`name`为主。
+    2.  当提供了`name`属性组件名称以后，主要结合`<keep-alive>`实现标签缓存，以及Vue工具显示的组件`name`名称。
+    3.  与`components`注册名称相比，components是为了使用标签，渲染到页面结构之中。
+
+23. 插槽`slot`：在封装组件中，把不确定的、希望用户指定的部分定义为插槽。（比如放广告，相同样式的移动端导航）
+    1.  简易使用插槽：
+        1.  子组件生命插槽区：`<slot></slot>`
+        2.  父组件使用插槽如：`<Right> <p>hello world</p> </Right>`
+    2.  官方规定：每一个插槽slot，都要有一个`name`名称。若省略了name属性，则有一个默认名称叫做`default`。如`<slot name="default"></slot>`
+    3.  指定某一个内容放到该插槽里面去。子组件中有`slot name="XX"`,父组件：`v-slot：XX`；注：只能放在组件之中或者`<template>`中。
+        1.  如父组件中使用：`<Left> <template v-slot:default> <p>hello world</p> </template> </Left>`而不是在标签元素中~`<p v-slot：default>`~。
+        2.  引用组件内的`<template>`只起到包裹元素的作用。不会被渲染任何实质性HTML。
+    4.  `v-slot:`简写形式是`#`。如`v-slot:defaultName`等同于`#defaultName`。
+    5.  插槽的默认内容；在子组件使用`<slot name="default"> 这是default插槽的默认内容 </slot>`。当父组件没有插入内容是的默认显示内容。
+        1.  子组件`<slot name="content" msg="Hello vue"> </slot>`
+        2.  父组件可以访问子组件中`msg`的值。`<template #content="obj">` => `{{ obj }}` => 输出{msg:"Hello vue"}； 推荐obj使用`scope`名称。
+        3. 为预留的`<slot>`提供属性对应的值，这种用法叫做“作用域插槽”，scope有效范围仅限于`<template>`内.
+        4. `<template #content="obj">`可以直接用对象获取`#content="{msg}"`；效果为‘obj.msg = msg’。多对象时{A,B..}。
+    6. 案例：App->Goods->Count。在购物车案例中Goods使用插槽预留位置，在APP中放入Count标签于Goods的标签内。 如`<Goods> <Count></Count></Goods> `
+       1. 注意：要在App中导入Counter.vue。
+       2. 数据交互时，因为App.vue直接包含`<Count>`,用普通的父传子方法`props`和自定义事件`$emit`即可（不用eventBus方法了）。
+       3. 大致写法：则在`<Goods><count :num="item.godds_count" @num-change="getNewNum(item,$event)></count></Goods>`
+          1. 此处使用item，因为在循环中，所以item即为当前的项。
+          2. $event为改变项的值。在方法中需要接收,如：`getNewNum(item,e){  item.goods_count = e }`
+
+24. 自定义指令：私有、全局。
+    1.  每个vue组件中，可以在`directives`节点下声明私有自定义指令，如下面的`v-color`。v-XX指令。
+        1.  当指令第一次绑定到元素上的时候，会理解触发`bind`函数。
+        2.  形参中的`el`表示当前指令所绑定到的那个DOM对象。
+        3.  `el`必填；`binding`可选；console.log(binding)查看可选参数，如`binding.color`
+            1.  binding：①v-color="color" 绑定data参数; ②v-color="'red'" 直接赋值
+    ```JS
+    directives:{
+        color: {
+            //为绑定到的HTML元素设置红色的文字
+            bind(el, binding){  // -> bind:function(el){..} 
+                //形参中的el(固定写法)是为了绑定此指令的、原生的DOM对象el
+                el.style.color='red'  //写法一，直接写<xxx v-color>
+                el.style.color = binding.value //写法二<xxx v-color="red">
+            }
+    }   }
+    ```  
+    2. `bind(){}`函数只在第一次绑定，当DOM更新时bind不会更新，若要用click等方法更改其中的值，无效。需要使用`update(){}`才能更新。
+       1. `update`每次DOM更新时被调用
+       2. 如：` update(el, binding){ el.style.color = binding.value } `
+    3. bind与update书写逻辑相同时，可以直接简写
+    ```JS 
+    directives:{
+        color(el,binding){ 
+            el.style.color = binding.value 
+            }
+    }
+    ```
+    4. 全局自定义指令,可以在main.js中写。一般场景用于全局使用，如filter()。
+    ```JS
+    //参数1：字符串，表示全局自定义指令的名字
+    //参数2：对象，用来在接收指令的参数值
+    Vue.directive('color',function(el,binding){
+        el.style.color = binding.value
+    })
+    //Vue.directive('color',bind(el,binding){..} 或 update(el,binding){..}   )
+    ``` 
+
+26. ESLint：可组装的JS和JSX检查工具
+    1.  VSCode的Settings搜索Tab Size可设置tab空格数量。
+    2.  VSCode的Settings搜索Format On Save保存时格式化文件。
+    3.  创建Vue项目选择ESLint时，一般选择'ESLint+Standard Config'
+        1.  Lint on save在保存时检查代码； Lint and fix on commit在提交时检查和修复代码（不实用）
+        2.  In Dedicated config files
+    4.  禁用console：在发布产品之前应该在配置文件`.eslintrc.js`中剔除console的调用。
+    5.  普通打断点：在浏览器的Sources的.html文件中可以点击行数打断点。
+        1.  在index.html中输入debugger可以打断点。
+    6.  错误阅读：‘8：18 error Newline required...’代表第8行的第18个字符处
+    7.  VSCode插件自动格式化代码：ESLint。  
+        1.  VSCode的Settings，右上角Open Settings(JSON)，
+        2.  基础添加："editor.acodActionsOnSave":{ "source.fixAll":true }
+    8.  CSCode插件：Prettier。[详细图片链接](https://imgur.com/a/EaMmhSI) / [B站视频地址](https://www.bilibili.com/video/BV1zq4y1p7ga?p=171&spm_id_from=pageDriver)    
+        1.  配置：Allowed Everywhere
+        2.  "prettier.trailingComma":"none"
+        3.  "prettier.semi":false
+        4.  prettier.printWidth":300
+        5.  prettier.singleQuote":true
+        6.  "prettier.arrowParens"::"void"
+
+
+27. 把Axios挂载到Vue原型prototype上并配上根路径。省去了在每个组件中都要引用。
+    1.  在main.js中导入axios: `import axios from 'axios'`
+    2.  配置请求根路径：`axios.defaults.baseURL = '请求根路径'`
+    3.  并且：`Vue.prototype.axios = axios`。 推荐=>  `Vue.prototype.$http = axios`
+    4.  在组件里使用时：`const {data:res} = this.axios.post('url',{name:'zs', age:2})`
+        1.  当配置成$http时： `this.$http.post('url',{name:'zs', age:2}) `
+
+28. Vue路由vue-router：就是Hash地址与组件之间的对应关系。[黑马原理讲解](https://www.bilibili.com/video/BV1zq4y1p7ga?p=178&spm_id_from=pageDriver)
+    1.  小知识：锚链接，即地址栏有`#XXX`或者`#/XXX`.
+    2.  console调用：`location.href`；`location.hash` 查看`<a href='#/home'>`
+    3.  原理：window对象`onhashchange`事件。`window.onhashchange = ()=>{ console.log("有变化.."), location.hash }`
+        1.  通过location.hash的值，使用switch切换组件名称。
+    4. 前端路由工作方式：用户点击路由链接-> URL地址栏的Hash值变化-> 前端路由监听到变化-> 前端路由把当前Hash地址对应的组件渲染到浏览器
+
+29. vue-router安装和配置步骤
+    1.  安装vue-router包。`npm i vue-router@3.5.2 -S`; i -> install，
+    2.  创建路由模块:新建`router/index.js`路由模块
+        ```JS
+        //1.导包
+        import Vue from 'vue'
+        import VueRouter from 'vue-router'
+        //2.调用Vue.use()函数，把VueRouter安装为Vue的插件
+        Vue.use(VueRouter)
+        //3.创建路由的实例对象
+        const router= new VueRouter()
+        //4.向外共享路由的实例对象e
+        export default router
+        ```
+    3.  导入并挂载路由模块(在main.js操作)
+        1. 导入路由模块：`import router from '@/router/index.js'`
+        2. 挂载：`router: router `  （在‘new Vue(){..}’里操作），属性值和属性名一样时可简写`router`
+    4.  声明路由链接和占位符 
+        1.  在路由模块`index.js`中定义hash地址与组件之间的对应关系。
+            ```JS
+            const router= new VueRouter({
+                routes:[
+                    {path: '/home', component: Home}， //Home需要导入对应的组件
+                    {path:'/',redirect: '/home'} //重定向。当访问/时，跳转到/home
+                ]
+            })
+            ```
+        2. template中使用`<router-view></router-view>` 占位符.
+        3. 配置vue-router后，可以使用`router-link`来代替普通的a链接(a链接也可以)
+           1. `<router-link to="/home">首页</router-link>` 等于 `<a href="/home">首页</a>`
+    5. 嵌套路由：about下面子路由规则
+       1. 默认子路由：如果children数组中，某个路由规则的path值为空字符串，则这条路由规则，叫做默认子路由。
+       ```JS
+        routes:[
+            {
+            path: '/about', 
+            component: About,
+            redirect:'/about/tab1',//重定向到子路由
+            children:[
+                {path: 'tab1', component: Tab1}, //访问 about/tab1 时展示Tab1组件
+                {path: 'tab2', component: Tab2}, //访问 about/tab2 时展示Tab2组件 
+                {path: '', component: Tab2}  //路径空字符串，默认子路由
+              ]
+            }，    
+        ]
+       ``` 
+
+30. 动态路由`route`：把Hash地址中可变的部分定义为参数项，从而提高路由规则的复用性。
+    ```JS
+    //动态路由中的动态参数以`：`进行声明，冒号后面的时动态参数的名称
+    { path : '/movie/:id', component: Movie}, //需求：在Movie组件中，根据id的值，展示对应电影的详情信息
+    
+    //将下面多个路由规则，合并成了一个，提高了路由规则的复用性
+    { path : '/movie/1', component: Movie},
+    { path : '/movie/2', component: Movie}
+    ```
+    1. 在Movie组件中，可以在方法中`console.log(this)`查看到VueComponent -> $route -> params:{ id: '1'}。
+    2. 在template显示`{{ this.$route.params.id }}`，其中this可以省略。
+    3. `this.$route`是路由的<strong>参数对象</strong>，可获取参数值如params；`this.$router`是路由的<strong>导航对象</strong>。
+    4. `<router-link to="/movie/2"> `中的‘/’后面的参数项'2'为 路径参数。需要使用`this.$route.params`来访问路径参数。
+    5. `<router-link to="/movie/2?name=zs&age=20"> `在hash地址中，‘？’后面的参数项叫做 查询参数。需要使用`this.$route.query`来访问查询参数。
+       1. `console.log(this)`查看到VueComponent -> $route -> query -> path:{ name:'zs', age:20}
+    6. 为路由规则开启`props`传参。
+       ```JS
+       //index.js中
+       { path : '/movie/:id', component: Movie, props: true},
+
+       //Movie组件中
+       props:['id'],
+       //template中
+       {{ id }} //与 this.$route.params.id获取的id一致
+       ``` 
+
+31. 路由的导航<strong>$router</strong>
+    1.  声明式导航 - 浏览器中，点击链接实现导航的方式。如网页中的`<a>`链接、Vue项目中的`<router-link>`。
+    2.  编程式导航 - 浏览器中，调用API方法实现导航的方式（在方法中使用this.$router.xx跳转，而非在template）。 如网页中调用`location.href`跳转到新页面的方式。
+    3.  vue-router常用的编程式导航API：
+        1.  `this.$router.push('hash地址')`：跳转到指定hash地址，并增加一条历史记录，可以在浏览器后退。栈是后进先出[参考](https://blog.csdn.net/ABAP_Brave/article/details/82034499)。
+            1.  router.push('home') - 字符串 
+            2.  router.push({ path: 'home' }) - 对象   
+            3.  router.push({ name: 'user', params: { userId: 123 }}) - 如果提供了path，params会被忽略
+            4.  router.push({ path: 'register', query: { plan: 'private' }}) - 带查询参数，变成 /register?plan=private
+            5.  router.push({ name: 'user', params: { userId }})  -> /user/123  [携带参数跳转](https://blog.csdn.net/IT_Holmes/article/details/123458606)
+            6.  router.push({ path: `/user/${userId}` })  -> /user/123
+        2.  `this.$router.replace('hash地址')`：跳到指定hash地址，并替换掉当前的历史记录，不能后退。
+        3.  `this.$router.go(数值n)`：在浏览历史中前进或者后退，可以正数，也可以负数。如果后退超过上限，则原地不动。
+            1.  go简化版：`$router.back()`历史记录中后退到上一个页面；`$router.forward()`历史记录中前进到下一个页面。
+    4.  注意：在行内(template)使用编程式导航跳转的时候不能有`this`。如`<button @click="$router.back()"> 后退 </button>`
+
+32. 路由导航守卫：可以控制路由的访问权限。每次发生路由的导航跳转时，都会触发全局前置守卫。在全局前置守卫中，可以对每个路由进行访问权限的控制。
+    ```JS
+    //创建路由实例对象const
+     router = new VueRouter({...})
+     //调用路由实例对象的beforeEach方法，即可声明 全局前置守卫。
+     //每次发生路由导航跳转的时候，都会自动触发fn这个“回调函数”
+     router.beforeEach(function(to, from, next){
+         //to 时将要访问的路由的信息对象
+         //from时将要离开的路由的信息对象
+         //next时一个函数，调用next（）表示放行，允许这次路由的导航
+     })
+    ```  
+
+33. console输入Vue.config查看vue配置。
    ```HTML
     <div id="app">
         
@@ -987,14 +1214,14 @@ ___
     2.  选择器不同，根据选择器权重执行
     3.  如：`div{ color: pink!important;}`  
  
-选择器 | 选择器权重
----- | ---
-继承 或者 * | 0，0，0，0
-元素选择器 |  0，0，0，1
-类选择器，伪类选择器 |  0，0，1，0
-ID选择器 |  0，1，0，0
-行内样式style="" |  1，0，0，0
-!important 重要的 |  无穷大
+| 选择器               | 选择器权重 |
+| -------------------- | ---------- |
+| 继承 或者 *          | 0，0，0，0 |
+| 元素选择器           | 0，0，0，1 |
+| 类选择器，伪类选择器 | 0，0，1，0 |
+| ID选择器             | 0，1，0，0 |
+| 行内样式style=""     | 1，0，0，0 |
+| !important 重要的    | 无穷大     |
 
 23. 权重叠加:复合选择器的权重。权重虽然是叠加，但是永远不会有进位。
 
@@ -1436,18 +1663,18 @@ ID选择器 |  0，1，0，0
         3.  `animation-timing-function`可以用来做动画，如一张PNG的熊跑起来，类似定格动画。[b站教程](https://www.bilibili.com/video/BV14J4114768?p=374&spm_id_from=pageDriver)
         4.  多个动画效果使用逗号隔开，如`animation:move1 1s forwards, move2 2s backwards`
 
-动画常用属性 | 描述
----- | ---
-@keyframes | 规定动画
-animation |  所有动画属性的简写属性，除了animation-play-state属性
-animation-name | 规定@keyframes动画的名称（必须的）
-animation-duration | 规定动画完成一个周期所花费的秒或毫秒，默认时0.（必须的）
-animation-timing-function | 规定动画的速度曲线，默认是ease。其他参数：linear,ease-in,ease-out,ease-in-out,steps()
-animation-delay | 规定动画何时开始，默认是0。
-animation-iteration-count | 规定动画被播放的次数，默认时1，还有infinite。
-animation-direction | 规定动画是否在下一周逆向播放，默认时"normal",alternate逆播放
-animation-play-state | 规定动画是否正在运行或暂停。默认是“running”，还有“pause”。
-animation-fill-mode | 规定动画结束后状态，保持在结束状态forwards，默认回到起始backwards。
+| 动画常用属性              | 描述                                                                                  |
+| ------------------------- | ------------------------------------------------------------------------------------- |
+| @keyframes                | 规定动画                                                                              |
+| animation                 | 所有动画属性的简写属性，除了animation-play-state属性                                  |
+| animation-name            | 规定@keyframes动画的名称（必须的）                                                    |
+| animation-duration        | 规定动画完成一个周期所花费的秒或毫秒，默认时0.（必须的）                              |
+| animation-timing-function | 规定动画的速度曲线，默认是ease。其他参数：linear,ease-in,ease-out,ease-in-out,steps() |
+| animation-delay           | 规定动画何时开始，默认是0。                                                           |
+| animation-iteration-count | 规定动画被播放的次数，默认时1，还有infinite。                                         |
+| animation-direction       | 规定动画是否在下一周逆向播放，默认时"normal",alternate逆播放                          |
+| animation-play-state      | 规定动画是否正在运行或暂停。默认是“running”，还有“pause”。                            |
+| animation-fill-mode       | 规定动画结束后状态，保持在结束状态forwards，默认回到起始backwards。                   |
 
 63. 3D转换：近大远小，物体后面遮挡不可见。
     1.  x轴，水平向右，左边负值，右边正值
@@ -1546,40 +1773,40 @@ img,a{-webkit-touch-callout:none;}
     4.  `flex`属性:定义子项目分配<strong>剩余空间</strong>，flex表示占多少份数
         1.  语法：`.item{ flex: <number>; }`默认值为0. 
           
-6个属性对父元素设置的 | 描述
----- | ---
-flex-direction | 设置主轴（x轴）方向，参数`row`等
-justify-content | 设置主轴上的子元素排列方式
-flex-wrap | 设置子元素是否换行，默认`nowrap`不换行并且缩小子元素宽度，其他参数`wrap`
-align-content | 设置侧轴上（y轴）的子元素的排列方式（多行）
-align-items | 设置侧轴上的子元素排列方式（单行）
-flex-flow | 复合属性，相当于同时设置了flex-direction和flex-wrap，语法`flex-flow:row wrap`
-flex | 分到的份数
-align-self | 控制子项自己在侧轴上的排列方式
+| 6个属性对父元素设置的 | 描述                                                                          |
+| --------------------- | ----------------------------------------------------------------------------- |
+| flex-direction        | 设置主轴（x轴）方向，参数`row`等                                              |
+| justify-content       | 设置主轴上的子元素排列方式                                                    |
+| flex-wrap             | 设置子元素是否换行，默认`nowrap`不换行并且缩小子元素宽度，其他参数`wrap`      |
+| align-content         | 设置侧轴上（y轴）的子元素的排列方式（多行）                                   |
+| align-items           | 设置侧轴上的子元素排列方式（单行）                                            |
+| flex-flow             | 复合属性，相当于同时设置了flex-direction和flex-wrap，语法`flex-flow:row wrap` |
+| flex                  | 分到的份数                                                                    |
+| align-self            | 控制子项自己在侧轴上的排列方式                                                |
 
-flex-direction(属性值) | 可设置主轴，余下为侧轴
----- | ---
-row | 默认值从左到右(相当于主轴为x轴)
-row-reverse | 从右到左
-column | 从上到下
-column-reverse | 从下到上
+| flex-direction(属性值) | 可设置主轴，余下为侧轴          |
+| ---------------------- | ------------------------------- |
+| row                    | 默认值从左到右(相当于主轴为x轴) |
+| row-reverse            | 从右到左                        |
+| column                 | 从上到下                        |
+| column-reverse         | 从下到上                        |
 
-justify-content(属性值) | 可设置主轴上子元素排列/对齐方式
----- | ---
-flex-start | 默认值，从头部开始，如果主轴x轴，左到右
-flex-end | 从尾部开始排列
-center | 在主轴居中对齐（如果主轴是x轴则水平居中）
-space-around | 评分剩余空间
-space-between | 先两边贴边，再平分剩余空间（重要）
+| justify-content(属性值) | 可设置主轴上子元素排列/对齐方式           |
+| ----------------------- | ----------------------------------------- |
+| flex-start              | 默认值，从头部开始，如果主轴x轴，左到右   |
+| flex-end                | 从尾部开始排列                            |
+| center                  | 在主轴居中对齐（如果主轴是x轴则水平居中） |
+| space-around            | 评分剩余空间                              |
+| space-between           | 先两边贴边，再平分剩余空间（重要）        |
 
-align-items/align-content(属性值) | 可设置侧轴上子元素排列方式，再子项为单项（单行）时使用(items)  | 只能用与子项出现换行的情况（多行，可通过flex-wrap设置wrap换行），单行效果无效(content)
----- | --- | ----
-flex-start | 默认值，从上到下  | 默认值在侧轴的头部开始排列
-flex-end | 从下到上  |  在侧轴的尾部开始排列
-center | 挤再一起居中（垂直居中） |  在侧轴中间显示
-stretch | 拉伸(items) | 设置子元素高度评分父元素高度（contents多行）
-space-around |  --  |  子项在侧轴平分剩余空间
-space-between | --  |  子项在侧轴先分布在两头，再平分剩余空间
+| align-items/align-content(属性值) | 可设置侧轴上子元素排列方式，再子项为单项（单行）时使用(items) | 只能用与子项出现换行的情况（多行，可通过flex-wrap设置wrap换行），单行效果无效(content) |
+| --------------------------------- | ------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| flex-start                        | 默认值，从上到下                                              | 默认值在侧轴的头部开始排列                                                             |
+| flex-end                          | 从下到上                                                      | 在侧轴的尾部开始排列                                                                   |
+| center                            | 挤再一起居中（垂直居中）                                      | 在侧轴中间显示                                                                         |
+| stretch                           | 拉伸(items)                                                   | 设置子元素高度评分父元素高度（contents多行）                                           |
+| space-around                      | --                                                            | 子项在侧轴平分剩余空间                                                                 |
+| space-between                     | --                                                            | 子项在侧轴先分布在两头，再平分剩余空间                                                 |
 
 73. 常见flex布局思路
     1. 图片居于文字正下方使用大盒包两个小盒，小盒常用`<span>`，[b站教程](https://www.bilibili.com/video/BV14J4114768?p=432&spm_id_from=pageDriver)
