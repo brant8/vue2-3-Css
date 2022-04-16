@@ -1,3 +1,6 @@
+[数据分析](https://yrzu9y4st8.feishu.cn/docs/doccnzwzLDGEnGoVsF6YT9Sh2Zd) / [B 站](https://www.bilibili.com/video/BV1ZM4y1u7uF?spm_id_from=333.337.search-card.all.click)
+
+
 ### 学习Vue2 [其他笔记链接](https://github.com/brant8/Vue2Study)
 1. webpack前端工程化具体解决方案：模块化开发，代码压缩混淆，处理浏览器端JS兼容性如ES6等。
    1. webpack基本使用：
@@ -1010,7 +1013,10 @@
             const router= new VueRouter({
                 routes:[
                     {path: '/home', component: Home}， //Home需要导入对应的组件
-                    {path:'/',redirect: '/home'} //重定向。当访问/时，跳转到/home
+                    {path:'/',redirect: '/home'}, //重定向。当访问/时，跳转到/home
+                    {path: '/about', name: 'About',  //懒加载
+                    component: () => import('../views/About.vue')
+                    } 
                 ]
             })
             ```
@@ -1077,19 +1083,196 @@
     4.  注意：在行内(template)使用编程式导航跳转的时候不能有`this`。如`<button @click="$router.back()"> 后退 </button>`
 
 32. 路由导航守卫：可以控制路由的访问权限。每次发生路由的导航跳转时，都会触发全局前置守卫。在全局前置守卫中，可以对每个路由进行访问权限的控制。
+    1.  有权限，直接放行`next()`
+    2.  没有权限，强制跳转到其他如登录页面`next('/login')`
+    3.  没有权限，不允许跳转到其他页面`next(false)`
     ```JS
-    //创建路由实例对象const
+    //index.js创建路由实例对象const
      router = new VueRouter({...})
      //调用路由实例对象的beforeEach方法，即可声明 全局前置守卫。
      //每次发生路由导航跳转的时候，都会自动触发fn这个“回调函数”
      router.beforeEach(function(to, from, next){
-         //to 时将要访问的路由的信息对象
-         //from时将要离开的路由的信息对象
-         //next时一个函数，调用next（）表示放行，允许这次路由的导航
+         //to 将要访问的路由的信息对象
+         //from 将要离开的路由的信息对象
+         //next 一个函数，调用next（）表示放行，允许这次路由的导航
      })
     ```  
+    1. 例子分析
+       1. 要拿到用户将要访问的hash地址
+       2. 判断hash地址是否等于/main
+       3. 如果等于/main,证明需要登陆之后才能访问成功
+       4. 如果不等于/main，则不需要登录，直接放行next（）
+       5. 如果访问的地址时/main，则需要localStorage中的token值
+       6. 如果有token则放行
+       7. 如果没有token则强行跳转到/login登录页
+       ```JS
+        router.beforeEach((to,from,next)=>{
+            if(to.path === '/main'){
+                const token = localStorage.getItem('token')
+                if(token){
+                    next() //访问的时后台主页，并且有token值
+                }else{
+                    next('/login') //访问的时后台主页，但是没有token值
+                }
+            }else{
+                next() //访问的不是后台主页，直接放行。
+            }
+        })
 
-33. console输入Vue.config查看vue配置。
+       ``` 
+       8. `localStorage.setItem('token','Bear xxx')` 存储token,token认证格式：当中的Bear加空格与其他字符，默认。
+
+33. 后台管理案例：
+    1.  路由导航：login，在index.js中进行路由守卫判定  
+        1.  router.beforEach(function(to, from, next){..})
+            1.  获取token-> `localStorage.get('token)`：注意，token格式一般'xx Xxxx'有空格。  
+            2.  使用if判断要到达的路由目标`to.path`
+            3.  判断完毕进行跳转`next（'/login'）`
+    2.  路由关系：
+        1.  用户管理/userInfo - 用户列表及详情操作：点击详情跳转到权限管理/userDetails，非~/userInfo/userDetails~
+        2.  权限管理/userRight - 管理用户权限
+        3.  商品管理等
+    3.  方法中利用`@click`使用`this.$router.push('/home/userinfo')`进行页面内容跳转     
+    4.  使用`this.$router.back()`后退到历史中的前一页。
+    5.  第一种方法 - 在跳转页面中传值$route.params
+        1.  在跳转页面中的template传值：`@click.prevent="gotoDetails(item.id)"`
+        2.  在方法中接收值并拼接地址`gotoDetails(id){ this.$router.push('/home/userinfo'+id) }`
+        3.  在路由规则中改造` { path: 'userinfo/:id', component: UserDetail }`
+        4.  在跳转后的页面中接收到id并输出：`{{ this.$route.params.id }}`其中id为路由中的id设置属性名。
+    6.  第二种方法 - 在跳转页面中传值props
+        1.  路由规则设置：`{ path: 'userinfo/:id', component: UserDetail, props:true }`
+        2.  在接收组件中设置`props:['id']`
+        3.  直接使用`{{ id }}`
+    7. 在路由中设置默认子路由： `redirect: '/home/users', component: Home` ，redirect与path平级。
+    8. 在全局前置守卫中，多个权限hash地址判断方法
+       1. 第一种方法使用'或 ||'：`if (to.path === '/home' || to.path ==='/home/users' || 条件三..) `
+       2. 第二种使用数组：`const pathArr = ['/home','/home/users','/home/rights']`
+          1. `if(pathArr.indexOf(to.path) !== -1)`
+       3. 第三种使用json或者js文件（与第二种方法类似），如pathArr.js：`export default ['/home','/home/users']`
+          1. 在index.js导入：import pathArr from '.../pathArr.js'
+
+34. 头条案例笔记
+    1.  安装项目时注意点：是否选择history模式路由->否。history路由一般与后端配合使用。目前使用井号`#`hash值地址模式，因为其通用性更强，适用于低级浏览器。history兼容性差。  
+    2.  目录结构：components和views。如果某个组件是通过动态路由切换，则把该路由放到views下面。如果该组件不是通过路由切换、是可复用的组件则放在components目录下。
+    3.  若只导入文件夹，默认导入文件夹中的index.js。
+    4.  组件库之：[Vant移动端](https://youzan.github.io/vant/v2/#/zh-CN/quickstart#yin-ru-zu-jian)
+        1.  导入Vant组件选择：开发阶段可导入所有的组件，打包发布阶段可以剔除/优化Vant组件（使用`externals`的CDN加速打包可以不打包Vant又不影响使用vant[黑马老师文档](http://doc.toutiao.liulongbin.top/mds/15.build.html#_15-4-%E5%9F%BA%E4%BA%8E-externals-%E9%85%8D%E7%BD%AE-cdn-%E5%8A%A0%E9%80%9F)）。
+        2.  对应Vue 2安装命令：`npm i vant@latest-v2 -S`
+    5.  路由链接控制`<router-link to="/xx">XX</router-link>` -> 路由导航`<router-view />`
+        1.  Vant在template元素标签开启'route'使用`to="/xx"`代替`<router-link to="/xx">`
+    6.  vant底部导航Tabbar菜单(固定底部)：
+        ```HTML
+         <!--路由占位符-->
+        <router-view />
+        <!-- Tabbar区域 -->
+        <van-tabbar route><!--v-model="active" 开启路由模式后自动高亮-->
+        <van-tabbar-item icon="home-o" replace to="/">Home</van-tabbar-item>
+        <van-tabbar-item icon="user-o" replace to="/user">Me</van-tabbar-item>
+        </van-tabbar>
+        <!--设置data-->
+        active: 0,
+        ```  
+    7. 设置首页顶部标题栏(固定)：[参考页面](https://youzan.github.io/vant/v2/#/zh-CN/nav-bar#api)API参数属性及设置
+       ```HTML
+       <!--写法一：更改默认值 fixed默认值false-->
+        <van-nav-bar  title="标题" :fixed=true />
+        <!--写法二：直接写属性值 默认true-->
+        <van-nav-bar  title="标题" fixed />
+       ``` 
+    8. 有了固定底部和顶部导航栏后，因其脱离标准流，部分头尾内容被覆盖。使用padding。
+    9. 更改vant默认样式时，若带有`<div data-v-xxx classs="home">`标签可直接更改`.home`，若要更改`<div data-v-xxx><h2></div>`中的'h2'样式时需要在style增加`/deep/ h2{..}`.
+    10. 安装axios：npm i axios -S
+        1.  导入axios：在main.js使用原型导入`Vue.protoytyp.$http=axios`或`Vue.protoytyp.axios=axios`(需要使用this.axios/this.$http调用，复用性低)
+        2.  实际调用axios方式：<strong>封装axios到request.js自定义模块</strong>
+            ```JS
+            import axios from 'axios'
+            const axios = axios.create({
+                baseURL:'http://api.taobao.com'
+                })
+            const axios2 = axios.create({ //不同api地址封装不同request进行导入，复用性好
+                baseURL: 'http://api.jd.com'
+                })
+            export default axios
+            ```  
+    11. 具体使用axios步骤：
+        1. 根据步骤10封装好request.js，设置baseURL
+        2. 导入request.js到对应组件
+        ```JS
+        data(){
+            return{ page:1, limit:10 }
+        }  
+        methods:{
+            async initArticleList(){ //此处promise所以async
+                const {data:res} = await axios.get('/articles',{ //await Promise实例对象
+                    //请求参数，使用params传出
+                    params:{
+                        _page:this.page,
+                        _limit:this.limit
+                    }
+                })
+                console.log(res)
+            }
+        },
+        created(){
+            this.initArticleList()
+        }
+        ```
+    12. 当多个地方使用axios时，可以把其方法封装到一个接口函数，实现快速复用。
+        1.  新建一个API文件src/api/articleAPI.js
+        ```JS
+        //向外按需导出一个API函数 
+        export const getArticleListAPI = function(_page,_limit){
+            console.log("嗲用了getArticleListAPI函数")
+            // return new Promise(function(){..})  其中axios.get(..)返回的是Promise对象
+            //所以
+            return axios.get('/articles',{ //axios需要导入
+                params:{
+                    _page:_page, //_page:函数传过来的page
+                    _limit:_limit //属性名和属性值一样可以简写 _limit，不用x:x
+                }
+            })
+        }
+
+        //使用的组件如User.vue中
+        import {getArticleListAPI} from '@/api/articleAPI.js'
+        //打印测试：直接调用该函数
+        getArticleListAPI(page,limit) //  =>输出一个Promise对象
+        //实际用处
+        const {data:res} = await getArticleListAPI(this.page,this.limit)
+        ``` 
+    13. 父子组件共享数据
+        1.  子组件使用props接收，父组件使用v-for循环并传递值。
+        ```JS
+        //子组件
+        props:{
+            title:{
+                type:String,
+                default:''
+            },    
+            cmtCount:{
+                type:[Number,String], //评论数量，该数值既可以是数字，也可以是字符串
+                default:0
+            },
+            cover:{ //传过来的图片是对象 {cover:2, images:["link1", "link"]}
+                type:Object
+                default:function(){ //对象或数组默认值必须从一个工厂函数获取
+                    return { cover: 0 }
+                }
+            }
+        }  
+        //父组件
+        <ArticleInfo v-for="item in list" :key="item.id" :title="item.title"></ArticleInfo>
+        //当返回值没有id时，并且key没有(存在)的意义时，可以使用索引来充当key来防止报错
+        <img src=".." alt="" v-for="(item,i) in cover.images" :key="i">
+        ```
+    14. 在使用组建的时候，如果某个属性名是“小驼峰”形式，则绑定属性的时候，建议携程“连字符”格式。如：cmtCount建议写成`:cmt-count="item.cmtCount"`。
+    15. JS补充：用于下拉屏幕刷新数据后，数组应该怎样合并。[Javascript在线编辑](https://playcode.io/new/)
+        1.  const arr1 = [1,2,3], const arr2=[4,5,6]
+        2.  arr1.push(arr2) => [1,2,3,[4,5,6]]
+        3.  方法一：`const newArr = [...arr1, ...arr2]`，方法二：`arr1.contact(arr2) `
+        4.  与vant中的list下拉刷新判断刷新数据得到的新数组与旧数组进行合并
+
+35. console输入Vue.config查看vue配置。
    ```HTML
     <div id="app">
         
@@ -1940,3 +2123,7 @@ img,a{-webkit-touch-callout:none;}
     5.  注意使用2x模式。
     6.  vh做滚动高度时会使用
     7.  插件自动转换：`px2vw`,可设置宽度转换
+
+84. Bootstrap 5 延申：
+    1.  导航`navbar`：参数`.navbar-toggler`, `.navbar-collapse`, `.navbar-expand`
+        1.  扩展参数{-sm|-md|-lg|-xl|-xxl}：如navbar-expand-md表示在md屏幕以上显示，md以下隐藏。
