@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mybatis.dao.UserMapper">
+
+    <!--sql语句的抽取-->
+    <sql id="selectUser">select * from user</sql>
+    <select id="findId" parameterType="int" resultType="user">
+        <include refid="selectUser"></include> <!--select * from user where id=#{id}-->
+        <where>
+            id=#{id}
+        </where>
+    </select>
+
+    <select id="findByCondition" parameterType="user" resultType="user">
+        <!--select * from user where id=#{id} and username = #{username} and password=#{password}-->
+        select * from user where 1=1
+            <if test="id != 0">
+                and id=#{id}
+            </if>
+            <if test="username != null">
+                and username=#{username}
+            </if>
+            <if test="password != null">
+                and password=#{password}
+            </if>
+<!--或者使用<where></where>包裹<if>条件,即可省略where 1=1，看起来更优雅。但是输出结果与where 1=1还是稍有不同，如空参-->
+    </select>
+
+    <select id="findByIds" parameterType="list" resultType="user">
+        <!-- select * from user where id in (1,2,3) -->
+        select * from user
+        <where>
+            <foreach collection="list" open="id in(" close=")" item="id" separator=","> <!--collection="array"-->
+                #{id}
+            </foreach>
+        </where>
+    </select>
+
+    <!--查询操作 -->
+    <select id="findAll" resultType="user">
+        select * from user
+    </select>
+
+    <select id="findId" parameterType="int" resultType="user">
+        select * from user where id=#{id}
+    </select>
+
+<!--    插入操作-->
+    <insert id="save" parameterType="com.example.mybatis.domain.User">
+        insert into user values(#{id},#{username},#{password})
+    </insert>
+<!--    修改操作-->
+    <update id="update" parameterType="com.example.mybatis.domain.User">
+        update user set username=#{username}, password=#{password} where id=#{id}
+    </update>
+
+    <delete id="delete" parameterType="java.lang.Integer">
+        delete from user where id=#{id}
+    </delete>
+
+    <select id="findById" resultType="user" parameterType="int">
+        delete from user where id=#{id}
+    </select>
+</mapper>

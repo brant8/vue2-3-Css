@@ -1,0 +1,5 @@
+div Method have Exception..
+Exception is: ArithmeticException
+Exception Reason is: / by zero
+-------------
+total have 1 Exception

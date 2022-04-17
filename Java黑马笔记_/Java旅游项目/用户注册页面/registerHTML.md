@@ -1,0 +1,124 @@
+|
+|---src\main\webapp\register.html
+```
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+	<meta charset="UTF-8">  
+	<title>Title</title>  
+	<script src="https://code.jquery.com/jquery-3.6.0.js"></script>  
+	<script> 
+		 /*表单格式校验  
+		* 1.用户名：单词字符，长度8到20位  
+		* 2.密码：单词字符，长度8到20位  
+		* 3.email：邮件格式  
+		* 4.姓名：非空  
+		* 5.手机号：手机号格式  
+		* 6.出生日期：非空  
+		* 7.校验码：非空  
+		*/ //校验用户名  
+		function checkUsername() {  
+			//获取用户名  
+			var username = $("#username").val();  
+			//alert("校验用户名");  
+			//正则验证用户名  
+			var reg_username = /^\w{8,20}$/;  
+			//正则判断用户名是否合法  
+			var flag = reg_username.test(username);  
+			if(flag) {  
+				//用户名合法恢复边框  
+				$("#username").css("border","");  
+			}else{  
+				//用户名非法红色边框  
+				$("#username").css("border","1.5px solid red");  
+			}  
+			return flag;  
+		}  
+		//校验密码  
+		function checkPassword(){  
+			//获取用户名  
+			var password = $("#password").val();  
+			//alert("密码");  
+			//正则验证用户名  
+			var reg_password = /^\w{8,20}$/;  
+			//正则判断用户名是否合法  
+			var flag = reg_password.test(password);  
+			if(flag) {  
+				//用户名合法恢复边框  
+				$("#password").css("border","");  
+			}else{  
+				//用户名非法红色边框  
+				$("#password").css("border","1.5px solid red");  
+			}  
+			return flag;  
+		}  
+		function checkEmail(){  
+			//获取邮箱  
+			var email = $("#email").val();  
+			//正则表达式  
+			var reg_email = /^\w+@\w+\.\w+$/; //标点用转义符号\.  
+			//判断  
+			var flag=reg_email.test(email);  
+			if(flag){  
+				$("#email").css("border","");  
+			}else{  
+				$("#email").css("border","1.5px solid red");  
+			}  
+			return flag;  
+		}  
+		//入口函数  
+		$(function(){  
+			//当表单提交时，调用所有的校验方法  
+			//输入通过验证提交表单发送数据到服务器  
+			$("#registerForm").submit(function(){  
+				//如果submit(Fn)这个匿名函数没有返回值，或者返回true则表单提交，如果返回false，则表单不提交  
+				if(checkUsername() && checkPassword() && checkEmail()){  
+					//校验通过，发送ajax请求，提交表单的数据; serialize()序列化数据结果等于 username=zhangsan&password=123提交表格数据，data为返回的数据  
+					//$.post("registUserServlet",$("registerForm").serialize(),function (data) {  
+					$.post("registUserServlet",$(this).serialize(),function (data) {  
+					//处理服务器相应的数据 data  })  
+			}  
+			});  
+			//当某一个组件失去焦点时，调用对应的校验方法  
+			$("#username").blur(function () {  
+				checkUsername();//方法加括号  
+			});  
+			$("#password").blur(checkPassword);//方法不加括号  
+			$("#email").blur(checkEmail);  
+		});  
+	</script>  
+</head>  
+<body>  
+
+<form id="registerForm">  
+	<table> <tr> <td class="td_left">  
+	<label for="username">用户名</label>  
+	</td> <td> <input type="text" id="username" name="username" placeholder="Enter account name">  
+	</td> </tr> <tr> <td class="td_left">  
+	<label for="password">密码</label>  
+	</td> <td> <input type="password" id="password" name="password" placeholder="Enter a Password">  
+	</td> </tr> <tr> <td class="td_left">  
+	<label for="email">邮箱</label>  
+	</td> <td> <input type="email" id="email" name="email" placeholder="Enter Your Email">  
+	</td> </tr> <tr> <td class="td_left">  
+	<label for="name">姓名</label>  
+	</td> <td> <input type="name" id="name" name="name" placeholder="Enter Your name">  
+	</td> </tr> <tr> <td class="td_left">  
+	<label for="gender">性别</label>  
+	</td> <td> <input type="radio" id="gender" name="gender" value="男" checked> 男  
+	<input type="radio" name="gender" value="女"> 女  
+	</td>  
+	</tr> <tr> <td class="td_left">  
+	<label for="phone">电话</label>  
+	</td> <td> <input type="text" id="phone" name="phone" placeholder="Enter Your Phone Number">  
+	</td> </tr> <tr> <td class="td_left">  
+	<label for="birthday">出生日期</label>  
+	</td> <td> <input type="date" id="birthday" name="birthday">  
+	</td> </tr> <tr> <td></td> <td> <input type="submit" class="submit" value="注册">  
+	</td> <tr> 
+	</table>
+</form>  
+
+</body>  
+</html>
+```
