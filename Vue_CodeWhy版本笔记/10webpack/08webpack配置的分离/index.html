@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div id="app">
+</div>
+
+<div>
+    <h3>1.runtime-only</h3>
+    <p>代码中，不可以有任何的template</p>
+    <h3>2.runtime-compiler</h3>
+    <p>代码中，可以有template，因为有compiler可以用于编译template</p>
+</div>
+
+<h3>说明（测试error可能版本问题）</h3>
+<p>1.webpack.config配置分离部分在Build目录下，根据目的截取不同内容</p>
+<p>2.生产环境使用base+dev,编译生成使用base+prod</p>
+<p>3.需要安装合并插件：npm install webpack-merge --save-dev</p>
+<p>4.在分离出来的部分导入webpack-merge路径，并使用exports=webpackMerge.merge（aa,{bb}）进行合并</p>
+<p>5.main.js最后一行可以测试以下页面刷新是否正常（不用run build的情况）</p>
+
+
+</body>
+</html>

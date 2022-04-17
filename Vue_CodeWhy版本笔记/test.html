@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vue基础</title>
+<style>
+    .active{
+        border: 1px solid red;
+    }
+</style>
+</head>
+<body>
+<h1>Vue基础:</h1>
+    <div id="app">
+        {{message}}
+    </div>
+    <div id="array">
+        {{ school }}        <br>
+        {{ school.name }}   <br>
+        {{ school.mobile}}  <br>
+        {{ campus }}        <br>
+        {{ campus[0] }}     <br>
+    </div>
+<h1>Vue指令:</h1>
+<h2>v-text:</h2>
+    <div id="vtext">
+        <div v-text="message + '^_^'"></div>
+        <h4>深圳{{ message + "^_^"}}</h4>
+    </div>
+
+<h2>v-html:</h2>
+    <div id="vhtml">
+        <p v-html="content"></p>
+        <p v-text="content"></p>
+    </div>
+
+<h2>v-on:</h2>
+    <div id="click">
+        <input type="button" value="事件绑定" v-on:click="doID1">
+        <input type="button" value="事件绑定" @mouseenter="doID2">
+        <input type="button" value="双击" v-on:dblclick="doID1">
+        <input type="button" value="双击" @dblclick="doID2">
+        <input type="button" value="console" @click="doID3(666)">
+        <input type="text" placeholder="Console keyUp" @keyup="sayHi">
+        <input type="text" placeholder="Console keyUp回车" @keyup.enter="sayHi">
+        <h3 @click="changeFood">{{food}}</h3>
+        <p>（通过this关键字同步更新内容）</p>
+    </div>
+<div id="num">
+    <button @click="add">+</button>
+    <span>{{ number }}</span>
+    <button @click="minus">-</button>
+</div>
+
+<h2>v-show:广告，遮罩层</h2>
+    <div id="showing">
+        <img src="https://via.placeholder.com/50" v-show="true">
+        <img src="https://via.placeholder.com/100" v-show="isShow">
+        <img src="https://via.placeholder.com/150" v-show="age>18">
+        <img src="https://via.placeholder.com/200" v-show="age<18">
+    </div>
+    <p>（思路：设置类似this.age累加达到隐藏自动广告效果）</p>
+<h2>v-if：dom元素</h2>
+    <div id="vif">
+        <p v-if="true">我是标签1</p>
+        <p v-if="isShow">我是标签2</p>
+        <button v-if="isShow" @click="changShow">我是标签3</button>
+        <button @click="toggleShow">我是标签4</button>
+    </div>
+<h2>v-bind:绑定属性</h2>
+    <div id="vbind">
+        <img v-bind:src="imgSrc">
+        <img :src="imgSrc" v-bind:title="imgTitle+'!!!'"><br>
+        <img :src="imgSrc" v-bind:class="isActive?'active':''">
+        <img :src="imgSrc" v-bind:class="{active:isActive}">
+        <img :src="imgSrc" v-bind:class="{active:isActive}" v-on:click="toggleActive">
+    </div>
+
+<h2>幻灯片案例</h2>
+<div id="slider">
+    <img v-bind:src="imgArr[index]">
+    <a href="#" v-on:click="pre" v-show="index!=0">left</a>
+    <a href="#"  @click="next"  v-show="index<imgArr.length">right</a>
+</div>
+
+<h2>v-for</h2>
+    <div id="vfor">
+        <ul>
+            <li v-for="item in arr">
+                范例：{{item}}
+            </li>
+            <li v-for="(item,index) in arr" v-bind:title="item">
+                {{ index }} {{ item }}
+            </li>
+            <li v-for="(item,index) in objArr">
+                {{ item }} :{{ item.name }}
+            </li>
+        </ul>
+    </div>
+
+<h2>v-model：设置&获取表单元素的值(双向绑定)</h2>
+    <div id="vmodel">
+        <input type="text" v-model="message">
+        <p>你输入的是：{{message}}</p>
+    </div>
+
+<h2>AXIOS网络请求库</h2>
+<p>格式：<br>
+    axios.get(地址?key=value&key2=value2)         <br>
+&ensp;   .then(function(response){},function(err){}</p>
+<p>axios.post(地址,{key=value&key2=value2})      //(地址,对象)   <br>
+&ensp;   .then(function(response){},function(err){}</p>
+
+<!-- 开发环境版本，包含了有帮助的命令行警告 -->
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+
+<script>
+var app=new Vue({
+    el:"#app",
+    data:{
+        message:"Hello Vue~~~"
+    }
+})
+</script>
+<script>
+    var array=new Vue({
+        el:"#array",
+        data:{
+            school:{
+                name:"黑马",
+                mobile:"416-123-1234"
+            },
+            campus:["北京","厦门"]
+        }
+    })
+</script>
+<script>
+    var app=new Vue({
+        el:"#vtext",
+        data:{
+            message: "小黑呀"
+        }
+    })
+</script>
+<script>
+    var vhtml = new Vue({
+        el:"#vhtml",
+        data:{
+            //content:"黑马"
+            content:"<a href='#'>黑马</a>"
+        }
+    })
+</script>
+<script>
+    var click = new Vue({
+        el:"#click",
+        data:{
+            food:"西红柿炒鸡蛋"
+        },
+        methods:{
+            doID1:function(){
+              alert("ID1");
+            },
+            doID2:function(){
+              alert("ID2");
+            },
+            doID3:function(var1){
+              console.log(var1);
+            },
+            sayHi:function(){
+              console.log("你好啊");
+            },
+            changeFood:function(){
+                //console.log(this.food);
+                this.food+="好好次！"
+            }
+        }
+    })
+</script>
+<script>
+    var num = new Vue({
+        el:"#num",
+        data:{
+            number:1,
+        },
+        methods:{
+          add:function(){
+              console.log("add");
+              this.number+=1;
+              //this.number++;
+              if(this.number > 10 ){
+                  alert("最大值时10");
+                    this.number=10;
+              }
+          },
+          minus:function(){
+              console.log("minus");
+              this.number-=1;
+              //this.number--;
+                if(this.number < 0 ){
+                  alert("最小值时0");
+                  this.number=0;
+              }
+          }
+        },
+    })
+</script>
+<script>
+    var showing = new Vue({
+        el:"#showing",
+        data:{
+            isShow:false,
+            age:16,
+        }
+    })
+</script>
+<script>
+    var vif = new Vue({
+        el:"#vif",
+        data:{
+            isShow:true,
+        },
+        methods:{
+            changShow:function(){
+                this.isShow = false;
+            },
+            toggleShow:function(){
+                this.isShow = !this.isShow; //取反
+            }
+        },
+    })
+</script>
+<script>
+    var vbind = new Vue({
+        el:"#vbind",
+        data:{
+            imgSrc:"https://via.placeholder.com/200",
+            imgTitle:"黑莓",
+            isActive:false,
+        },
+        methods:{
+            toggleActive:function(){
+                this.isActive = !this.isActive;
+            }
+        }
+    })
+</script>
+<script>
+    var slides = new Vue({
+        el:"#slider",
+        data:{
+          imgArr:[
+              "https://via.placeholder.com/150",
+              "https://via.placeholder.com/200",
+              "https://via.placeholder.com/250",
+          ],
+          index:0,
+        },
+        methods:{
+            pre:function(){
+                this.index--;
+            },
+            next:function(){
+                this.index++;
+            }
+        }
+    })
+</script>
+<script>
+    var vfor = new Vue({
+        el:"#vfor",
+        data:{
+            arr:[1,2,3,4,5,6],
+            objArr:[
+                {name:"jack"},
+                {name:"rose"},
+            ],
+        },
+        methods:{
+          add:function(){
+              this.objArr.push({name:"heima"})
+          },//添加数据
+        remove:function(){
+              this.objArr.shift();
+            }//按顺序移除数据
+        },
+        deleteByArrayIndex:function(index){
+            this.arr.splice(index,1);//删除索引之后的内容，一次删一个
+        }
+    })
+</script>
+<script>
+    var vmodel = new Vue({
+        el:"#vmodel",
+        data:{
+            message:"你好message"
+        },
+        methods:{
+
+        }
+    })
+</script>
+
+
+</body>
+</html>

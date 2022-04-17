@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+</head>
+<body>
+<button>按钮1</button>
+<button>按钮2</button>
+<button>按钮3</button>
+<p>
+    ES5之前因为ifhefor都没有块级作用域的概念，所以很多时候我们必须借助于function的作用域来决绝应用外面变量的问题。
+</p>
+<p>
+    ES6中，加入了let，let它是有if和for的块级作用域。
+</p>
+
+<script>
+//变量作用域：变量在什么范围内是可用。
+//【没有块级作用域】引起的问题：if的块级
+    var func;
+    if(true) {
+        var name = 'why';
+        func = function () {
+            console.log(name);
+        }
+        //func()
+    }
+    name = 'bok';
+    func()
+
+</script>
+--------------------
+<script>
+//闭包能解决
+//监听按钮的点击：【函数是一个作用域】->（function（））
+var btns=document.getElementsByTagName('button');
+for (var i = 0; i < btns.length; i++) {
+    (function(i){//此处闭包，此处的i有自己的作用域,并且可以是其他引用如j。此处i传入的值为0
+        btns[i].onclick = function(){
+            console.log('js点击了' + i + '个');
+        }
+    })(i)
+}
+//【没有块级作用域】引起的问题：for的块级
+//js异步执行
+//事件监听的回调函数属于异步任务，会在所有同步任务（如i++）执行完毕后才执行，则i在所有同步任务执行完后值为5.
+var btns=document.getElementsByTagName('button');
+for (var i = 0; i < btns.length; i++) {
+    btns[i].addEventListener('click',function(){//btn的i是自己的
+        console.log('Event听到点击了' + i + '个');//log的i回调的是var的i
+    })
+}
+</script>
+--------------------
+<script>
+let btns = document.getElementsByTagName('button');
+for (let i = 0; i < btns.length; i++) {
+    btns[i].onclick = function(){
+        console.log('点击了' + i + '个');//log的i拿的是let中的
+    }
+}
+</script>
+--------------------
+
+</body>
+</html>

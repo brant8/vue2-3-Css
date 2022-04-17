@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+</head>
+<body>
+
+<div id="app">
+    <cpn v-bind:c-Info="cInfo" v-bind:child-my-message="childMessage"></cpn>
+</div>
+
+<template id="cpn">
+    <div>
+        <h2>{{cInfo}}</h2>
+        <p>{{childMyMessage}}</p>
+    </div>
+</template>
+<script>
+    //子组件
+    const cpn={
+        template: id='#cpn',
+        props:{
+            cInfo:{
+                type:Object,
+                default(){
+                    return {};
+                },
+            },
+            childMyMessage:{
+                type: String,
+                default: '',
+            },
+        }
+    };
+    //父组件
+    let app = new Vue({
+        el:'#app',
+        data:{
+          cInfo:{
+              name: 'Tom',
+              age: 18,
+              height: 178,
+          },
+          childMessage:"我是...。",
+        },
+        components:{
+            cpn
+        }
+    })
+</script>
+</body>
+</html>

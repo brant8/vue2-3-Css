@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+
+<h2>箭头函数基本使用</h2>
+<script>
+  //1.箭头函数;也是一种定义函数的方式
+  const aaa = function(){
+  }
+  //2.对象字面量中定义函数
+  const obj = {
+    bbb: function () {
+    },
+    ccc(){
+    }
+  }
+  //3.ES6中的箭头函数
+  const ccc = (参数列表)=>{
+  }
+  const aaa = ()=>{
+  }
+</script>
+
+<h2>箭头函数的参数和返回值</h2>
+<script>
+    // 1.参数问题:
+    const sum = (sum1, sum2)=>{
+        return num1 + num2
+    }
+    const power = (num)=>{
+        return num * num
+    }
+    const power = num=>{ //一个参数可省略()
+        return num * num
+    }
+    // 2.1函数中多行代码时
+    const test= ()=>{
+        console.log("hello world")
+        console.log("hello world")
+    }
+    //2.2函数代码中只有一行代码
+    const mul = (num1,num2)=>{
+        return num1+num2
+    }
+    const mul = (num1,num2) => num1 + num2
+</script>
+
+<h1>箭头函数this的使用</h1>
+<script>
+    setTimeout(function(){
+        console.log(this)
+    },1000) //输出Window
+
+    setTimeout( ()=>{
+        console.log(this)
+    },1000)  //输出Window
+
+    //箭头函数中的this引用的就是最近作用域中的this
+    //箭头函数的this向外层作用域中，一层层查找this知道有this的定义。
+    const obj = {
+      aaa(){
+        setTimeout( ()=>{
+            console.log(this) //打印obj对象，箭头函数中没有this指向
+          })                  //此处向外层查找this，找到aaa()
+
+          console.log(this) //aaa(){}有obj对象的this
+
+        setTimeout(function(){
+            console.log(this) //打印Window，fn函数中返回一个call函数并且传回一个window
+        })
+      }
+    }
+</script>
+
+
+</body>
+</html>

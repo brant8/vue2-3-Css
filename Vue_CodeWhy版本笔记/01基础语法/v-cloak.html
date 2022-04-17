@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+  <style>
+    [v-cloak]{
+      display: none;
+    }
+  </style>
+
+</head>
+<body>
+页面加载的时候js没有完全加载完的情况：
+<div id="app">
+  <h2>Welcome 1...{{ message }}</h2>
+  <h2 v-cloak>Welcome 2...{{ message }}</h2>
+</div>
+
+<script>
+  //在Vue解析之前，divr中有一个属性v-cloak
+  //在vue解析之后，div中没有一个属性v-cloak
+  //延迟一秒展示
+  setTimeout(function(){
+    const app = new Vue({
+      el:'#app',
+      data:{
+        message:"hello world..",
+      }
+    })
+  },1000)
+
+</script>
+</body>
+</html>

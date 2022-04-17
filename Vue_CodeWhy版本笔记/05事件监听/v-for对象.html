@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+</head>
+<body>
+
+<div id="app">
+  <h2>{{ info.name }}</h2>
+<!--在遍历对象的过程中，如果只是获取一个值，那么获取到的是value-->
+  <ul>
+    <li v-for="item in info"> {{ item }} </li>
+  </ul>
+<!-- 获取key和value -->
+  <ul>
+    <li v-for="(value,key) in info"> {{ key }} - {{ value }} </li>
+  </ul>
+  <ul>
+    <li v-for="(value,key) in kids"> {{key}} is {{ value }} </li>
+  </ul>
+  <ul>
+    <li v-for="(value,key,index) in kids"> {{key}} is {{ value }} - {{index}}</li>
+  </ul>
+</div>
+
+<script>
+  const app = new Vue({
+    el:'#app',
+    data:{
+      info:{
+        name:"yay",
+        age:18,
+        height:180
+      },
+      kids:[{
+          name:"kitty",
+          gender:"female"
+        },{
+          name:"wendy",
+          gender:"female"
+        },{
+          name:"jim",
+          gender:"male"
+      }
+      ],
+    }
+  })
+</script>
+</body>
+</html>

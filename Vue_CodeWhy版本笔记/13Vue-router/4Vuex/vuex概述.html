@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<h2>管理什么状态</h2>
+<p>需要在多个见面间共享的才进行管理。</p>
+<p>如：登录状态，用户名称，头像，地理位置信息等等</p>
+<p>比如商品的收藏，购物车中的物品等等</p>
+<p>这些状态信息可以放在统一的地方，进行保存和管理，并且还是响应式的。</p>
+<p></p>
+<p></p>
+
+
+
+<script>
+  const shareobj={
+      name:'why'
+  }
+  Vue.prototype.shareObj  = shareobj //所有Vue组件都是继承自Vue，在Vue原型中加入一个变量达到共享一个变量
+  Vue.component('cpn1',{
+    //this.shareobj.name //不是响应式获取name
+  })
+  Vue.component('cpn2',{
+
+  })
+
+  const app = new Vue({
+      el:"#app"
+  })
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+</head>
+<body>
+
+<div id="app">
+    <h2 v-if="true">1 {{ message }}</h2>
+    <h2 v-if="false">2 {{ message }}</h2>
+    <h2 v-if="isShow">3 {{ message }}</h2>
+
+    <h2 v-if="score>=90">优秀</h2>
+    <h2 v-else-if="score>=80 && score<90">优</h2>
+    <h2 v-else-if="score>=60">及格</h2>
+
+</div>
+
+<script>
+    const app = new Vue({
+        el:'#app',
+        data:{
+            message:"hello world..",
+            isShow:true,
+            score:66,
+        }
+    })
+</script>
+</body>
+</html>

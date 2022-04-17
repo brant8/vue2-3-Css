@@ -1273,6 +1273,18 @@
         4.  与vant中的list下拉刷新判断刷新数据得到的新数组与旧数组进行合并
 
 35. console输入Vue.config查看vue配置。
+    1.  webpack配置简单的方式是在`vue.config.js`中的configureWebpack选项提供一个对象,该对象会被`webpack-merge`合并入最终的webpack配置。
+    2.  Vant定制主体方式：脚手架cli通过`vue.config.js`直接配置。[详情参考](https://youzan.github.io/vant/v2/#/zh-CN/theme#bu-zou-er-xiu-gai-yang-shi-bian-liang),通过配置的方法不实用，每次配置完需要重启服务器。
+        1.  推荐方式：vue.config.js通过 less 文件覆盖（文件路径为绝对路径）
+    ```JS
+    module.xexorts = {
+        configureWebpack:{
+            puugins:[
+                new MyAwesoneWebpackPlugin()
+                ]
+        }
+    }  
+    ```
    ```HTML
     <div id="app">
         
@@ -1291,6 +1303,15 @@
         })
     </script>
    ```
+
+36. 打包发布：默认情况，build打包后index.html只能通过HTTP服务启动，若通过文件`file///xxx`协议直接打开则无法实现，可以通过配置发布实现普通html打开即可浏览效果。
+    1.  通过配置`vue.config.js`实现：`publicPath`的配置给与空值或者`./`即可。
+        ```JS
+        module.exports = {
+            publicPath: './', // publicPath: '/' ->表示通过绑定域名发布打包
+            
+        }  
+        ```
 
 
 ___

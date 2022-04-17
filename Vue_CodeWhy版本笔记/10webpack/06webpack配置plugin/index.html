@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div id="app">
+</div>
+
+<div>
+    <h3>1.runtime-only</h3>
+    <p>代码中，不可以有任何的template</p>
+    <h3>2.runtime-compiler</h3>
+    <p>代码中，可以有template，因为有compiler可以用于编译template</p>
+</div>
+
+<h3>说明</h3>
+<p>添加版权的plugin - BannerPlugin，属于webpack自带插件,在bundle.js上声明版权</p>
+<p>1.打包html的插件：npm install html-webpack-plugin --save-dev</p>
+<p>2.config.js下导入路径，注册plugin</p>
+<p>3.编译npm run build，dist目录下生成index.html文件</p>
+<p>4.检查html文件若是有src="dist/bundle.js"在config下注释path路径，并且根据模板生成`div id="app"..`填充内容</p>
+<p>5.1对js等文件进行压缩处理的插件：npm install uglifyjs-webpack-plugin --save-dev</p>
+<p>5.2当uglifyjs-webpack-plugin无法安装使用npm install terser-webpack-plugin --save-dev</p>
+<p>6.config下导入路径，并配置plugin</p>
+
+
+
+</body>
+</html>

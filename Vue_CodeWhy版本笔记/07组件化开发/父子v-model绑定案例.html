@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+</head>
+<body>
+
+<div id="app">
+<!--    <cpn :number1="num1" :number2="num2"></cpn>-->
+
+    <cpn :number1="num1" :number2="num2" @num1change="num1change" @num2change="num2change"></cpn>
+</div>
+
+<template id="cpn">
+    <div>
+        <h2>props: {{ number1 }}</h2>
+        <h2>data : {{ dnumber1 }}</h2>
+        <input type="text" v-model="dnumber1"> <!-- 绑定input，单没有发射到父组件 -->
+        <input type="text" :value="dnumber1" @input="dnumber1=$event.target.value">
+<!--        <h3>绑定@input</h3>-->
+        <input type="text" :value="dnumber1" @input="num1Input">
+        <h2>props: {{ number2 }}</h2>
+        <h2>data : {{ dnumber2 }}</h2>
+        <input type="text" v-model="dnumber2">
+        <input type="text" :value="dnumber2" @input="dnumber2=$event.target.value">
+<!--        <h3>绑定@input</h3>-->
+        <input type="text" :value="dnumber2" @input="num2Input">
+
+    </div>
+</template>
+<script>
+ const app = new Vue({
+     el:'#app',
+     data:{
+         num1:1,
+         num2:0,
+     },
+     methods:{
+       num1change(value){
+         console.log(typeof value); //value=> String类型, String转Int，方法一：string*1=int; 方法二:parseInt(String)
+         //this.num1=value;
+         //this.num1=parseInt(value);
+         this.num1=parseFloat(value);
+       },
+       num2change(value){
+         //this.num2=value;
+         this.num2=parseFloat(value);
+       },
+     },
+     components:{
+         cpn:{
+             template: id="#cpn",
+             props:{
+                 number1:Number,
+                 number2:Number,
+             },
+            data(){
+                 return{
+                   dnumber1:this.number1,
+                   dnumber2:this.number2,
+                 };
+            },
+             methods:{
+                 num1Input(event){
+                     //1.将input中的value赋值到dnumber中
+                     this.dnumber1 = event.target.value
+                     //2.为了让父组件可以修改值，发出一个事件
+                     this.$emit('num1change',this.dnumber1);
+                     //3.同时修改number2的值
+                     this.dnumber2 = this.dnumber1 * 100;//修改number2中的data的值。
+                     this.$emit('num2change',this.dnumber2);//同时修改number中的prop的值。
+                 },
+                 num2Input(event){
+                     this.dnumber2 = event.target.value
+                     this.$emit('num2change',this.dnumber2);
+                     //this.$emit('父组件自定义事件',传递的值)
+
+                     //同时修改dnumber1的值
+                     this.dnumber1 = this.dnumber2 / 100;
+                     this.$emit('num1change',this.dnumber1);
+                 }
+             }
+         }
+     }
+ })
+</script>
+</body>
+</html>

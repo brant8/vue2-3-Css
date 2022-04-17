@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+</head>
+<body>
+
+<div id="app">
+<!--    这里不可以使用mustache语法-->
+<!--    <tabbar src="{{imageUrl}}" alt="">-->
+    <img v-bind:src="imageUrl" alt="">
+    v-bind语法糖（简写）
+    <img :src="imageUrl" alt="">
+</div>
+
+<script>
+    const app = new Vue({
+        el:'#app',
+        data:{
+            message:"hello world..",
+            imageUrl:"https://via.placeholder.com/150"
+        }
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<script src="./dist/bundle.js">
+    //1.管理员权限CMD命令： webpack ./src/main.js -o ./dist/bundle.js --mode development
+
+    //2.有了webpack.config.js后，直接在命令行输入webpack即可。
+    //后续produ.config.js等，以后会有其他命令
+
+    //3.在webpack.config.js的script标签下使用`build:"webpack"`映射到npm run build直接命令运行(分本地和全局)
+
+    //4.安装本地webpack版本/依赖：npm install webpack@5.66.0 --save-dev
+    //webpack -v查看当前版本， --save-dev
+    //package.json会多一个参数：devDependencies （开发性依赖）
+
+    //5.在终端使用命令webpack百分百使用全局webpack，本地的webpack可以在目录node_modules（本地安装完自动生成），使用映射npm的为本地webpack
+    //也可以使用./node_modules/.bin/webpack命令来执行，本地没有再使用全局环境变量webpack
+</script>
+
+
+</body>
+</html>

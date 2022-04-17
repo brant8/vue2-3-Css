@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<script>
+    //A. ajax普通方法根据两个结果返回值再处理的操作步骤
+    let isResult1 = false;
+    let isResult2 = false;
+    //result1和result2传出去回来后的返回值无法确定谁先返回的时候
+    //要同时判断result1和result2的结果再处理的步骤如下
+    $ajax({
+        url:'',
+        success:function(){
+            console.log("结果1")
+            isResult1 = true
+            handleResult()
+        }
+    })
+    $ajax({
+        url:'',
+        success:function(){
+            console.log("结果2")
+            isResult2 = true
+            handleResult()
+        }
+    })
+    function handleResult(){
+        if(isResult1 && isResult2){
+        }
+    }
+
+    //B. promise方式处理多个结果
+    Promise.all([
+        new Promise((resolve,reject) => {
+            $ajax({
+                url:'',
+                success:function(data){
+                    resolve(data)
+                }
+            })
+        }),
+        new Promise((resolve,reject)=>{
+            $ajax({
+                url:'url2',
+                success:function(data){
+                    resolve(data)
+                }
+            })
+        })
+    ]).then(results=>{
+        results[0]
+        results[1]
+    })
+</script>
+
+</body>
+</html>

@@ -1,0 +1,5 @@
+/* 可在main.js引入css，推荐在App.vue的style引入样式 */
+body{
+  padding: 0;
+  margin: 0;
+}

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+</head>
+<body>
+
+<div id="app">
+</div>
+
+<script>
+  const app = new Vue({
+    el:'#app',
+    data: {
+      books: [
+        {name: "算法导论", publication_date: "2006-09", price: 10, quantity: 2},
+        {name: "方程解", publication_date: "2016-04", price: 12, quantity: 1},
+        {name: "高数", publication_date: "2024-03", price: 13, quantity: 3},
+      ],
+    },
+    methods:{
+      filterFn(){
+        //filter中的回调函数有一个要求：必须返回一个boolean值
+        //true:当返回true是，函数内部会自动将这次回调的n加入到新的数组中
+        //false:当返回false时，函数内部会过滤掉这次的n
+        const nums=[10,20,30,60,120,110,320];
+        let newNums = nums.filter(function(n){
+          //return true;
+          return n< 100;//筛选小于100的数
+        });
+        console.log(newNums);
+      },
+
+      mapFn(){
+        //map函数的使用
+        const nums=[10,20,30,60];
+        let num2 = nums.map(function(n){
+          return n*2;
+        })
+        return num2;
+      },
+
+      reduceFn(){//reduce作用对数组中所有的内容进行汇总
+        const nums=[10,20,30,60];
+        nums.reduce(function(preValue, n){
+          return
+        },0)
+      },
+      //第一次遍历： preValue 为0， n 为20 （因为初始化写了0，在’},0)‘末尾的初始化值）
+      //第二次遍历： preValue根据函数内的return返回
+      //              preValue 为 20,即为preValue + n, n 为 40
+      //遍历完成四遍。
+      //x.reduce(参数一，参数二)
+      // Array<number>.reduce(callbackfn:(
+      //         previousValue: number,
+      //         currentValue: number,
+      //         currentIndex: number,
+      //         array: number[]) => number):number
+    },
+    computed:{
+        summ(){
+        const nums=[10,20,30,120,324];
+        let total = nums.filter(function(n){
+            return n<100;
+          }).map(function (n){
+            return n * 2;
+          }).reduce(function(preValue, n){
+            return preValue+n;
+          },0);
+        console.log(total);
+        },
+        summ2(){ //简写版本
+        const nums=[10,20,30,120,324];
+        let total = nums.filter(n => n<100).map(n => n * 2).reduce((preValue,n) => preValue+n);
+        console.log(total);
+        }
+    },
+  })
+</script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+</head>
+<body>
+
+<div id="app">
+    <!-- 3.使用组件-->
+    <cpn1></cpn1>
+    <cpn2></cpn2>
+</div>
+<div id="app01">
+    <cpn01></cpn01>
+    <cpn02></cpn02>
+</div>
+
+<script>
+    //1.创建组件构造器对象
+    const cpnC1 = Vue.extend({
+        template:`
+            <div>
+                <h2>我是标题1</h2>
+                <p>我是内容123</p>
+            </div>
+        `
+    });
+    const cpnC3 = Vue.extend({
+        template:`
+            <div>
+                <h2>我是标题3</h2>
+                <p>我是内容123</p>
+            </div>
+        `
+    });
+    const cpnC2 = Vue.extend({
+        template:`
+            <div>
+                <h2>我是标题2</h2>
+                <p>我是内容123</p>
+                <cpn3></cpn3> <!--需要放在<div>里面-->
+            </div>
+        `,
+        components:{
+            cpn3:cpnC3,
+        }
+    });
+
+    //2.注册组件
+    //Vue.component('cpn',cpnC);
+
+    //这里app也可以是组件，叫做根组件
+    const app = new Vue({
+        el:'#app',
+        data:{
+            message:"hello world..",
+        },
+        components:{
+            cpn1:cpnC1,
+            cpn2:cpnC2,
+        }
+    });
+
+    //1.全局组件注册的语法糖
+    //1.创建组件构造器
+    //const cpn01 = Vue.extends();  //此处省去extends({...})
+    //2.注册组件
+    //原来的：Vue.component('cpn01',cpn01);
+    //注册的是全局组件
+    Vue.component('cpn01',{
+        template:`
+            <div>
+            <h2>我是标题语法糖1</h2>
+            </div>
+       `,
+    });
+
+    //注册局部组件语法糖方式
+    const app01 = new Vue({
+        el:'#app01',
+        data:{
+            message:"hello world..",
+        },
+        components:{
+            'cpn02':{
+                template:`
+                    <div>
+                    <h2>我是标题语法糖2</h2>
+                    </div>
+                `,
+            }
+        }
+    });
+
+</script>
+</body>
+</html>

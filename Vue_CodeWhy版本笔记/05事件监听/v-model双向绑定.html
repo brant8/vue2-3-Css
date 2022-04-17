@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+</head>
+<body>
+
+<div id="app">
+    <input type="text" v-model="message">
+    {{message}}
+    <input type="text" :value="message" v-on:input="valueChange">
+    <input type="text" :value="message" v-on:input="message =$event.target.value">
+</div>
+
+<script>
+    const app = new Vue({
+        el:'#app',
+        data:{
+            message:"hello world..",
+        },
+        methods:{
+            valueChange(event){//浏览器生产的event事件，在html上有个默认输入event可省略。
+                this.message = event.target.value;
+            }
+        }
+    })
+</script>
+</body>
+</html>

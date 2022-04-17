@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+</head>
+<body>
+
+<div id="app">
+  <ul>
+    <li v-for="item in message" :key="item">{{ item }}</li>
+  </ul>
+  <button @click="add">加了个油</button>
+</div>
+<p>添加key让vue插入的时候更高效的添加元素，而不是用diff来在index插入处往后的逐步替换</p>
+<p>console输入app.message.splice(2,2)：删除index为2后面的两个元素</p>
+<p>console输入app.message.splice(2,0,'F')：在index为2的处添加元素F</p>
+<br>
+<p>响应式追加：app.message.push('aaa')</p>
+
+<script>
+  const app = new Vue({
+    el:'#app',
+    data:{
+      message:['a','f','b','c','d'],
+    },
+    methods:{
+      add(){
+        //响应式追加一个元素
+        //app.message.push("+10086");
+
+        //响应式删除数组的最后一个元素
+        //app.message.pop();
+        //this.message.pop();
+
+        //响应式删除数组的第一个元素
+        //this.message.shift();
+
+        //响应追加在第一个元素
+        //this.message.unshift("abc");
+
+        //splice作用：删除元素/插入元素/替换元素
+        //(start)从第start个元素开始删
+        //(start,num)从第start个元素开始删除num个元素
+        //(start,num,[...])从第start个元素开始替换num个元素并且赋值[..]
+        //(start,0,[...])从第start个元素开始插入num个元素并且赋值[..]
+        //this.message.splice(1,1)//删除第一个元素
+        //this.message.splice(3,3,'y','a','y')//从索引3开始替换3个元素
+
+        //this.message.sort()
+
+        //this.message.reverse()
+
+        //通过所以只修改数组中的元素 -> 不会直接响应的页面刷新出来
+        //this.message[0] = 'bbb';
+        //set(要修改的对象，索引值，修改后的值)
+        Vue.set(this.message,0,'ababab')
+
+
+      }
+    }
+  })
+</script>
+</body>
+</html>

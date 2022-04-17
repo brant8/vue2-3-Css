@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h2>Promise时异步编程的一种解决方案</h2>
+<p>一般情况下有异步操作进行封装。</p>
+<p></p>
+<p></p>
+
+<script>
+    const a = 3+5 //此为同步，3+5结果赋值给变量a
+</script>
+<script>
+    //举例一：多重回调场景
+    $.ajax('url',function(data1){
+        $.ajax(data1['url2]'], function(data2){
+            console.log((data2))
+        })
+    })
+
+    //举例二：一秒后请求数据
+    setTimeout(function(){
+        let data = 'hello world'
+        console.log(content);
+    },1000)
+
+    //根据举例二的Promise格式：
+    new Promise( (resolve,reject)=>{
+        setTimeout(function(){ //此处resolve和reject均为函数
+            resolve('hello world...1')
+            reject('Error Data')
+        },1000)
+    } ).then(data=>{ //来自resolve需要执行的
+        console.log(data)
+        return new Promise((resolve, reject)=>{ //如果套娃，函数里还有海曙，使用return方法
+            setTimeout(()=>{
+                resolve("hello word...2")
+            })
+        }).then(()=>{
+            console.log(data)
+        })
+    }).catch(error=>{ //来自reject需要执行的
+        console.log(error)
+    })
+
+    //promise另外的处理形式
+    new Promise((resolve,reject)=> {
+        setTimeout(()=>{
+            resolve("hello")
+        },1000)
+    }).then( data=>{
+        console.log(data);
+    },error=>{
+        console.log(error)
+    })
+
+    //wrapped into
+    //new Promise(resolve => resolve(结果))
+    //网络请求使用return返回链式
+    //处理aaa+111
+    //处理aaa111+222
+    new Promise((resolve,reject)=>{
+        setTimeout(()=>{
+            resolve("aaa")
+        },1000)
+    }).then(res=>{
+        //1.自己处理10行代码
+        console.log(res,"第一层的10行处理代码")
+
+        //2.对结果的第一次处理
+        return new Promise( (resolve)=>{
+            resolve(res + '111')
+        })
+        //return Promise.reject("error message")
+        //throw 'error message'
+    }).then( res=>{
+        console.log(res,"第二层的10行处理代码")
+
+        return new Promise( (resolve)=>{
+            resolve(res+"222")
+        })
+    }).then( res=>{
+        console.log((res,"第三层的10行处理代码"))
+    }).catch(err=>{
+        console.log(err)
+    })
+
+    //第一种简写方式
+    //return Promise.resolve(结果))简写
+    new Promise((resolve,reject)=>{
+        setTimeout(()=>{
+            resolve("aaa")
+        },1000)
+    }).then(res=>{
+        //1.自己处理10行代码
+        console.log(res,"第一层的10行处理代码")
+
+        //2.对结果的第一次处理
+        return Promise.resolve(res + '111')
+    }).then( res=>{
+        console.log(res,"第二层的10行处理代码")
+
+        return Promise.resolve(res+"222")
+    }).then( res=>{
+        console.log((res,"第三层的10行处理代码"))
+    })
+
+    //第二种简写方式
+    //return (结果) 内部封装
+    new Promise((resolve,reject)=>{
+        setTimeout(()=>{
+            resolve("aaa")
+        },1000)
+    }).then(res=>{
+        //1.自己处理10行代码
+        console.log(res,"第一层的10行处理代码")
+
+        //2.对结果的第一次处理
+        return (res + '111')
+    }).then( res=>{
+        console.log(res,"第二层的10行处理代码")
+
+        return res+"222"
+    }).then( res=>{
+        console.log((res,"第三层的10行处理代码"))
+    })
+</script>
+</body>
+</html>

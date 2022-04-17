@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+</head>
+<body>
+
+<div id="app">
+    <h2>当前计数: {{ counter }}</h2>
+    <button v-on:click="counter++">+</button>
+    <button v-on:click="counter--">-</button>   <br>
+
+    <button @click="add">+</button>
+    <button @click="subtraction">-</button>
+</div>
+
+<script>
+    const app = new Vue({
+        el:'#app',
+        data:{
+            counter:0,
+        },
+        methods:{
+            add:function(){
+                this.counter++;
+            },
+            subtraction:function(){
+                this.counter--;
+            }
+        }
+    })
+
+    //js代码步骤
+    //1.拿button元素
+    //2.添加监听事件
+    //。。。
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>vueroutercli2</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  <h2>实现页面刷新</h2>
+  <p>操作：</p>
+  <p>1.在console界面输入：location.hash='foo'</p>
+  <p>2.地址栏对应变为：http://localhost:8080/#/bbb</p>
+  <p></p>
+
+
+  <h2>说明：</h2>
+  <p>1.URL的hash：也就是锚点（#），本质上时改变window.location的href属性。</p>
+  <p>可以通过直接赋值location.hash来改变href但是页面不发生刷新。</p>
+  <p>注：hash值的url会有#符号。</p>
+  <p>2.1HTML5的history.pushState（{data},'title','?url'）也可以实现改变url不刷新。</p>
+  <p>console命令：hitsory.pushState({},'','home')  ->  localhost:8081/home</p>
+  <p>console命令：hitsory.pushState({},'','about')  ->  localhost:8081/about</p>
+  <p>2.2有后退键。console命令：hitsory.back()  ->  localhost:8081/home  -> 移除掉about，压栈性质，先进后出。</p>
+  <p>2.3history.go(-1) == history.back()</p>
+  <p>2.4history.go(1) == history.forward()</p>
+  <p></p>
+  <p>3.HTML5的history.replaceState（{data},'title','?url'）</p>
+  <p>console命令：hitsory.replaceState({},'','home')  ->  localhost:8081/home</p>
+  <p>console命令：hitsory.replaceState({},'','about')  ->  localhost:8081/about</p>
+  <p>没有后退键。</p>
+  <p></p>
+
+  <h2>安装和使用vue-router</h2>
+  <p>1.安装：npm install vue-router --save</p>
+  <p>2.导入路由对象，调用Vue.use(VueRouter)</p>
+  <p>创建路由实例，传入路由映射配置</p>
+  <p>在Vue实例中挂载创建的路由实例</p>
+  <p>3.具体配置步骤在src/router/index.js</p>
+  <h3>使用步骤</h3>
+  <p>4.创建路由组件</p>
+  <p>5.在哪index.js配置路由映射：组件和路由映射关系（需导入组件路径）</p>
+  <p>6.在App.vue使用路由：通过”router-link“和”router-view“</p>
+  <p>说明：router-link相当于a标签</p>
+  <p>router-view为展示，如果没有router-view则只有链接没有内容</p>
+  <p>7.默认vue使用hash值的url会有#符号，更改方式在main.js里添加history模式</p>
+  <p></p>
+
+  <h2>传递参数的方式</h2>
+  <p>params:</p>
+  <p>配置路由格式：/router/:id</p>
+  <p>传递的方式：在path后面跟上对应的值</p>
+  <p>传递后形成的路径：/router/123,/router/abc</p>
+  <p></p>
+  <h2>query：</h2>
+  <p>配置路由格式：/router，也就是普通配置</p>
+  <p>传递的方式：对象中使用query的key作为传递方式</p>
+  <p>传递后形成的路径：/router?id=123,/router?id=abc</p>
+  <p></p>
+
+  <h2>template中的keep-alive遇见vue-rouer</h2>
+  <p>keep-alive是Vue内置的一个组件，可以使被包含的组件保留状态，或避免重新渲染。</p>
+  <p>router-view也是一个组件，如果直接被包在keep-alive里面，所有路径匹配到的视图组件都会被缓存。 </p>
+  <p>1.include： 字符串或正则表达，只有匹配的组件会被缓存。如首页新闻或者消息选择的路由。</p>
+  <p>2.exclude： 字符串或正则表达式，任何匹配的组件都不会被缓存。如个人档案每次打开都是新的。</p>
+  <p>在App template中设置.</p>
+  <p></p>
+
+  </body>
+</html>

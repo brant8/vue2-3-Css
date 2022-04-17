@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+</head>
+<body>
+
+<div id="app">
+    <h2>总价格： {{ totalPrice }}</h2>
+</div>
+
+<script>
+    const app = new Vue({
+        el:'#app',
+        data:{
+            books:[
+                {id:101, name:'php书',price:130},
+                {id:102, name:'java书',price:150},
+                {id:103, name:'mysql书',price:160},
+            ],
+        },
+        computed: {
+            //高阶函数：filter/map/reduce
+            totalPrice:function(){
+                let result = 0;
+                for (let i = 0; i < this.books.length; i++) {
+                    result+=this.books[i].price;
+                }
+                for (let i in this.books) {
+
+                }
+                for (let book of this.books) {
+
+                }
+                return result;
+            }
+        }
+    })
+</script>
+</body>
+</html>
