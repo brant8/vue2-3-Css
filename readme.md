@@ -1,7 +1,8 @@
 [数据分析](https://yrzu9y4st8.feishu.cn/docs/doccnzwzLDGEnGoVsF6YT9Sh2Zd) / [B 站](https://www.bilibili.com/video/BV1ZM4y1u7uF?spm_id_from=333.337.search-card.all.click)
 
+<h1>Vue2</h1>
 
-### 学习Vue2 [其他笔记链接](https://github.com/brant8/Vue2Study)
+### 学习Vue2 [github笔记链接](https://github.com/brant8/Vue2Study)
 1. webpack前端工程化具体解决方案：模块化开发，代码压缩混淆，处理浏览器端JS兼容性如ES6等。
    1. webpack基本使用：
       1. 在新建空白目录下运行：`$ npm init -y`;（`npm i`在复制public和src等其他目录结构，没有node_modules时运行，i代表install）
@@ -1285,24 +1286,24 @@
         }
     }  
     ```
-   ```HTML
-    <div id="app">
-        
-    </div>
-    <script>
-        const vm=new Vue({
-        el:'#app',
-        data：{
-            r:'',
-        }，
-        computed:{//${} 模板字符串解析变量的写法
-            rgb:function(){
-                //return '${this.r}'
+    ```HTML
+        <div id="app">
+            
+        </div>
+        <script>
+            const vm=new Vue({
+            el:'#app',
+            data：{
+                r:'',
+            }，
+            computed:{//${} 模板字符串解析变量的写法
+                rgb:function(){
+                    //return '${this.r}'
+                }
             }
-        }
-        })
-    </script>
-   ```
+            })
+        </script>
+    ```
 
 36. 打包发布：默认情况，build打包后index.html只能通过HTTP服务启动，若通过文件`file///xxx`协议直接打开则无法实现，可以通过配置发布实现普通html打开即可浏览效果。
     1.  通过配置`vue.config.js`实现：`publicPath`的配置给与空值或者`./`即可。
@@ -1313,11 +1314,221 @@
         }  
         ```
 
+37. <strong>ES6 扩展</strong>：运行该 .js 命令 `node xx.js`
+    1.  每个JS文件都是一个独立的模块。
+    2.  导入其他模块成员使用`import`关键字。
+    3.  向外共享模块成员使用`export`关键字。
+    4.  在node.js中默认仅支持CommonJS模块化规范，若要支持需要配置
+        1.  确保安装V14.15.1或更高版本node.js
+        2.  查看版本命令`node -v`
+        3.  在package.json根节点中"type":"module"节点;默认"type":"CommonJs"。
+    5.  ES6模块化3中用法
+        1.  默认导出与默认导入
+            1.  `export default 默认导出的成员`
+            ```JS
+            let n1 = 10
+            function show(){}
+            export default { n1, show }   //注意：只允许唯一一次export default
+            ```
+            2. `import 接收名称 from '模块标识符'`
+            ```JS
+            import m1 from './m1.js'
+            console.log(m1)
+            ``` 
+        2.  按需导出与按需导入
+            ```JS
+            //按需导出 : 可以导出多次按需，导入和导出名称必须保持一致
+            export let s1= 'aa'
+            export function say(){}
+                export default {}  //默认导出空
+                export default { a: 2} //默认导出对象
 
-___
+            //按需导入  ： 可以和默认导入一起使用(默认导出使用自定义对象或空对象预留均可)
+            import {s1,s2,say} from './f1.js'
+            //as关键字可以重命名，如 s2 as a2
+            import info,{s1,say} from './f1.js' //info为default导出内容
+
+            ```  
+        3.  直接导入并执行模块中的代码
+            1.  指向单纯的执行某个模块中的代码，并不需要得到模块中向外共享的成员
+            ```JS
+            for(let i = 0; i<3; i++){ console.log(i) }
+            //导入上行所处js文件名 不需要from接收名字
+            import './m3.js'
+            ```  
+38. Promise
+    1.  回调地狱：多层回调函数的相互嵌套。 缺点 - 耦合性太强维护性差，可读性差。
+    ```JS
+    setTimeout( ()=>{   //第一层回调函数
+        console.log('延迟1秒输出')
+
+        setTimeout( ()=>{  //第二层回调函数
+            console.log('延迟2秒输出')
+        },2000 )
+    }, 1000)  
+    ```
+    2. 为了解决回调地狱，ES6（ESCMAScript 2015）新增了Promise概念。
+       1. Promise是一个构造函数
+          1. 可以创建Promise实例：`const p = new Promise() `
+          2. new出来的Promise实例对象，<strong>代表一个异步操作</strong>（异步耗时）
+       2. `Promise.prototype`上包含一个`.then()`方法
+          1. 浏览器查看Promise：`console.dir(Promise)`
+          2. 可以通过<strong>原型链</strong>的方式访问到.then()方法，如`p.then()`
+          3. `.then()`方法用来预先指定成功和失败的回调函数
+          4. `p.then( result=>{}, error=>{} )`
+          5. 成功的回调函数是必选的，失败的回调函数是可选的。
+          ```JS
+          //基于回调函数按顺序读取文件内容
+          //读取文件1.txt
+          fs.readFile('/.files/1.txt','utf8',(err1,r1)=>{
+              if(err1) return console.log(err1.message) //读取文件1失败
+              console.log(r1) //读取文件1成功
+              //读取文件2.txt
+              fs.readFiel('./files/2.txt', 'utf8', (err2,r2)=>{
+                  if(err2) return console.log(err2.message) //读取文件2失败
+                  console.log(r2) //读取文件2成功
+              })
+          }) 
+          ```
+          6. 基于then-fs读取文件内容：
+             1. node.js官方提供的fs模块仅支持回调函数的读取方式读取文件，不支持Promise调用方式，需要安装then-fs第三方包。
+             2. 安装命令：`npm install then-fs`. 
+             3. then-fs提供readFile()方法，可以<srong>异步</srong>读取文件内容。返回的是Promise实例对象，因此可以调用.then()方法。
+           ```JS
+           //基于Promise方式读取文件
+           import thenFs from 'then-fs'
+           //.then()中的失败回调时可选的，可以被省略。
+           thenFs.readFile('files/1.txt', 'utf8').then( r1 => {console.log(r1)}, err1 => {console.log(err1.message)} )
+           thenFs,readFile('files/2.txt', 'utf8').then( r2 => {console.log(r2)}, err2 =>{console.log(err2.message)} )
+           //上述代码无法保证文件读取顺序，需要进一步改造
+
+           //基于Promise 按顺序 读取文件的内容， Promise的链式调用
+           thenFs.readFile('files/1.txt','utf8') //1.返回值是Promise的实例对象
+                .then( (r1)={ //2.通过.then为第一个Promise实例指定成功之后的回调函数
+                    console.log(r1)
+                    return thenFs.readFile('files/2.txt','utf8') //3.在第一个.then中返回一个新的Promise实例对象
+                })
+                .then( (r2)=>{ //4.继续调用.then，为上一个.then的返回值指定成功之后的回调函数
+                    console.log(r2)
+                })
+                .catch( err=>{ //捕获第一行发生的错误并输出错误
+                    console.log(err.message)
+                } )
+
+           ```
+          7. 通过`.catch`捕获错误：在Promise的链式操作中如果发生了错误，可以使用Promise.prototype.catch方法进行捕获和处理。
+             1. 也可以把catch放在then之前，不过会先出现无法读取的错误。
+          8. `Promise.all()`：会发起并行的Promise异步操作，等所有的异步操作全部结束后才会执行下一步`.then`操作（等待机制）。
+          ```JS
+          //定义一个数组，存放2个读文件的异步操作（按顺序）
+          const promiseArr = [
+              thenFs.read('files/1.txt','utf8'),
+              thenFs.read('files/2.txt','utf8'),
+          ]
+          //2.将Promise的数组，作为Promise.all()的参数
+          Promise.all(promiseArr)  //Promise.race(promiseArr) 赛跑机制
+            .then( ([ r1,r2 ])=>{  //.then( (result)=>{..} )  最先跑完的输出结果
+                console.log(r1,r2)
+            } )
+            .catch( err=>{ //3.捕获Promise异步操作中的错误
+                console.log(err.message)
+            } )
+          ``` 
+          9. 👆`Promise.race()`：发起并行的Promise异步操作，只要任何一个操作完成，就立即执行下一步.then操作（赛跑机制）。
+          10. 基于Promise封装读文件的方法
+              1.  方法定义getFile方法
+              2.  接收一个形参fpath，读取文件路径
+              3.  返回值Promise实例对象   
+              ```JS
+              function getFile(fpath){
+                  return new Promise() //只创建了一个形式上的异步操作
+                  }     
+              ```  
+              4. 创建具体的异步操作，需要在new Promise()构造函数期间，传递一个fcuntion函数，将具体的异步操作定义到function函数内部。 
+              ```JS
+              function getFile(fpath){
+                  return new Promise( function(resolve,reject){
+                      //一个具体的、读文件的异步操作
+                      fs.readFile(fpath,'utf8',(err,dataStr)=>{
+                          if(err) return reject(err)
+                          resolve(dataStr)
+                      } )
+                  }) 
+                  }
+              //getFile方法调用过程
+              getFile('./1.txt').then(成功的回调函数，失败的回调函数)
+                  getFile('./1.txt').then( (r1)=>{ console.log(r1) }).catch( err=> console.log(err.message))
+              ```
+              5. 👆获取.then的两个实参：通过.then指定的成功和失败的回调函数，可以在function形参中进行接收。    
+                 1. resolve形参：调用getFiles（）方法时，通过.then指定的成功的回调函数
+                 2. reject形参：调用getFiles（）方法时，通过.then指定的失败的回调函数。
+
+39. `async/await`是ES8（ECMAScript 2017）引入的新语法，用来简化Promise异步操作。在async/await出现之前，只能通过`链式.then()`方式处理Promise异步操作。
+    1.  如果在function中使用了await，则function必须被async修饰
+    2.  在async中，第一个await之前的代码会同步执行，await之后的代码会异步执行。
+    3.  异步任务等同步任务执行完毕后再执行
+    ```JS
+    //链式.then()方式处理Promise异步操作:解决回调地狱问题，缺点代码冗余，阅读性差
+    thenFs.readFile('./1.txt','utf8')
+        .then( r1=>{
+            console.log(r1)
+            return thenFs.readFile('./2.txt', 'utf8')
+            } )
+        .then( r2=>{
+            console.log(r2)
+            return thenFs.readFile('./3.txt','utf8')
+        }) 
+        .then( r3=>{
+            console.log(r3)
+        })   
+
+    //使用async/await简化Promise异步操作
+    async function getAllFile(){
+        const r1 = await thenFs.readFile('./1.txt','utf8')
+        console.log(r1)  //thenFs.readFile('./1.txt','utf8')返回Promise实例，加了await后返回的不再是Promise实例，而是结果值
+        const r2 = await thenFs.readFile('./2.txt', 'utf8')
+        console.log(r2)
+        const r3 = await thenFs.readFile('./3.txt','utf8')
+        console.log(r3) 
+    }
+    getAllFile()
+    ```  
+40. Javascript是一门单线程执行编程语言，同一时间只能做一件事。
+    1.  为了防止某个耗时任务导致程序假死的问题，Javascript把待执行的任务分了两类
+    2.  同步任务 (`synchronous`)：非耗时任务，指的是再主线程上排队执行的任务；只有前一个任务执行完毕，才能执行后一个任务。创建新实例对象立刻执行，回调函数稍后执行。
+    3.  异步任务 (`asynchronous`)：耗时任务，异步任务由Javascript委托给宿主环境(js执行环境如浏览器/node)进行执行；当异步任务执行完成后，会通知Javascript主线程执行异步任务的回调函数。
+      
+        |  堆    👈|  栈   （JavaScript主线程）👈|   👉宿主环境（浏览器或Node.js） |    
+        |  ----  | ----  |                   --            |                    
+        |    -    | 同步任务1 |             |                 
+        |    -    | 异步任务A | 委托宿主环境-> `fs.readFile('路径','utf8',cbA)`| 
+        |    -    | 异步任务B | 委托宿主环境->  `setTimtout(cbC, 0)`|   
+        |    -    | 同步任务1 |             |  
 
 
-## CSS学习
+        |  EventLoop 回调  （主线程不断重复此步骤⭕）  | --  |  --|
+        |  ----  | ----  | --|
+        |  callback queue任务队列  | cbC |  cbA |
+        |  Javascript主线程的执行栈被清空后，会读取任务队列中的回调函数，次序执行 |
+    4. EventLoop：Javasccript主线程从”任务队列“中读取异步任务的回调函数，放到执行栈中一次执行。这个过程是循环不断的，所以整个的这种运行机制又称为EventLoop（事件循环）。
+    5. 两类异步任务：
+       1. 宏任务（macrotask）：异步Ajax请求、setTimtout、setInterval、文件操作，其他宏任务。
+       2. 微任务（microtask）：Promise.then、Promise.catch、Promise.finally、process.nextTick、其他微任务
+       ```JS
+       //同步任务总是最先执行
+                                ↗️------------无--------------⤵️
+       宏任务 -> 执行结束 -> 有微任务 -> 执行所有微任务 -> 执行下一个宏任务 
+          ↖️------------------------------------------------↩ 
+        //每一个宏任务执行完之后，都会检查时候存在待执行的微任务，
+        //如果有，则执行完所有为日任务后，再继续执行下一个宏任务。
+
+       ```
+
+
+
+<h1>CSS学习</h1>
+
+
 1. 选择器：选择标签。
     1. 标签（元素）选择器如`<div>`,`<p>`。
     2. class类选择器。`.class`
