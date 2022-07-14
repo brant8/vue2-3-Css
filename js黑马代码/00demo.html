@@ -18,6 +18,20 @@
             return day + '天' + hours + '时' + minutes + '分' + s + '秒';
         }
         console.log(countDown('2022-07-13 18:00:00'));
+
+
+        //对象：{name:'zhangsan', age:18}
+        var str = "19231091";
+        var o = {}; //把每个字符都存储给对象，如果对象没有该属性就为1，如果存在了就+1
+        for (var i = 0; i < str.length; i++) {
+            var chars = str.charAt(i);
+            if (o[chars]) { //o[chars]得到的是属性值
+                o[chars]++;
+            } else {
+                o[chars] = 1; //给对象设置属性和赋值
+            }
+        }
+        console.log(o);
     </script>
 </head>
 
