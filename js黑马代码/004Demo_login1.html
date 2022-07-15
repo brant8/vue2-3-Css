@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .box {
+            position: relative;/*子绝父相*/
+            width: 400px;
+            border-bottom:1px solid #ccc;
+            margin:100px auto;
+        }
+        .box input{
+            width:370px;
+            height:30px;
+            border:0;
+            outline: none; /*鼠标点击后不显示边框*/
+        }
+        .box img{
+            position:absolute;
+            top:2px;
+            right: 2px;
+            width: 24px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <label for="">
+            <img src="https://via.placeholder.com/15" id="eye" alt="">
+        </label>
+        <input type="password" name="" id="pwd">
+    </div>
+<!--    思路：-->
+<!--        1.一个按钮两个状态，点击一次，切换为文本框，继续点击一次切换为密码框-->
+<!--        2.算法：利用一个flag变量，判断flag的值，如果是1就切换伪文本框，flag设置为0；如果是0就切换为密码框，flag设置为1.-->
+    <script>
+        //1.获取元素
+        var eye = document.getElementById('eye');
+        var pwd = document.getElementById('pwd');
+        //2.注册事件 处理程序
+        var flag=0;
+        eye.onclick = function () {
+            if(flag==0) {
+                pwd.type = 'text';
+                eye.src='https://via.placeholder.com/15'; //打开眼睛的图片
+                flag=1;
+            }else{
+                pwd.type='password';
+                eye.src='https://via.placeholder.com/15';//闭眼的图片
+                flag=0;
+            }
+        }
+    </script>
+</body>
+
+</html>

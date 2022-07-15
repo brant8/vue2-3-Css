@@ -36,7 +36,46 @@
 </head>
 
 <body>
+    <div id="time">我是帅哥哥</div>
+    <script>
+        var timer = document.getElementById('time');
+        console.log(timer); //<div id="time">我是帅哥哥</div>
+        console.log(typeof timer); // object
+        console.dir(timer); //打印返回的元素对象，更好的查看里面的属性和方法
+    </script>
+    <ul>
+        <li>哇啦啦1</li>
+        <li>哇啦啦2</li>
+        <li>哇啦啦3</li>
+        <li>哇啦啦4</li>
+    </ul>
+    <ol>
+        <li>1</li>
+        <li>2</li>
+    </ol>
+    <script>
+        var lis = document.getElementsByTagName('li');
+        console.log(lis);
+        for (var i = 0; i < lis.length; i++) {
+            console.log(lis[i]);
+        }
+        var ol = document.getElementsByTagName('ol'); //[ol]
+        console.log(ol);
+        console.log(ol[0].getElementsByTagName('li'));
+    </script>
 
+
+    <button>显示当前系统时间</button>
+    <div id="content">某个时间</div>
+    <script>
+        //1.获取元素
+        var btn = document.querySelector('button');
+        var _div = document.querySelector('.content');
+        //2.注册事件
+        btn.onclick = function() {
+            _div.innerText = "被更换的内容：就是酱紫";
+        }
+    </script>
 </body>
 
 </html>
