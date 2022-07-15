@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        div{
+            width:100px;
+            height: 100px;
+            background-color: greenyellow;
+        }
+    </style>
+</head>
+<body>
+
+    <div></div>
+    <script>
+        //1.获取元素
+        var div = document.querySelector('div');
+        //2. 注册事件 处理程序
+        div.onclick = function(){
+            //div.style 里面的属性 采取驼峰命名法
+            this.style.backgroundColor = 'purple';
+            this.style.width = '250px';
+        }
+    </script>
+</body>
+</html>

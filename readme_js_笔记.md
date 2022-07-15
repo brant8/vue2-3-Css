@@ -829,7 +829,7 @@
        </script>
        ```
 
-    2. 常用元素的属性操作
+    2. **常用元素的属性操作**
 
        1. innerText、innerHTML：改变元素内容
 
@@ -852,7 +852,7 @@
           </script>
           ```
 
-    3. 表单元素的属性操作
+    3. **表单元素的属性操作**
 
        1. 利用DOM可以操作如下表单元素的属性
 
@@ -879,7 +879,7 @@
           </script>
           ```
 
-       3. 案例分析：登录框按钮有眼睛按钮，点击可切换明文显示密码，详细代码]()
+       3. 案例分析：登录框按钮有眼睛按钮，点击可切换明文显示密码，[详细代码](https://github.com/brant8/vue2-3-Css/blob/main/js%E9%BB%91%E9%A9%AC%E4%BB%A3%E7%A0%81/004Demo_login1.html)
 
           ```js
           //1.获取元素
@@ -900,7 +900,64 @@
           }
           ```
 
-       4. 
+    4. **样式属性操作**
+
+       1. 通过 js 修改元素的大小、颜色、位置等样式
+
+       2. 行内样式操作：`element.style` (当修改的样式较少时使用)
+
+          ```js
+          //1.获取元素
+          var div = document.querySelector('div');
+          //2. 注册事件 处理程序
+          div.onclick = function(){
+              //div.style 里面的属性 采取驼峰命名法
+              this.style.backgroundColor = 'purple';
+              this.style.width = '250px';
+          }
+          /*
+          JS修改style样式操作，产生的时行内样式，CSS权重比较高
+          */
+          ```
+
+       3. 类名样式操作：`element.className`
+
+          1. 现在css中预设要更改成什么样的样式，然后js点击事件进行类切换
+
+          2. `class`因为是个保留字，因此使用`className`来操作元素类名属性。
+
+          3. `className`会直接更改元素的类名，会覆盖原先的类名。
+
+          4. 适用于样式较多或者功能复杂的情况
+
+             ```html
+             <style>
+                 div{
+                     height: 50px;
+                     width:50px;
+                     background-color: red;
+                 }
+                 .change{
+                     background-color: purple;
+                     color:#ffffff;
+                     font-size:25px;
+                 }
+             </style>
+             
+             <div>文本</div>
+             <!--如果原来有class，则js会覆盖原来的class名-->
+             <div class='first'>文本2</div> 
+             <script>
+                 var test = document.querySelector('div');
+                 test.onclick = function () {
+                     //相当于<div class='change'>..
+                     this.className = 'change'; //会覆盖原来的类名
+                     this.className = 'first change';//保留原来的first
+                 }
+             </script>
+             ```
+
+          5. 
 
 
 

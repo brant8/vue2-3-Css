@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>精灵图</title>
+    <style>
+        div{
+            height: 50px;
+            width:50px;
+            background-color: red;
+        }
+        .change{
+            background-color: purple;
+            color:#ffffff;
+            font-size:25px;
+        }
+    </style>
+</head>
+<body>
+<!--    1. 有规律的精灵图，比如竖排一列下去-->
+<!--    2.核心思路：利用佛如循环，修改精灵图片的背景位置 background-position-->
+    <script>
+        //1.获取元素 所有的li标签
+        var lis = document.querySelectorAll('li');
+        for(var i = 0; i<lis.length;i++){
+            //让索引号诚意44 就是每个li的背景y坐标
+            var index = i * 44;//y坐标
+            lis[i].style.backgroundPosition = '0 -'+index+'44px';//‘0 -44px’
+        }
+    </script>
+
+    <div>文本</div>
+<!--    如果原来有class，则js会覆盖原来的class名-->
+    <script>
+        var test = document.querySelector('div');
+        test.onclick = function () {
+            //相当于<div class='change'>..
+            this.className = 'change';
+        }
+    </script>
+
+</body>
+</html>
