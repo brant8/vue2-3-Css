@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    <button>按钮1</button>
+    <button>按钮2</button>
+    <button>按钮3</button>
+    <button>按钮4</button>
+    <button>按钮5</button>
+
+    <script>
+        //1.获取所有按钮元素
+        var btns = document.getElementsByTagName('button');
+        //btns得到的时伪数组
+        for (let i = 0; i < btns.length; i++) {
+            btns[i].onclick = function(){
+                console.log(this.innerHTML);
+                //2.每次切换后的背景颜色会变，所以先把所有的按钮背景颜色去掉
+                for (let j = 0; j < btns.length; j++) {
+                    btns[j].style.backgroundColor='';
+                }
+                //3.然后才让当前的背景颜色变色为pink
+                this.style.backgroundColor='pink';
+            }
+        }
+    </script>
+
+<!--<ul>-->
+<!--    <li><img src="images/1.jpg"></li>-->
+<!--    <li><img src="images/2.jpg"></li>-->
+<!--    <li><img src="images/3.jpg"></li>-->
+<!--    <li><img src="images/4.jpg"></li>-->
+<!--</ul>-->
+<!--<script>-->
+<!--    //1.获取标签内所有元素-->
+<!--    var imgs = document.querySelector('.baidu').querySelectorAll('img');-->
+<!--    //console.log(imgs);-->
+<!--    for(var i=0; i<imgs.length;i++){-->
+<!--        imgs[i].onclick=function(){-->
+<!--            document.body.style.backgroundImage = 'url('+this.src+')';-->
+<!--        }-->
+<!--    }-->
+<!--</script>-->
+
+<div class="wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>
+                    <input type="checkbox" id="j_cbAll">
+                </th>
+                <th>商品</th>
+                <th>价格</th>
+            </tr>
+        </thead>
+        <tbody id="j_tb">
+            <tr>
+                <td>
+                    <input type="checkbox">
+                </td>
+                <td>Iphone3</td>
+                <td>5000</td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="checkbox">
+                </td>
+                <td>Iphone4</td>
+                <td>8000</td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="checkbox">
+                </td>
+                <td>Iphone5</td>
+                <td>12000</td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="checkbox">
+                </td>
+                <td>Iphone6</td>
+                <td>14000</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<script>
+    //1.全选和取消全选做法：让下面所有复选框的checked属性（选中状态） 跟随全选按钮即可
+    var j_cbAll = document.getElementById('j_cbAll');//全选按钮
+    var j_tbs = document.getElementById('j_tb').getElementsByTagName('input');
+    console.log(j_cbAll);
+    console.log(j_tbs);
+    //2.注册事件
+    j_cbAll.onclick = function(){
+        console.log(this.checked);
+        for(var i=0; i<j_tbs.length;i++){
+            j_tbs[i].checked=this.checked;//总勾选框 - 取消全选和全选
+        }
+    }
+    //下面复选框需要全部选中，上面的全选才能选中
+    for (let i = 0; i < j_tbs.length; i++) {
+        j_tbs[i].onclick = function(){
+            var flag = true; //控制全选按钮是否选中
+            //每次点击下面的复选框都要循环检查4个小按钮是否被选中
+            for (let j = 0; j < j_tbs.length; j++) {
+                if(!j_tbs[j].checked){  //取反
+                   //如果点击了取反就是false，没有点击默认是false取反就是true，全选就会赋值下面的为false。
+                    flag = false;
+                }
+            }
+            j_cbAll.checked = flag;
+        }
+    }
+</script>
+</body>
+</html>

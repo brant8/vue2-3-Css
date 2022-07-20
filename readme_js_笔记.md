@@ -957,7 +957,146 @@
              </script>
              ```
 
-          5. 
+18. ## 排他思想（操作元素）
+
+    1. 排他思想案例
+
+       ```js
+       <button>按钮1</button>
+       <button>按钮2</button>
+       <button>按钮3</button>
+       <button>按钮4</button>
+       <button>按钮5</button>
+       
+       <script>
+           //1.获取所有按钮元素
+           var btns = document.getElementsByTagName('button');
+       //btns得到的时伪数组
+       for (let i = 0; i < btns.length; i++) {
+           btns[i].onclick = function(){
+               console.log(this.innerHTML);
+               //2.每次切换后的背景颜色会变，所以先把所有的按钮背景颜色去掉
+               for (let j = 0; j < btns.length; j++) {
+                   btns[j].style.backgroundColor='';
+               }
+               //3.然后才让当前的背景颜色变色为pink
+               this.style.backgroundColor='pink';
+           }
+       }
+       </script>
+       ```
+
+    2. 如果有同一组元素，我们想要某一个元素实现某种样式，需要用到循环的**排他思想**：
+
+       1. 所有元素全部清除样式（干掉其他人）
+       2. 给当前元素设置样式（留下我自己）
+       3. 注意顺序不能颠倒，首先干掉其他人，再设置自己。
+
+    3. **排他思想**：首先排除他人，然后才设置自己的样式。
+
+    4. 其他案例：换皮肤
+
+    5. ```html
+       <ul>
+           <li><img src="images/1.jpg"></li>
+           <li><img src="images/2.jpg"></li>
+           <li><img src="images/3.jpg"></li>
+           <li><img src="images/4.jpg"></li>
+       </ul>
+       <script>
+           //1.获取标签内所有元素
+           var imgs = document.querySelector('.baidu').querySelectorAll('img');
+           //console.log(imgs);
+           for(var i=0; i<imgs.length;i++){
+               imgs[i].onclick=function(){
+                   document.body.style.backgroundImage = 'url('+this.src+')';
+               }
+           }
+       </script>
+       ```
+
+    6. 案例：选择框的全选
+
+       ```html
+       <div class="wrap">
+           <table>
+               <thead>
+                   <tr>
+                       <th>
+                           <input type="checkbox" id="j_cbAll">
+                       </th>
+                       <th>商品</th>
+                       <th>价格</th>
+                   </tr>
+               </thead>
+               <tbody id="j_tb">
+                   <tr>
+                       <td>
+                           <input type="checkbox">
+                       </td>
+                       <td>Iphone3</td>
+                       <td>5000</td>
+                   </tr>
+                   <tr>
+                       <td>
+                           <input type="checkbox">
+                       </td>
+                       <td>Iphone4</td>
+                       <td>8000</td>
+                   </tr>
+                   <tr>
+                       <td>
+                           <input type="checkbox">
+                       </td>
+                       <td>Iphone5</td>
+                       <td>12000</td>
+                   </tr>
+                   <tr>
+                       <td>
+                           <input type="checkbox">
+                       </td>
+                       <td>Iphone6</td>
+                       <td>14000</td>
+                   </tr>
+               </tbody>
+           </table>
+       </div>
+       <script>
+           //1.全选和取消全选做法：让下面所有复选框的checked属性（选中状态） 跟随全选按钮即可
+           var j_cbAll = document.getElementById('j_cbAll');//全选按钮
+           var j_tbs = document.getElementById('j_tb').getElementsByTagName('input');
+           console.log(j_cbAll);
+           console.log(j_tbs);
+           //2.注册事件
+           j_cbAll.onclick = function(){
+               console.log(this.checked);
+               for(var i=0; i<j_tbs.length;i++){
+                   j_tbs[i].checked=this.checked;//总勾选框 - 取消全选和全选
+               }
+           }
+           //下面复选框需要全部选中，上面的全选才能选中
+           for (let i = 0; i < j_tbs.length; i++) {
+               j_tbs[i].onclick = function(){
+                   var flag = true; //控制全选按钮是否选中
+                   //每次点击下面的复选框都要循环检查4个小按钮是否被选中
+                   for (let j = 0; j < j_tbs.length; j++) {
+                       if(!j_tbs[j].checked){  //取反
+                          //如果点击了取反就是false，没有点击默认是false取反就是true，全选就会赋值下面的为false。
+                           flag = false;
+                           break;//退出for循环，提高执行效率，因为只要有一个没有选中，剩下的就是无意义循环
+                       }
+                   }
+                   j_cbAll.checked = flag;
+               }
+           }
+       </script>
+       ```
+
+19. ## 自定义属性的操作
+
+    1. 获取属性值
+       1. `element.属性` ：获取属性值
+       2. 
 
 
 
