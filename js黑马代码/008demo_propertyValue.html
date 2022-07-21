@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div id="demo" index="1" class="test"></div>
+<script>
+  //方式一
+  var div=document.querySelector('div');
+  console.log(div.valueOf()) //获得 <div id="demo"></div>
+  console.log(div.id); //获得 demo
+  //方式二
+  console.log(div.getAttribute('id'));//获得 demo
+  console.log(div.getAttribute('index'));//获得自定义属性的值
+
+  div.id='test';
+  div.className='navs';
+  //
+  div.setAttribute('index',2);
+  div.setAttribute('class', 'footer')
+</script>
+
+<ul>
+    <li>1</li>
+    <li>2</li>
+    <li>3</li>
+</ul>
+<script>
+    //DOM方式
+    var ul=document.querySelector('ul');
+    var lis = ul.querySelectorAll('li');
+    //子节点 所有的子节点，包含 元素节点 文本节点等
+    console.log(ul.childNodes); //结果是[text,li,text,li,...]
+    console.log(ul.childNodes[0].nodeType);
+    console.log(ul.childNodes[1].nodeType);
+    console.log(ul.children);
+</script>
+</body>
+</html>

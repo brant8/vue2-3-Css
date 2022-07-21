@@ -1095,12 +1095,273 @@
 19. ## 自定义属性的操作
 
     1. 获取属性值
-       1. `element.属性` ：获取属性值
-       2. 
 
+       1. `element.属性` ：获取属性值。获取**内置属性值**（元素本身自带的属性）。
 
+       2. `element.getAttribute('属性')`。获得**自定义的属性**（标准）。
 
+       3. ```html
+          <div id="demo" index="1" class="test"></div>
+          <script>
+            //方式一
+            var div=document.querySelector('div');
+            console.log(div.valueOf()) //获得 <div id="demo"></div>
+            console.log(div.id); //获得 demo
+            //方式二
+            console.log(div.getAttribute('id'));//获得 demo
+            console.log(div.getAttribute('index'));//获得自定义属性的值 
+          </script>
+          ```
 
+    2. 设置属性值
+
+       1. `element.属性 = '值'`：设置内置属性值
+
+       2. `element.setAttribute('属性','值')`：主要针对自定义属性值
+
+       3. ```html
+          <script>
+          div.id='test';
+          div.className='navs';
+          //
+          div.setAttribute('index',2);
+          div.setAttribte('class', 'footer'); //class比较特殊，不是className了。
+          </script>
+          ```
+
+    3. 移除属性
+
+       1. `element.removeAttribute('属性')`
+
+    4. 案例：tab栏切换
+
+       1. 当鼠标点击上面相应的选项卡tab，下面内容跟随变化。
+       2. Tab大模块分两个模块：`<li>`导航模块，和`<div>`内容模块
+       3. for循环绑定点击事件，排他思想 -> 双层循环，内层循环清空，外层循环赋值
+       4. 核心思路：循环内用 js 给tab_list即`<li>`添加自定义属性，属性值从0开始编号，setAttribute
+
+    5. H5自定义属性
+
+       1. 目的：为了保存并使用数据，有些数据可以保存到页面中而不用保存到数据库中。
+
+       2. 自定义获取是通过`getAttribute('属性')`,但是有时候无法判断是否是内置属性还是自定义属性。
+
+       3. 规范：H5规定自定义属性`data-`开头作为属性名并且赋值
+
+          1. 比如：`<div data-index='1'></div>`
+
+       4. H5新增`element.dataset.属性`或者`element.dataset['属性']`获取自定义属性值
+
+       5. ```html
+          <div getTime="20" data-index="2" data-list-name="andy"></div>
+          <script>
+          	var div = document.querySelector('div');
+              console.log(div.getTime); //与内置方法getTime冲突，实际调用内置方法
+              console.log(div.getAttribute('getTime')) //可以正常显示
+              div.setAttribute('data-time',20);
+              console.log(div.getAttribute('data-index'));
+              //h5新增获取自定义方法（IE10+） dataset是一个集合，存放了所有以data开头的自定义属性
+              console.log(div.datadset.index);//不需要用data-index
+              console.log(div.dataset['index']);//与上面结果一样
+              console.log(div.dataset['listName'])//多个需要驼峰
+          </script>
+          ```
+
+20. ## 节点操作
+
+    1. 利用DOM提供方法获取元素
+
+       1. `document.getElementById()`、`document.getElementByTagName()`、`document.querySelectior()`等
+       2. 缺点：逻辑性不强，繁琐。多数情况下需要先获取父级等才能获得子级别
+
+    2. 利用节点层级关系获取元素
+
+       1. 利用父子兄节点关系获取元素，比如`<div><img></div>`
+       2. 逻辑性强，但是兼容性稍差
+
+    3. **节点**：网页中的所有内容都是节点（标签、属性、文本、注释等），再DOM中，节点使用node来表示。
+
+    4. HTML DOM树中的所有节点均可通过JavaScript进行访问，所有HTML（节点）均可被修改，也可以创建或删除。
+
+    5. **节点 三个基本属性**：
+
+       1. `nodeType`节点类型：1，主要针对标签
+       2. `nodeName`节点名称：2
+       3. `nodeValue`节点值 ：3（文本节点包含文字、空格、换行等）
+
+    6. 节点操作主要操作的是元素节点，即 nodeType
+
+    7. **父级节点**：`node.parentNode`
+
+       1. parentNode属性可返回某节点的父节点，注意是最近的一个父节点
+       2. 如果指定的节点没有父节点则返回null
+
+       ```html
+       <div class="box">
+           <span class="QRcode"></span>
+       </div>
+       <script>
+       	//1.父节点 parentNode
+           var qrcode=document.querySelector('.QRcode');
+           var box = document.querySelector('.box');
+           //得到的是离元素最近的父级节点，如果找不到父节点就返回null
+           console.log(qrcode.parentNode);
+       </script>
+       ```
+
+    8. **子节点**：`node.childNodes` (标准)
+
+       1. childNodes返回包含指定节点的子节点的集合，该集合为即时更新的集合。
+       2. 如果只想要获得里面的元素节点，需要专门处理，所以一般不提倡使用 childNodes。
+
+       ```html
+       <ul>
+           <li>1</li>
+           <li>2</li>
+           <li>3</li>
+       </ul>
+       <script>
+           //DOM方式
+       	var ul=document.querySelector('ul');
+       	var lis = ul.querySelectorAll('li');
+           //子节点 所有的子节点，包含 元素节点 文本节点等 
+           console.log(ul.childNodes); //结果是[text, li, text, li, text, li, text]
+           console.log(ul.childNodes[0].nodeType);//输出：3
+           console.log(ul.childNodes[1].nodeType);//输出：1
+           //获得元素节点
+           for(var i=0;i<ul.childNodes.length; i++){
+               if(ul.childNodes[i].nodeType ==1){
+                   //ul.childNodes[i]是元素节点
+                   console.log(ul.childNodes[i]);
+               }
+           }
+       </script>
+       ```
+
+    9. **子节点**：`node.children` (非标准)
+
+       1. children是一个只读属性，返回所有的子元素节点。只返回子元素节点，其余节点不返回。
+       2. 虽然是非标准，但是得到了各个浏览器的支持。
+
+       ```js
+       console.log(ul.children); //返回结果集（伪数组）: [li, li, li]
+       ////解决firstElementChild兼容性问题
+       console.log(ul.children[0]);//第一个元素
+       console.log(ul.children[ul.children.length-1]);//最后一个元素
+       ```
+
+    10. **其他子节点**：
+
+        1. `node.firstChild`：返回第一个节点，找不到返回null。同样，包含所有节点。
+        2. `node.lastChild`：返回最后一个节点，找不到返回null。同样，包含所有节点。
+        3. `node.firstElementChild`：返回第一个子元素节点。IE9+才支持。
+        4. `node.lastElementChild`：返回最后一个元素节点。IE9+才支持。
+
+    11. 案例分析：导航栏显示二级导航
+
+        1. 导航代码`<nav><ul><li><ul><li></li></ul></li></ul>`其中外层`<ul>`为导航，内层`<ul>`为二级导航。
+        2. 先获取外层导航的元素集合，可使用`lis = nav.children`获得，再遍历每个元素，当`onmouseover`时的触发事件。
+
+    12. **兄弟节点**：`node.nextSibling`
+
+        1. 返回当前元素的下一个兄弟节点，找不到返回null。包含元素节点、文本节点等。
+        2. 若返回结果时`#text`表示换行的文本节点
+
+    13. **兄弟节点**：`node.previousSibling`
+
+        1. 返回当前元素的上一个兄弟节点，找不到返回null。包含元素节点、文本几点等。
+
+    14. **兄弟节点**：`node.nextElementSibling` 。**IE9+才支持**。
+
+        1. 返回当前元素下一个兄弟元素节点，找不到则返回null。
+
+    15. **兄弟节点**：`node.previousElementSibling`。**IE9+才支持**。
+
+        1. 返回当前元素上一个兄弟元素节点，找不到则返回null。
+
+    16. 解决兼容性问题：
+
+        ```html
+        <script>
+            //自行封装一个方法
+        	function getNextElementSibling(element){
+                var el = element;
+                while(el = el.nextSibling){//获取所有节点然后循环
+                    if(el.nodeType ===1){
+                        return el;
+                    }
+                }
+                return null;
+            }
+        </script>
+        ```
+
+    17. **创建节点**：`document.createElement('tagName')`
+
+        1. 比如文章评论，在没有评论情况下进行评论，产生页面新节点。
+
+    18. **添加节点**：`node.appendChild(child)`
+
+        1. 将一个节点添加到指定父节点的子节点列表**末尾**。类似于css里面的**after伪元素**。
+
+           ```js
+           //1.创建节点元素节点
+           var li = document.createElement('li');
+           //2.添加创建好的节点
+           var ul = document.querySelector('ul');//父节点
+           ul.appendChild(li);
+           ```
+
+    19. **添加节点**：`node.insertBefore(child,指定元素)`
+
+    20. 案例：添加评论/留言发布
+
+        ```html
+        <textarea name="" id="">123</textarea>
+        <button>发布</button>
+        <ul>
+        
+        </ul>
+        <script>
+            //1.获取元素
+            var btn = document.querySelector('button');
+            var text=document.querySelector('textarea');
+            var ul=document.querySelector('ul');
+            //2.注册事件
+            btn.onclick=function() {
+                if (text.value == '') {
+                    console.log("没有输入东西");
+                    return false;
+                } else {
+                    console.log(text.value);//获得输入的内容
+                    //1.创建元素
+                    var li = document.createElement('li');
+                    //先有li才赋值
+                    li.innerHTML=text.value + "<a href='javascript:void(0)'>删除</a>";
+                    //2.1添加元素到末尾
+                    //ul.append(li);
+                    //2.2添加元素到开头，即原先第一个的前面
+                    ul.insertBefore(li,ul.children[0]);
+                    //3.添加删除键后删除元素，删除的时当前链接的li 其父元素
+                    var as = document.querySelectorAll('a');
+                    for (let i = 0; i < as.length; i++) {
+                        as[i].onclick = function(){
+                            //node.removeChild(child)删除的时li 当前a所在的li
+                            ul.removeChild(this.parentNode);
+                        }
+                    }
+                }
+            }
+        </script>
+        ```
+
+    21. **删除节点**：`node.removeChild(child)`
+
+        1. 从DOM中删除一个子节点，返回删除的节点。
+
+    22. **阻止链接跳转**：（链接跳转表现在地址栏有变化比如点击完后xxx#）
+
+        1. `<a href=''>`添加`javascript:void(0)`或者`javascript:;`
 
 
 
