@@ -1346,7 +1346,7 @@
                     var as = document.querySelectorAll('a');
                     for (let i = 0; i < as.length; i++) {
                         as[i].onclick = function(){
-                            //node.removeChild(child)删除的时li 当前a所在的li
+                            //node.removeChild(child)删除的是li， 当前a所在的li。<li><a></li>
                             ul.removeChild(this.parentNode);
                         }
                     }
@@ -1362,6 +1362,87 @@
     22. **阻止链接跳转**：（链接跳转表现在地址栏有变化比如点击完后xxx#）
 
         1. `<a href=''>`添加`javascript:void(0)`或者`javascript:;`
+
+    23. **复制节点**：`node.cloneNode()`
+
+        1. 返回调用该方法的节点的一个副本，也成为克隆节点。
+        2. 如果括号参数为*空或者false*，则是浅拷贝，值克隆复制节点本身，不克隆里面的子节点（内容）。
+        3. 比如`ul.children[0].cloneNode(true)` 为深度拷贝。
+        4. 克隆完后与创建节点一样，需要添加节点。
+
+21. ## 动态创建元素
+
+    1. `document.write()`：是直接将内容写入页面的内容流，但是文档流执行完毕，则会导致页面全部重绘。
+       1. 比如：`document.write(<div>123</div>)`
+       2. 页面重绘：相当于创建了一个新的页面，旧页面DOM的标签都会消失。
+       3. `window.onload = function(){}` 表示页面加载完毕后运行
+    2. `element.innerHTML`
+       1. 添加多个内容使用 '+' 拼接时，耗时久
+       2. 使用数组循环`push`添加内容，再使用数组方法`join()`合并成字符串一次性复制给innerHTML，耗时更少。
+       3. 将内容写入某个DOM节点，不会导致页面全部重绘。
+    3. `document.createElement()`
+       1. 创建多个元素时，耗时稍少，innerHTML使用数组时最佳。
+    4. 总结：不同浏览器下，innerHTML效率比createElement高。
+
+22. ## DOM操作推荐（总结）
+
+    1. 查：获取查询dom元素
+       1. DOM提供API方法：getElementById、getElementsByTagName。 古老用法 不推荐
+       2. H5提供的新方法：querySelector、querySelectorAll 。 提倡
+       3. 利用节点操作获取元素：父 parentNode、 子 children、兄previousElementSibling/nextElementSibling。 提倡
+    2. 属性操作：主要针对自定义属性
+       1. setAttribute：设置dom属性值
+       2. getAttribute：得到dom的属性值
+       3. removeAttribute 移除属性
+    3. 事件操作：
+       1. 给元素注册事件，事件源.事件类型 = 事件处理程序
+       2. onclick、onmouseover等。
+
+23. ## 事件高级
+
+    1. **注册事件**
+
+       1. 给元素添加事件，成为注册事件或者绑定事件。
+       2. 注册事件有两种方式：*传统方式和方法监听方式*
+
+    2. **传统注册方式**
+
+       1. 利用on开头的事件 onclick
+       2. `<button onclick = "alert('hi~')"></button>`
+       3. `btn.onclick=function(){}`
+       4. **特点**：注册事件的唯一性
+       5. 同一个元素同一个事件只能设置一个处理函数，最后注册的处理函数将会**覆盖**前面注册的处理函数。
+
+    3. **方法监听注册方式**
+
+       1. w3c标准，推荐方式
+       2. `addEventListener()` 是一个方法
+       3. IE9之前不支持此方法，可使用`attachEvent()`替代
+       4. **特点**：同一个元素同一个事件可以注册多个监听器。
+       5. 按注册顺序依次执行
+
+    4. addEventListener 注册事件*/*绑定事件
+
+       1. ```js
+          eventTarget.addEventListener(type, listener[, useCapture])
+          ```
+
+       2. **参数 type**：事件类型字符串，比如 click、mouseover，注意这里不要带 on。
+
+       3. **参数 listener**：事件处理函数，事件发生时，会调用该监听函数
+
+       4. **参数 useCapture**：可选参数，是一个布尔值，默认时false。
+
+       5. `eventTarget.addEventListener()`方法将指定的监听器注册到eventTarget(目标对象)上，当该对象触发指定的事件时，就会执行事件处理函数。
+
+       6. ```js
+          var btns=document.querySelectorAll('button');
+          btns[1].addEventListener('click',function(){
+            ..  
+          })
+          ```
+
+       7. 
 
 
 
