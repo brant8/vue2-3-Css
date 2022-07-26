@@ -1752,9 +1752,170 @@
 30. ## BOM浏览器对象模型
 
     1. BOM - Browser Object Model 即浏览器对象模型，提供了独立于内容而与 浏览器窗口进行交互的对象，其核心是对象window。
+
        1. 比如浏览器刷新、滚动条、窗口大小等
+
     2. BOM由一系列相关的对象构成，并且每个对象都提供了很多方法与属性。[BOM与DOM对比图](https://github.com/brant8/vue2-3-Css/blob/main/pictures/javascript_bomdom.png)。
-    3. 
+
+    3. BOM比DOM更大，包含DOM
+
+       1. **window**包含：document、location、navigation、screen、history。
+       2. `document.querySelector('..')` 等同于 `window.document.querySelector('..')`
+
+    4. window对象时浏览器顶级对象，具有双重角色：
+
+       1. 是JS访问浏览器窗口的一个接口。
+
+       2. 是一个**全局对象**。定义在全局作用域中的变量、函数都会变成window对象的属性和方法。
+
+       3. ```js
+          var num = 10;
+          console.log(num);
+          console.log(window.num);
+          ```
+
+       4. window下的一个特殊属性`window.name`，变量尽量不取`var name`
+
+31. ## window对象常见事件
+
+    1. 一般DOM执行是从上往下执行，js代码必须放在html元素之后方能操作该元素。
+
+    2. **窗口加载事件**：
+
+       1. ```js
+          window.onload = function(){..}
+          //或者
+          window.addEventListener("load",function(){..});
+          ```
+
+       2. window.onload是窗口（页面）加载事件，当**文档内容**完全加载完成会触发该事件（包括图像、脚本文件、css文件等），就调用的处理函数。
+
+    3. 有了`window.onload`就可以把JS代码写道元素的上方，因为onload是等页面全部加载完毕再去处理函数。
+
+    4. `window.onload`传统注册方式**只能写一次**，如果有多个，会以最后一个`window.onload`为准。
+
+    5. 如果使用`addEventListener`则**没有限制**。
+
+    6. `DOMContentLoaded`事件触发时，仅当DOM加载完成，不包括样式表、图片、flash等。
+
+       1. `document.addEventListener('DOMContentLoaded',function(){..})`
+       2. IE 9 + 才支持。
+       3. 若页面图片很多，用户访问到 onload 触发可能需要较长事件，交互效果不能实现，影响用户体验，此时用 DOMContentLoaded 事件比较合适。
+
+    7. **调整窗口大小事件**
+
+       1. ```js
+          window.onresize = function(){..}
+          //或者
+          window.addEventListener("resize",function(){..});
+          ```
+
+       2. `window.onresize`是调整窗口大小加载事件，当触发时就调用的处理函数。
+
+    8. 只要窗口大小发生变化，就会触发这个事件。
+
+    9. 经常利用这个事件完成响应式布局。`window.innerWidth`当前屏幕的宽度。
+
+    10. **定时器**
+
+        1. 两种定时器：setTimeout() 、 setInterval()
+
+        2. **SetTimeout() ：**
+
+           ```js
+           //该定时器在定时器到期后执行调用函数。	
+           //一、其中window可省略。
+           window.setTimeout(调用函数, [延迟的毫秒数]);//二、毫秒可省略，默认值0.
+           setTimeout(function(){},2000); //2秒后执行匿名函数function，也可以调用外层函数
+           //
+           function callback(){
+               console.log('爆炸了');
+           }
+           setTimeout(callback,2000); //2秒后输出，不加括号表示的函数本身整个代码
+           setTimeout(callback(),2000); //立刻输出，加括号表示调用函数输出的结果
+           setTimeout('callback()',2000);//三、2秒后输出，但是不提倡此写法
+           //四、页面中可能有很多定时器，经常给定时器加标识符（名字）
+           var timer1 = setTimeout(callback,3000);
+           var timer2 = setTimeout(callback,5000); //无需调用timerX，直接运行
+           ```
+
+        3. 回调函数：setTimeout()调用的函数也称为回调函数 callback。
+
+           1. 普通函数是按照代码顺序直接调用。
+           2. callback函数，需要等待事件，时间到了采取调用这个函数，因此称为回调函数。
+           3. `element.onclick=function(){}`和`element.addEventListener("click",fn)`也是回调函数
+
+        4. 案例1：定时5s后关闭广告。
+
+        5. **停止**`setTimeout()`定时器
+
+           1. `window.clearTimeout(timeoutID)`
+           2. window可省略。
+
+        6. **setInterval()**
+
+           ```js
+           window.setInterval(回调函数, [间隔的秒数]);
+           ```
+
+        7. setInterval() 方法重复调用一个函数，每隔这个事件，就去调用一次回调函数。
+
+        8. 案例：倒计时
+
+           1. 使用setInterval设置事件自动变化
+           2. 三个盒子分别存放时分秒
+           3. 使用innerHTML放入计算的值
+           4. 封装倒计时函数，使用定时器调用时先调用一次，否则刷新页面会慢1秒/空白。
+
+        9. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
