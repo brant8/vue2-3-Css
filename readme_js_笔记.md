@@ -1421,7 +1421,7 @@
        4. **特点**：同一个元素同一个事件可以注册多个监听器。
        5. 按注册顺序依次执行
 
-    4. addEventListener 注册事件*/*绑定事件
+    4. **addEventListener** 注册事件*/*绑定事件
 
        1. ```js
           eventTarget.addEventListener(type, listener[, useCapture])
@@ -1438,11 +1438,323 @@
        6. ```js
           var btns=document.querySelectorAll('button');
           btns[1].addEventListener('click',function(){
-            ..  
+            alert(22);  
+          }) 
+          //同一个元素 同一个事件可以添加多个监听器（事件处理程序）
+          btns[1].addEventListener('click',function(){
+            alert(23);  
           })
           ```
 
-       7. 
+    5. **attachEvent** 事件监听方式**(**IE9以前的识别，非标准，尽量不使用**)**
+
+       1. ```js
+          eventTarget.attachEvent(eventNameWithOn, callback)
+          ```
+
+       2. **参数 eventNameWithOn**：事件类型字符串，比如 onclick、onmouseover，这里要**带on**。
+
+       3. **参数 callback**：事件处理函数，当目标触发事件时回调函数被调用。
+
+       4. `eventTarget.attachEvent()`方法将指定的监听器注册到eventTarget(目标对象)上，当该对象触发指定的事件时，指定的回调函数就会被执行。
+
+       5. ```js
+          btns[2].attachEvent('onclick',function(){
+              alert(11)
+          })
+          ```
+
+    6. 注册事件兼容性解决不同浏览器
+
+       ```js
+       function addEventListener(element, eventName, fn){
+           //判断当前浏览器是否支持 addEventListener方法
+           if(element.addEventListener){
+               element.addEventListener(eventName, fn);//第三个参数 默认是false
+           }else if(element.attachEvent){
+               element.attachEvent('on'+eventName,fn);
+           }else{
+               //相当于element.onclick = fn;
+               element['on' + eventName] = fn;
+           }
+       }//兼容性原则：先照顾大多数浏览器，再处理特殊浏览器
+       ```
+
+    7. **删除事件的方式**
+
+       1. 传统注册方式：
+
+          ```js
+          var divs = document.querySelectorAll('div');
+          divs[0].onclick=function(){
+              alert(11);
+              //点击一次后不想让其点击后再弹出窗口，解除事件绑定
+              //eventTarget.onclick = null;
+              divs[0].onclick=null;
+          }
+          ```
+
+       2. 方法监听注册方式
+
+          ```js
+          var divs = document.querySelectorAll('div');
+          /**
+          divs[1].addEventListener('click',function(){ //若要解除绑定，此处不能用匿名函数
+              alert(22);
+              divs[1].removeEventListener('click', /*失败*/)
+          })
+          */
+          //正确做法 点击后再次点击不弹窗
+          divs[1].addEventListener('click',fn) //里面的fn不需要调用 加小括号
+          function fn(){
+              alert(22);
+              divs[1].removeEventListener('click',fn); //解除事件绑定
+          }
+          divs[2].attachEvent('onclick',fn1);
+          function fn1(){
+              alert(33);
+              divs[2].detachEvent('onclick',fn1);
+          }
+          ```
+
+24. ## DOM事件流
+
+    1. 事件流描述的是从页面中接收事件的顺序。
+
+    2. 事件发生时会在元素节点之间按照特定的顺序传播，这个传播过程即DOM事件流。
+
+    3. DOM事件流三个阶段 [图示](https://github.com/brant8/vue2-3-Css/blob/main/pictures/javascript_eventflow.png)：
+
+       1. 捕获阶段： document -> html -> body -> 当前阶段
+       2. 当前目标阶段
+       3. 冒泡阶段： 当前阶段 -> body -> html -> document
+
+    4. **注意事项**：
+
+       1. JS 代码中只能执行捕获或者冒泡其中的一个阶段
+       2. onclick 和 attachEvent 只能得到冒泡阶段
+       3. addEventListener(type, listener[, userCapture]) 第三个参数如果是true，表示在事件捕获阶段调用事件处理程序；如果是false（不写默认就是false），表示在事件冒泡阶段用事件处理函数。
+
+    5. ```html
+       <div class="father">
+           <div class="son">son盒子</div>
+       </div>
+       <script>
+       	//捕获阶段，如果第三个参数是true， 
+           //那么捕获阶段 弹框顺序： document -> html -> body -> father -> son
+           var son = document.querySelector('.son');
+           son.addEventListener('click',function(){
+               alert('son');
+               e.stopPropagation();//阻止冒泡事件(标准)
+               e.cancelBubble = true;//阻止冒泡事件（非标准）
+           },true);
+          // 捕获阶段 第三个参数是true，
+           //document -> html -> body -> father,  点击son也会有弹窗
+           var father = document.querySelector('.father');
+           father.addEventListener('click',function(){
+               alert('father');
+           },true);
+           //冒泡阶段， addEventListener 第三个参数是false 或者省略，那么处于冒泡阶段
+           //弹框顺序：son -> father -> body -> html -> document
+           var son = document.querySelector('.son');
+           son.addEventListener('click',function(){ //点击son father也会一起弹出来
+               alert('son');
+           },false);
+           var father = document.querySelector('.father');
+           father.addEventListener('click',function(){
+               alert('father');
+           },false);
+       </script>
+       ```
+
+    6. 主要关注：**事件冒泡 Bubbling**
+
+    7. 有些事件是没有冒泡的：onblue、onfocus、onmouseenter、onmouseleave。
+
+25. ## 事件对象
+
+    1. ```js
+       var div = document.querySelector('div');
+       div.onclick=function(event){}
+       ```
+
+    2. **event就是一个事件对象**，写到侦听函数的小括号里面，当做形参来看。
+
+    3. 事件对象只有有了事件才会存在，它是系统自动创建的，不需要传递参数。
+
+    4. 事件对象，是事件一系列相关数据的集合，跟事件相关的，比如鼠标点击了鼠标的相关信息，鼠标坐标。也包含键盘信息，比如用户按了什么键。
+
+    5. ```js
+       div.addEventListener('click',function(event){}) //此处event可以自定义名字
+       ```
+
+    6. 事件对象也有兼容性问题，ie678通过`window.event`获取。
+
+       1. 兼容性解决：`e = e || window.event`
+
+    7. 常见事件对象的属性和方法：
+
+       ```html
+       <div>123</div>
+       <ul>
+           <li>123</li>
+           <li>123</li>
+       </ul>
+       <script>
+           //1. e.target返回的是触发事件的对象（元素）
+           //2. this返回的是绑定事件的对象（元素）
+           var div=document.querySelector('div');
+           div.addEventListener('click',function(e){
+               console.log(e.target); //输出：<div>123</div>
+               console.log(this);//输出：<div>123</div>
+           });
+           var ul = document.querySelector('ul');
+           ul.addEventListener('click',function(e){ //实际点击的是ul中的li
+               console.log(this); //给ul绑定了事件，那么 this 指向ul
+               //<ul>...</ul>
+               console.log(e.target);
+               //<li>123</li>
+           })
+           //了解即可：跟this有个非常相似的属性 currentTarget  ie678不认识
+       </script>
+       ```
+
+    8. | 事件对象属性方法    | 说明                                                         |
+       | ------------------- | ------------------------------------------------------------ |
+       | e.target            | 返回触发事件的对象   -  标准                                 |
+       | e.srcElement        | 返回触发事件的对象   -  非标准 ie 6-8使用                    |
+       | e.type              | 返回事件的类型 比如 click mouseover 不带 on                  |
+       | e.cancelBubble      | 该属性阻止冒泡  非标准  ie6-8使用                            |
+       | e.returnValue       | 该属性 阻止默认事件（默认行为） 非标准 ie6-8 使用， 比如不让链接跳转 |
+       | e.preventDefault()  | 该方法 阻止默认事件（默认行为） 标准，比如不让链接跳转       |
+       | return false        | 该返回可阻止默认行为，并且无兼容性问题，特点：return后面代码不执行，且只限制于传统注册方式 |
+       | e.stopPropagation() | 阻止冒泡  标准                                               |
+
+26. ## 阻止事件冒泡
+
+    1. 事件冒泡：开始时由最具体的元素接收，然后主机向上传播到DOM最顶层节点。
+    2. 标准写法：利用事件对象里面的`e.stopPropagation()`方法，*演示笔记 24 - 5代码*。
+    3. 非标准写法：IE 6-8 利用事件对象cancelBubble属性。`e.cancelBubble = true`
+
+27. ## 事件委托（代理）
+
+    1. 比如一个班100个学生，由100个快递，一个个送耗费时间长，每个学生领取也需要排队。快递员把100个快递，委托给班主任，下课后学生自行领取即可。又比如`<ul><li><li>..`
+
+    2. 事件委托**原理**：不是给每个子节点单独设置事件监听器，而是事件监听器设置在其父节点上，然后利用冒泡原理印象设置每个子节点。
+
+    3. 作用：只操作了一次DOM，提高了程序的性能。
+
+    4. ```html
+       <ul>
+           <li>知否知否</li>
+           <li>知否知否</li>
+           <li>知否知否</li>
+           <li>知否知否</li>
+           <li>知否知否</li>
+       </ul>
+       <script>
+           var ul = document.querySelector('ul');
+           ul.addEventListener('click',function(e){
+               alert('点击了ul弹出了 li标签中的知否');
+               //e.target可以得到点击的对象 获得li标签，更改某一个li的背景颜色
+               e.target.style.backgroundColor = 'pink';
+           })
+       </script>
+       ```
+
+28. ## 常用鼠标事件
+
+    1. **禁止**鼠标右键菜单
+
+       1. `contextmenu`主要控制应该何时显示上下文菜单，主要用于程序员取消默认的上下文菜单。
+
+          ```js
+          document.addEventListener('contextmenu',function(e){
+              e.preventDefault();
+          })
+          ```
+
+       2. 禁止鼠标选中（selectstart开始选中）
+
+          ```js
+          document.addEventListener('selectstart',function(e){ //禁止鼠标选择文字
+              e.preventDefault();
+          })
+          ```
+
+    2. **event对象**代表事件的状态，跟事件相关的一系列信息的集合。比如 MouseEvent、KeyboardEvent等。
+
+    3. | 鼠标事件对象 | 说明                                      |
+       | ------------ | ----------------------------------------- |
+       | e.clientX    | 返回鼠标相对于浏览器窗口可视区的 X 坐标   |
+       | e.clientY    | 返回鼠标相对于浏览器窗口可视区的 Y 坐标   |
+       | e.pageX      | 返回鼠标相对于文档页面的 X 坐标 IE9+ 支持 |
+       | e.pageY      | 返回鼠标相对于文档页面的 Y 坐标 IE9+ 支持 |
+       | e.screenX    | 返回鼠标相对于电脑屏幕的 X 坐标           |
+       | e.screenY    | 返回鼠标相对于电脑屏幕的 Y 坐标           |
+
+    4. 案例：鼠标移动图片跟随
+
+       1. 使用鼠标移动事件：mousemove
+       2. 页面中移动，给document注册事件
+       3. 图片要移动举例，而且不占位置，使用绝对定位即可。
+       4. 核心原理：每次鼠标移动，都会获得新的鼠标坐标，把这个x和y坐标作为图片的top和left值就可以移动图片。注意值加'px'.
+
+29. ## 常用键盘事件
+
+    1. | 键盘事件                | 触发条件                                                     |
+       | ----------------------- | ------------------------------------------------------------ |
+       | onkeyup<br/>keyup       | 某个键盘按键被松开时触发                                     |
+       | onkeydown<br/>keydown   | 某个键盘按键被按下时触发                                     |
+       | onkeypress<br/>keypress | 某个键盘按键被按下时触发，但是它**不识别功能键**，比如ctrl、shift、箭头等 |
+
+    2. 传统方式：
+
+       1. `document.onkeyup = function(){..}`
+
+    3. 监听方式：
+
+       1. `document.addEventListener('keyup',function(){...})`
+
+    4. 执行顺序：keydown  -- keypress -- keyup
+
+    5. 键盘事件对象 KeyboardEvent：
+
+       1. 键盘对象包含多个属性，比如 `e.keyCode`遵循ASCII表格
+       2. keyup、keydown 事件不区分字母大小写
+       3. keypress 事件区分字母大小写
+
+    6. ```js
+       document.addEventListener('keyup',function(e){
+           console.log('up:' + e.keyCode);
+           if(e.keyCode ===65){
+               alert("你按下了a键")
+           }
+       })
+       ```
+
+    7. 案例分析：
+
+       1. 核心思路：检测用户是否在页面按下了s键，若按下s键，就把光标定位到搜索框里面
+       2. 使用键盘事件对象里的keyCode 判断用户按下的是否s键
+       3. 搜索框获得焦点：使用 js 里面的 `element.focus()` 方法
+       4. 提示：使用keydown会在搜索框里面有s字母，使用keyup可以解决。
+
+    8. 案例：搜索框放大镜
+
+       1. 快递单号里面的值 value 获取过来给 con 盒子 innerText作为内容
+       2. 注意表单获取的值使用value，div的盒子使用innerText或者innerHTML。
+       3. 注意：keydown 和 keypress在文本框里面的特点：事件触发的时候，文字还没有落入文本框中。
+       4. keypress触发事件对于盒子删除键无效。keyup触发事件的时候，文字已经落入文本框了。
+       5. 失去焦点：`element.addEventListener('blur',function(){..})`
+       6. 获得焦点：`element.addEventListener('focus',function(){..})`
+
+30. ## BOM浏览器对象模型
+
+    1. BOM - Browser Object Model 即浏览器对象模型，提供了独立于内容而与 浏览器窗口进行交互的对象，其核心是对象window。
+       1. 比如浏览器刷新、滚动条、窗口大小等
+    2. BOM由一系列相关的对象构成，并且每个对象都提供了很多方法与属性。[BOM与DOM对比图](https://github.com/brant8/vue2-3-Css/blob/main/pictures/javascript_bomdom.png)。
+    3. 
 
 
 

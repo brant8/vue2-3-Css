@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<ul>
+    <li>知否知否</li>
+    <li>知否知否</li>
+    <li>知否知否</li>
+    <li>知否知否</li>
+    <li>知否知否</li>
+</ul>
+<script>
+    var ul = document.querySelector('ul');
+    ul.addEventListener('click',function(e){
+        alert('点击了知否的li标签的ul');
+        //e.target可以得到点击的对象
+        e.target.style.backgroundColor = 'pink';
+    })
+</script>
+
+</body>
+</html>
