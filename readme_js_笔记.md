@@ -2004,6 +2004,101 @@
        5. 第一步，去掉`？`利用`substr`
        6. 第二部，利用 =号分割 键 和 值，` split('=')`
 
+    5. location对象的方法
+
+       | location对象方法   | 返回值                                                       |
+       | ------------------ | ------------------------------------------------------------ |
+       | location.assign()  | 跟href一样，可以跳转页面（也成为重定向页面）                 |
+       | location.replace() | 替换当前页面，因为不记录历史，所以不能后退页面               |
+       | location.reload()  | 重新加载页面，相当于刷新按钮或者 f5，如果参数为true，**强制刷新ctrl + f5** |
+
+35. ## navigator对象
+
+    1. navigator对象包含有关浏览器的信息，有很多属性，如常用的 userAgent，该属性可以返回有客户机发送服务器的user-agent头部的值。
+
+       1. 如手机浏览网站，切换手机版和电脑版
+
+       2. ```js
+           //前端判断用户用那个终端打开页面
+          if((navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone/i))){
+                  window.location.href="";//手机
+              }else{
+                  window.location.href="";//电脑
+              }
+          ```
+
+36. ## history对象
+
+    1. window对象提供了history对象，与浏览器历史记录进行交互。该对象包含用户访问过的URL。
+
+       | history对象方法 | 作用                                                         |
+       | --------------- | ------------------------------------------------------------ |
+       | back()          | 可以后退功能                                                 |
+       | forward()       | 前进功能                                                     |
+       | go(参数)        | 前进后退功能 <br/> 参数如果是1，前进1个页面<br/>如果是-1，后退1个页面 |
+
+    2. history对象一般在开发中比较少用，但是会在一些OA办公系统中见到。
+
+37. ## offset偏移量
+
+    1. offset翻译过来就是偏移量，使用offset系列相关属性可以*动态的*得到该元素的位置（偏移）、大小等。
+
+       1. 获得元素举例带有定位父元素的位置
+       2. 获得元素自身的大小（高度宽度）
+       3. 注意：返回的数值都不带单位
+
+    2. offset系列常用属性
+
+       | offset系列属性       | 作用                                                         |
+       | -------------------- | ------------------------------------------------------------ |
+       | element.offsetParent | 返回作为该元素带有定位的父级元素，如果父级都没有定位则返回body |
+       | element.offsetTop    | 返回元素相对带有定位父元素上方的偏移                         |
+       | element.offsetLeft   | 返回元素相对带有定位父元素左边框的偏移                       |
+       | element.offsetWidth  | 返回自身包括padding、边框、内容区的宽度，返回数值不带单位    |
+       | element.offsetHeight | 返回自身包括padding、边框、内容去的高度，返回数值不带单位    |
+
+    3. offsetParent与parentNode
+
+       1. parentNode节点：返回父亲元素，最近一级的父亲，不管父亲有没有定位
+       2. offsetParent：返回带有定位的父亲元素，否则返回的是body。
+
+    4. offset与style区别
+
+       | offset                                        | style                                       |
+       | --------------------------------------------- | ------------------------------------------- |
+       | offset可以得到任意样式中的样式值              | style只能得到行内样式表中的样式值           |
+       | offset获得数值是没有单位的                    | style.width获得的是带有单位的字符串         |
+       | offsetWidth包含padding+border+width           | style.width获得不包含padding和border的值    |
+       | offsetWidth等属性是只读属性，只能获取不能赋值 | style.width是可读写属性，可以获取也可以赋值 |
+       | 比如：box.offsetWidth                         | 比如：box.style.width                       |
+       | *想要获取元素大小位置，offset更适合*          | *想要给元素更改值，使用style*               |
+
+    5. 案例分析：获取在盒子内的鼠标坐标（以后的图片放大镜）
+
+       ```html
+       <div class="box"></div>
+       <script>
+           //在盒子内点击，得到鼠标举例盒子左右的距离
+           let box = document.querySelector('.box');
+           box.addEventListener('mousemove',function (e) {
+               //鼠标在页面中的坐标e.pageX， e.pageY
+               // console.log(e.pageX);
+               // console.log(e.pageY);
+               //盒子在页面中的距离（box.offsetLeft, box.offsetTop)
+               // console.log(box.offsetLeft);
+               var x = e.pageX - this.offsetLeft;
+               var y = e.pageY - this.offsetTop;
+               this.innerHTML = 'x坐标是：' + x + '<br>y的坐标是：'+ y ;
+           })
+       </script>
+       ```
+
+    6. 案例分析：模态框拖拽
+
+    7. ```html
+       ```
+
+    8. 
 
 
 

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .box{
+            width: 500px;
+            height: 500px;
+            background-color: pink;
+        }
+    </style>
+</head>
+<body>
+
+<div class="box"></div>
+<script>
+    //在盒子内点击，得到鼠标举例盒子左右的距离
+    let box = document.querySelector('.box');
+    box.addEventListener('mousemove',function (e) {
+        //鼠标在页面中的坐标e.pageX， e.pageY
+        // console.log(e.pageX);
+        // console.log(e.pageY);
+        //盒子在页面中的距离（box.offsetLeft, box.offsetTop)
+        // console.log(box.offsetLeft);
+        var x = e.pageX - this.offsetLeft;
+        var y = e.pageY - this.offsetTop;
+        this.innerHTML = 'x坐标是：' + x + '<br>y的坐标是：'+ y ;
+    })
+</script>
+
+</body>
+</html>
