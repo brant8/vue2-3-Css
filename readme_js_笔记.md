@@ -2054,8 +2054,8 @@
        | element.offsetParent | 返回作为该元素带有定位的父级元素，如果父级都没有定位则返回body |
        | element.offsetTop    | 返回元素相对带有定位父元素上方的偏移                         |
        | element.offsetLeft   | 返回元素相对带有定位父元素左边框的偏移                       |
-       | element.offsetWidth  | 返回自身包括padding、边框、内容区的宽度，返回数值不带单位    |
-       | element.offsetHeight | 返回自身包括padding、边框、内容去的高度，返回数值不带单位    |
+       | element.offsetWidth  | 返回自身**包括**padding、边框、内容区的宽度，返回数值不带单位 |
+       | element.offsetHeight | 返回自身**包括**padding、边框、内容去的高度，返回数值不带单位 |
 
     3. offsetParent与parentNode
 
@@ -2093,12 +2093,110 @@
        </script>
        ```
 
-    6. 案例分析：模态框拖拽
+    6. 案例分析：模态框拖拽 [html细节链接](https://github.com/brant8/vue2-3-Css/blob/main/js%E9%BB%91%E9%A9%AC%E4%BB%A3%E7%A0%81/013demo_moveframe.html)
 
-    7. ```html
+       ```html
+       <script>
+           var login = document.querySelector('.login');
+           var mask = document.querySelector('.login-bg');
+           var link = document.querySelector('#link')
+           var closeBtn = document.querySelector('#closeBtn');
+           var title = document.querySelector('#title');
+           link.addEventListener('click',function(){
+               mask.style.display='block';
+               login.style.display='block';
+           })
+           closeBtn.addEventListener('click',function(){
+               mask.style.display='none';
+               login.style.display='none';
+           })
+           //开始拖拽
+           title.addEventListener('mousedown',function(e){
+               var x = e.pageX - login.offsetLeft;
+               var y = e.pageY - login.offsetTop;
+               //鼠标移动的时候，把鼠标在页面中的坐标，减去鼠标在盒子内的坐标就是模态框的坐标
+               document.addEventListener('mousemove',move);//为了后续移除让盒子固定位置
+               function move(e) {
+                   login.style.left = e.pageX - x + 'px';
+                   login.style.top = e.pageY - y + 'px';
+               }
+               //鼠标弹起，就让鼠标移动事件移除
+               document.addEventListener('mouseup',function(){
+                   document.removeEventListener('mousemove',move);
+               })
+           })
+       </script>
        ```
 
-    8. 
+38. ## 元素可视区client
+
+    1. 使用client系列的相关属性来获取元素可视区的相关信息，即动态的得到该元素大小、边框大小等。不计较内容溢出部分。
+
+       | client系列属性       | 作用                                                         |
+       | -------------------- | ------------------------------------------------------------ |
+       | element.clientTop    | 返回元素上边框的大小                                         |
+       | element.clientLeft   | 返回元素左边框的大小                                         |
+       | element.clientWidth  | 返回自身包括padding、内容区的宽度，**不含**边框，返回数值不带单位 |
+       | element.clientHeight | 返回自身包括padding、内容区的高度，**不含**边框，返回数值不带单位 |
+
+    2. 立即执行函数：`(function(){})()`
+
+       1. 主要作用：创建一个独立的作用域
+       2. 里面所有的变量都是局部变量，不会有命名冲突的情况
+
+       ```js
+       function fn(){
+           console.log(1);
+       }
+       fn();
+       //立即执行函数：不需要调用，立马能够自己执行的函数，多个立即执行函数需要逗号隔开
+       //写法一：(function{})() ->相当于 （匿名函数)（） 第二个括号相当于调用
+       //写法二：(function(){}())
+       (function(a){
+           console.log(2);
+           console.log(a); //输出1
+       })(1); //第二个小括号可以看作是调用函数
+       ```
+
+    3. 阿里flexible.js分析
+
+       1. 物理像素比：`var dpr = window.devicePixelRatio || 1`，有像素比则获取，没有则取值1.
+       2. 三种情况都会刷新页面触发 addEventListener('load',fn) 事件。
+          1. a标签的超链接
+          2. F5或者刷新按钮（强制刷新）
+          3. 前进后退按钮
+
+       3. 在火狐中，有个特点，有个“往返缓存”，这个缓存中不仅保存着页面数据，还保存了DOM和JavaScript的状态；实际上是将整个页面都保存在了内存里。此时后退不能刷新页面。
+       4. 此时可以用pageshow事件来触发，这个事件在页面显示时触发，无论页面是否来自缓存。在重新加载页面中，pageshow会在load事件触发后触发；根据事件对象中的persisted来判断是否缓存中的页面触发的pageshow事件，注意这个事件给window添加。
+          1. addEventListener('pageshow',fn())
+          2. persisted有缓存返回true，无缓存返回false。
+
+39. ## 元素滚动scroll
+
+    1. 使用scroll可以动态的得到该元素的大小、滚动距离等。若有内容溢出，以溢出为主的实际大小。
+
+       | scroll系列属性       | 作用                                           |
+       | -------------------- | ---------------------------------------------- |
+       | element.scrollTop    | 返回被卷去的上侧距离，返回数值不带单位         |
+       | element.scrollLeft   | 返回被卷去的左侧距离，返回数值不带单位         |
+       | element.scrollWidth  | 返回自身实际的宽度，不含边框，返回数值不带单位 |
+       | element.scrollHeight | 返回自身实际的高度，不含边框，返回数值不带单位 |
+
+    2. 盒子文字内容溢出情况：
+
+       1. `overflow：auto`后内容有滚动条，向下滚动时，scrollTop为第一行（被卷去的头部）到内容可视区的高度。
+
+    3. 页面被卷去的头部：
+
+       1. 如果浏览器的高（或宽）度不足以显示整个页面时，会自动出现滚动条。当滚动条向下滚动时，页面上面被隐藏掉的高度，我们就成为页面被卷去的头部。滚动条在滚动时会触发onscroll事件。
+
+       2. ```js
+          div.addEventListener('scroll',function(){
+              console.log(div.scrollTop); //滚动时被卷掉的高度
+          })
+          ```
+
+    4. 案例：固定右侧侧边栏，返回顶部，头部固定
 
 
 
