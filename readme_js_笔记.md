@@ -1867,7 +1867,142 @@
            3. 使用innerHTML放入计算的值
            4. 封装倒计时函数，使用定时器调用时先调用一次，否则刷新页面会慢1秒/空白。
 
-        9. 
+        9. 其他案例提示：
+
+           1. 定义变量不赋值时，尽量赋值`null`值，否则会`undefined`，容易出错
+
+           2. button修改按钮上的字，使用innerHTML修改其内容。
+
+           3. 清除timer时注意如下
+
+              ```js
+              var timer = setInterval(function(){
+                  if(time ==0 ){
+                      clearInterval(timer);//此处可以清除timer定时器，因在其内部
+                      ...
+                  }
+              })
+              ```
+
+32. ## this指向问题
+
+    1. 一般情况下this的最终指向是哪个调用它的对象
+
+    2. 全局作用域或者普通函数中this指向全局对象window（注意定时器里面的this指向window）
+
+       ```js
+       console.log(this); //window对象
+       function fn(){
+           console.log(this); //window对象
+       }
+       fn(); //实际window.fn()
+       setTimeout(function(){ //相当于window.setTimeout...
+           console.log(this);
+       },1000);
+       ```
+
+    3. 方法调用中谁调用this指向谁
+
+       ```js
+       var o = {
+           sayHi: function(){
+               console.log(this); //指向的是o这个对象
+           }
+       }
+       o.sayHi(); //输出 {saHi:f}
+       o.sayHi;//输出 ƒ (){console.log(this); }
+       var btn = document.querySelector('button');
+       btn.onclick=function(){
+           console.log(this);//指向btn这个按钮对象， <button>点击</button>
+       }
+       btn.addEventListener('click',function(){
+           console.log(this);//指向btn这个按钮对象
+       })
+       ```
+
+    4. 构造函数中this指向构造函数的实例
+
+       ```js
+       function Fun(){
+           console.log(this); //指得是fun 实例对象
+       }
+       var fun = new Fun();
+       ```
+
+33. ## JS执行机制
+
+    1. JS是单线程：
+
+       1. JavaScript语言的一大特点就是单线程。同一时间只能做一件事。
+       2. 比如堆某个DOM元素进行添加和删除操作，不能同时进行。因该先进行添加，之后再删除。
+       3. HTML5提出Web Worker标准，允许JavaScript脚本创建多个线程。于是JS有了*同步*和*异步*。
+
+    2. 同步：前一个任务结束后再执行后一个任务，程序的执行顺序与任务的排列顺序是一致的、同步的。
+
+    3. 异步：在当前任务处理中可以处理其他任务。
+
+    4. 本质区别：流水线上各个流程的执行顺序不同。
+
+    5. 同步任务：同步任务都在主线程上执行，形成一个执行栈。
+
+       ```js
+       console.log(1); //同步1
+       var timer = setTimeout(function(){  //回调函数为异步1
+           console.log(3);
+       },1000); //timer为同步2
+       console.log(2); //同步3
+       //输出结果：1 2 3
+       ```
+
+    6. 异步任务：JS的异步是通过回调函数实现的。[如图示](https://github.com/brant8/vue2-3-Css/blob/main/pictures/javascript_sync.png)
+
+    7. 常见异步任务：
+
+       1. 普通事件：如click、resize等
+       2. 资源加载：如load、error等
+       3. 定时器，包括setInterval、setTimeout等
+
+    8. **JS执行机制**：
+
+       1. 先执行*执行栈*中的同步任务
+       2. 异步任务（回调函数）放入任务队列中。
+       3. 一旦执行栈中的所有同步任务执行完毕，系统就会按次序读取任务队列中的异步任务，于是被读取的异步任务结束等待状态，进行执行栈，开始执行。[如图示](https://github.com/brant8/vue2-3-Css/blob/main/pictures/javascript_sync2.png)
+
+    9. **事件循环 event loop**：由于主线程不断地重复获得任务、执行任务、再获得任务、再执行，这种机制称为事件循环。[如图示](https://github.com/brant8/vue2-3-Css/blob/main/pictures/javascript_eventloop.png)
+
+34. ## location对象
+
+    1. window对象给我们提供了一个location属性，用于获得或设置窗体的URL，并且可以用于解析URL。因为这个属性返回的示一个对象，所以将这个属性也成为location对象。
+
+    2. URL一般语法格式
+
+       ```js
+       protocol://host[:port]/path/[?query]#fragment
+       //比如：
+       http://www.itcast.cn/index.html?name=andy&age=18#link
+       //query 参数，以键值对的形式，通过 & 符号分隔开来
+       //fragment 片段 #后面内容 常见于链接 锚点
+       ```
+
+    3. location对象的属性
+
+       | location对象属性  | 返回值                           |
+       | ----------------- | -------------------------------- |
+       | location.href     | 获取或设置整个URL                |
+       | location.host     | 返回主机（域名）                 |
+       | location.port     | 返回端口号，如果未写返回空字符串 |
+       | location.pathname | 返回路径                         |
+       | location.search   | 返回参数，比如`?name=andy&..`    |
+       | location.hash     | 返回片段 ，常见链接、锚点        |
+
+    4. 案例分析：
+
+       1. 第一个登录页面有提交表单(登录)，action提交到index.html页面
+       2. 第二个页面，可以使用第一个页面的参数，实现了一个数据不同页面之间的传递效果
+       3. 第二个页面之所以可以使用第一个页面的数据，是利用了URL里面的**location.search**参数。
+       4. 在第二个页面中，需要把这个参数提取
+       5. 第一步，去掉`？`利用`substr`
+       6. 第二部，利用 =号分割 键 和 值，` split('=')`
 
 
 
