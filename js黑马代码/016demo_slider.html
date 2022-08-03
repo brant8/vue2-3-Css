@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        li{
+            list-style-type:none;
+        }
+        .main{
+            width:980px;
+            height: 455px;
+            margin-left: 219px;
+            margin-top:10px;
+        }
+        .focus{
+            position: relative;
+            width:720px;
+            height: 455px;
+            background-color: purple;
+        }
+        .focus ul{
+            position:absolute;
+            top: 0;
+            left: 0;
+            width:600%; /*子元素宽度比父元素宽度大，让li可以放的下*/
+        }
+        .focus ul li{
+            float: left;
+        }
+        .focus ul li img{
+            max-width:350px;
+        }
+        .focus ol{
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 100%;
+        }
+        .focus ol li{
+            float: left;
+            width: 5px;
+            height: 5px;
+            margin-left: 10px;
+            background-color: white;
+        }
+        .arrow-l,
+        .arrow-r{
+            display: none;
+            position: absolute;
+            top: 50%;
+            margin-top: -20px;
+            width: 24px;
+            height: 40px;
+            background: rgba(0,0,0,.3);
+            text-align: center;
+            line-height: 40px;
+            color:#fff;
+            font-size: 18px;
+            z-index: 2;
+        }
+        .arrow-r{
+            right: 0px;
+        }
+        .arrow-r{
+            left: 0px;
+        }
+    </style>
+</head>
+<body>
+<!--模块-->
+<div class="w">
+    <div class="main">
+        <div class="focus f1">
+            <!--左侧按钮 -->
+            <a href="#" class="arrow-l">&lt;</a>
+            <!--右侧按钮 -->
+            <a href="#" class="arrow-r">&gt;</a>
+            <!--核心的滚动区域 -->
+            <ul>
+                <li><a href="#"><img src="https://cdn.pixabay.com/photo/2022/07/26/13/55/egg-7345934_960_720.jpg"/></a></li>
+                <li><a href="#"><img src="https://cdn.pixabay.com/photo/2022/07/25/15/18/cat-7344042_960_720.jpg"/></a></li>
+                <li><a href="#"><img src="https://cdn.pixabay.com/photo/2020/04/30/03/26/rufous-5111261_960_720.jpg"/></a></li>
+                <li><a href="#"><img src="https://cdn.pixabay.com/photo/2022/07/13/22/27/butterfly-7320158_960_720.jpg"/></a></li>
+            </ul>
+            <ol class="circle">
+<!--                <li></li>-->
+<!--                <li class="current"></li>-->
+<!--                <li></li>-->
+<!--                <li></li>-->
+<!--                <li></li>-->
+            </ol>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.addEventListener('load',function(){
+        //1.获取元素
+        var arrow_l = document.querySelector('.arrow-l');
+        var arrow_r = document.querySelector('.arrow-r');
+        var focus = document.querySelector('.focus');
+        //2.鼠标经过focus 显示隐藏的按钮
+        focus.addEventListener('mouseenter',function(){
+            arrow_l.style.display='block';
+            arrow_r.style.display='block';
+        })
+        //3.鼠标经过focus 隐藏按钮
+        focus.addEventListener('mouseleave',function(){
+            arrow_l.style.display='none';
+            arrow_r.style.display='none';
+        })
+        //4.生成动态小圆圈，有几张图片就生成几个
+        var ul = focus.querySelector('ul');
+        console.log(ul.children.length);
+        var ol = focus.querySelector('ol');
+        for (let i = 0; i < ul.children.length; i++) {
+            //5.创建一个li
+            var li = document.createElement('li');
+            //13.记录当前小圆圈的索引号，通过自定义属性来做
+            li.setAttribute('index',i);
+            //6.把li插入到ol里面
+            ol.appendChild(li);
+            //8.小圆圈的排他思想，可以直接再生成小圆圈的同时直接绑定点击事件
+            li.addEventListener('click',function(){
+                console.log('ol - li ...click')
+                //9.干掉所有人，把所有li清除current类名
+                for (let j = 0; j < ol.children.length; j++) {
+                    ol.children[j].className = '';
+                }
+                //10.留下自己，当前li设置current
+                this.className='current';
+                //11.点击小圆圈，移动图片 移动的是ul
+                //12.ul的移动距离，小圆圈的索引号，乘以图片的宽度
+                var focusWidth = focus.offsetWidth;
+                //14.当点击了某个li就获取当前li的索引号
+                var index= this.getAttribute('index');
+                //当点击了某个li，就把li的索引号同步给num
+                num = index;
+                //当点击了li 就把这个li 索引号同步给circle
+                circle = index;
+                //15.让其移动ul，，注意是负值
+                animate(ul,-index * focusWidth, callback);
+            })
+        }
+        //7.把ol里面的第一个li设置类名为current
+        ol.children[0].className = 'current';
+        //克隆第一张图片li 到ul最后面（过渡效果）
+        var first = ul.children[0].cloneNode(true);
+        ul.appendChild(first);
+        //点击右侧按钮，图片滚动一张
+        var num = 0;
+        var focusWidth = focus.offsetWidth;
+        var flag = true;
+        arrow_r.addEventListener('click',function(){
+            if(flag){
+                flag=false;//关闭节流阀
+                //当图片滚动到克隆的最后一张图片时，让ul 快速的、不做动画的跳到最左侧，left 为0
+                if(num ==ul.children.length-1){
+                    ul.style.left=0;
+                    num=0;
+                }
+                num++;
+                animate(ul, -num * focusWidth, function(){
+                    flag=true;
+                });
+                //点击右侧按钮，小圆圈跟随一起变化，可以再声明一个变量控制小圆圈的播放
+                var circle=0;
+                circle++;
+                //先清除其余小圆圈的current类名
+                //留下当前的小圆圈的current类名
+                if(circle == 4){
+                    circle=0;
+                }
+                for (let i = 0; i < ol.children.length; i++) {
+                    ol.children[i].className='';
+                }
+                //留下当前的小圆圈current类名
+                ol.children[circle].className = 'current';
+            }
+        })
+    })
+</script>
+
+</body>
+</html>

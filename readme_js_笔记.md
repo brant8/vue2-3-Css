@@ -2196,7 +2196,405 @@
           })
           ```
 
-    4. 案例：固定右侧侧边栏，返回顶部，头部固定
+    4. 案例：固定右侧侧边栏，返回顶部，头部固定 [代码示例](https://github.com/brant8/vue2-3-Css/blob/main/js%E9%BB%91%E9%A9%AC%E4%BB%A3%E7%A0%81/014demo_moveframescrolltop.html)
+
+       1. 滚动事件scroll，事件源document
+
+       2. 滚动到某个位置(头部卷去时)，判断页面被卷去的上部值
+
+       3. 页面被卷去的头部：通过`window.pageYOffset`获得，如果时被卷去的左侧`window.pageXOffset`
+
+       4. 注意：**元素**被卷去的头部时`element.scrollTop`，如果是**页面**被卷去的头部则是`window.pageYOffset`
+
+       5. ```html
+          <script>
+              var sliderbar = document.querySelector('.slider-bar');
+              var banner = document.querySelector('.banner');
+              console.log(banner.offsetTop);
+              var bannerTop = banner.offsetTop;
+              //当侧边栏固定之后应该变化的数值，否则位置跳动幅度很大
+              var sliderbarTop = sliderbar.offsetTop - bannerTop;
+              //获得main主体元素
+              var main = document.querySelector('.main');
+              var goBack = document.querySelector('.goBack');
+              var mainTop = main.offsetTop;
+              document.addEventListener('scroll',function(){
+                  //console.log(window.pageYOffset);//页面被卷去的头部
+                  //当页面被卷去的头部大于等于某个值，侧边栏就改为固定定位
+                  if(window.pageYOffset >= bannerTop){
+                      sliderbar.style.position = 'fixed';
+                      sliderbar.style.top = sliderbarTop + 'px';
+                  }else{
+                      //低于头部值，恢复其值
+                      sliderbar.style.position = 'absolute';
+                      sliderbar.style.top = '300px';
+                  }
+                  //当页面滚动到main盒子，就滚动goback模块
+                  if(window.pageYOffset >= mainTop){
+                      goBack.style.display='block';
+                  }else{
+                      goBack.style.display='none';
+                  }
+              })
+          </script>
+          ```
+
+       6. 需要注意的时，页面被卷去的头部，有兼容性问题，因此被卷去的头部通常有如下写法
+
+          1. 声明了DTD，使用document.documentElement.scrollTop
+
+          2. 未声明DTD，使用document.bodyscrollTop
+
+          3. 新方法window.pageYOffset和window.pageXOffset，IE9开始支持
+
+          4. ```js
+             function getScroll(){
+                 return {
+                     left:window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+                     top: window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+                 };
+             }
+             //使用的时候 getScroll().left
+             ```
+
+40. ## 三大系列总结
+
+    1. | 三大系列大小对比    | 作用                                                         |
+       | ------------------- | ------------------------------------------------------------ |
+       | element.offsetWidth | 返回自身**包括**padding、**边框**、内容区的宽度，返回数值不带单位 |
+       | element.clientWidth | 返回自身包括padding、内容区的宽度，**不包含边框**，返回数值不带单位 |
+       | element.scrollWidth | 返回自身实际的宽度，**不包含边框**，返回数值不带单位  (超出内容宽度使用这个) |
+
+    2. ![总结](https://github.com/brant8/vue2-3-Css/blob/main/pictures/javascript_offsetscroll.png)
+
+    3. 主要用法：
+
+       1. offset系列主要用于获得元素位置 offsetLeft、offsetTop
+       2. client经常用于获得元素大小 clientWidth、clientHeight
+       3. scroll经常用于获取滚动距离 scrollTop、scrollLeft
+       4. 注意页面滚动的距离通过window.pageXOffset获得
+
+41. ## 其他鼠标事件
+
+    1. 当鼠标移动到元素上时就会触发mouseenter事件
+    2. 类似mouseover经过自身盒子会触发，经过子盒子还会触发。mouseenter指挥经过自身盒子触发。
+    3. mouseenter不会冒泡
+    4. mouseleave同样不会冒泡
+
+42. ## 动画函数封装
+
+    1. 核心原理：通过定时器`setInterval()`不断移动盒子位置
+
+    2. 实现步骤：
+
+       1. 获得盒子当前位置 `div.offsetLeft`
+
+       2. 让盒子在当前位置加上1个移动距离 `div.style.left = div.offsetLeft + 1 + 'px'`
+
+       3. 利用定时器不断重复这个操作 `setInterval(function(){..},30)`
+
+       4. 加一个结束定时器的操作 if->`div.offsetLeft >=400`，`clearInterval(timer)`
+
+       5. 注意此**元素需要添加定位**，才能使用`element.style.left`
+
+          1. 比如定位：`position:absolute`
+
+          ```html
+          <div></div> <!--场景：幻灯片移动-->
+          <script>
+          	var div = document.querySelector('div'); //有var表示要在内存开辟空间
+              var timer = setInterval(function(){
+                  if(div.offsetLeft >= 400){
+                      clearInterval(timer);
+                  }
+                  div.style.left = div.offsetLeft +1 + 'px';
+              },30);
+          </script>
+          ```
+
+    3. 简单动画封装函数： **动画元素必须要有定位**
+
+       ```js
+       function animate(obj,target){
+           var div = document.querySelector('div'); 
+           var timer = setInterval(function(){
+               if(obj.offsetLeft >= target){
+                   clearInterval(timer);
+               }
+               obj.style.left = obj.offsetLeft +1 + 'px';
+           },30);
+       }
+       var div = document.querySelector('div');
+       //调用函数
+       animate(div,300);
+       ```
+
+    4. 动画函数给不同元素记录不同定时器
+
+       1. 如果多个原始都使用这个动画函数，每次都要var声明定时器。我们可以给不同元素使用不同的定时器（自己还专门用自己的定时器）。
+
+       2. 核心原理：利用JS时一门动态语言，可以很方便的给当前对象添加属性。
+
+          ```js
+          var obj = {};
+          obj.name = 'andy';
+          ```
+
+       3. ```js
+          function animate(obj,target){
+              var div = document.querySelector('div'); 
+              obj.timer = setInterval(function(){ //obj设定属性timer
+                  if(obj.offsetLeft >= target){
+                      clearInterval(timer);
+                  }
+                  obj.style.left = obj.offsetLeft +1 + 'px';
+              },30);
+          }
+          ```
+
+    5. BUG：当不断点击按钮，元素的速度会越来越快，因为i开启了太多的定时器。
+
+       1. 解决方案：让元素只有一个定时器执行
+
+          ```js
+          function animate(obj,target){
+              clearInterval(obj.timer);//清除以前的定时器，以防用户多次点击给元素加速
+              var div = document.querySelector('div'); 
+              obj.timer = setInterval(function(){ //obj设定属性timer
+                  if(obj.offsetLeft >= target){
+                      clearInterval(timer);
+                  }
+                  obj.style.left = obj.offsetLeft +1 + 'px';
+              },30);
+          }
+          ```
+
+    6. **缓动效果原理**：
+
+       1. 让元素运动速度有所变化，最常见的时让速度慢慢停下来。
+
+       2. 思路：
+
+          1. 让盒子每次移动的距离慢慢变小，速度就会慢慢落下来。
+          2. 核心算法：（目标值-现在的位置）/10，作为每次移动的距离步长
+          3. 停止的条件：让当前盒子位置等于目标位置就停止定时器
+          4. 注意步长值取整。
+
+          ```js
+          function animate(obj,target){
+              clearInterval(obj.timer);//清除以前的定时器，以防用户多次点击给元素加速
+              var div = document.querySelector('div'); 
+              obj.timer = setInterval(function(){ //obj设定属性timer
+                  //把步长值改为整数，不要出现小数的问题即可让步长满足移动距离
+                  //var step = Math.ceil((target - obj.offsetLeft) /10);
+                  var step = (target - obj.offsetLeft) /10;
+                  //往正方向走时向上取整，往回走时向下取整，否则步长不等于期望的移动距离
+                  step = step > 0 ? Math.ceil(step) : Math.floor(step);
+                  if(obj.offsetLeft >= target){
+                      clearInterval(timer);
+                  }
+                  obj.style.left = obj.offsetLeft + step + 'px';
+              },15);
+          }
+          ```
+
+       3. 匀速动画：盒子当前位置+固定值
+
+       4. 缓动动画：盒子当前位置+变化值
+
+    7. **动画函数添加回调函数**
+
+       1. 函数作为一个参数，将这个函数作为参数传到另一个函数里面，当那个函数执行完之后，再执行传进去的这个函数，这个过程就叫做回调。
+
+       2. ```html
+              <style>
+                  .move{
+                      width: 300px;
+                      height: 300px;
+                      background: #009dfd;
+                      position: absolute; /*必须定位*/
+                  }
+              </style>
+          <button>点击移动</button>
+          <div class="move"></div>
+          <script>
+          function animate(obj,target,callback){ //callback回调函数
+          //function animate(obj,target){ 
+              	console.log(callback);// 调用的时候 callback()
+                  clearInterval(obj.timer);
+                  obj.timer = setInterval(function(){
+                      if(obj.offsetLeft >= target){
+                          clearInterval(obj.timer);
+                          //回调函数写到定时器里面
+                          if(callback){
+                              callback();
+                          }
+                      }
+                      console.log(obj.offsetLeft);
+                      obj.style.left = obj.offsetLeft + 10 + 'px';
+                  },15);
+              }
+              var div = document.querySelector('.move');
+              var btn = document.querySelector('button');
+              btn.addEventListener('click',function (e) {
+                  console.log("btn clicked")
+                  animate(div,800,function (){
+                      //当盒子位置抵达800后背景颜色变为红色
+                      div.style.backgroundColor = 'red';
+                  });
+                  //相当于 animate(div,800,fn) fn当参数传入
+              })
+          </script>
+          ```
+
+    8. **动画函数封装到单独JS文件里面**
+
+       1. 若经常使用这个动画函数，可以单独封装到一个js文件里面，使用的时候直接引用js文件即可。
+
+    9. 案例：鼠标经过展示动画，显示菜单名字。
+
+       1. 鼠标经过和离开的事件监听
+       2. 效果执行完毕，使用回调函数更改图标方向
+
+43. ## 常见网页特效案例
+
+    1. 网页轮播图
+
+       1. 按钮显示
+
+          1. 鼠标经过轮播图模块，左右显示按钮，离开隐藏按钮。
+          2. 点击左侧按钮一次，图片往左播放一张，以此类推
+          3. 图片播放的是同时，下面圆圈模块跟随一起变化
+          4. 点击小圆圈，可以播放相应图片
+          5. 鼠标不经过轮播图，轮播图也会自动播放
+          6. 鼠标经过，轮播图模块，自动停止播放
+
+       2. 动态生成小圆圈
+
+          1. 核心思路：圆圈个数跟图片张数一致
+          2. 首先得到ul里面图片张数（图片放入li里面，就是li的个数）
+          3. 利用循环动态生成小圆圈（小圆圈放入ol里面）
+          4. 创建节点createElement('li')
+          5. 插入节点ol.append Child(li)
+
+       3. 小圆圈的排他思想
+
+          1. 点击当前小圆圈，就添加current类，更换当前样式
+          2. 其余的小圆圈，就移除这个current类
+
+       4. 点击小圆圈滚动图片
+
+          1. 用到animate动画函数，将js文件引入，注意引入先后顺序
+
+          2. 使用动画函数的前提，该元素必须有定位
+
+          3. **注意**是 ul 移动，而不是 li 移动。如 'div - ul - li' 是ul整体移动，否则 li 移动会造成排版问题
+
+          4. 滚动图片的核心算法：点击某个小圆圈，让图片滚动，小圆圈的索引号乘以图片的宽度，作为ul移动距离。
+
+          5. 此时需要直到小圆圈的索引号，可以再生成小圆圈的时候，设定一个自定义属性，点击的时候获取这个自定义属性即可。
+
+          6. ```js
+             window.addEventListener('load',function(){
+                 //1.获取元素
+                 var arrow_l = document.querySelector('.arrow-l');
+                 var arrow_r = document.querySelector('.arrow-r');
+                 var focus = document.querySelector('.focus');
+                 //2.鼠标经过focus 显示隐藏的按钮
+                 focus.addEventListener('mouseenter',function(){
+                     arrow_l.style.display='block';
+                     arrow_r.style.display='block';
+                 })
+                 //3.鼠标经过focus 隐藏按钮
+                 focus.addEventListener('mouseleave',function(){
+                     arrow_l.style.display='none';
+                     arrow_r.style.display='none';
+                 })
+                 //4.生成动态小圆圈，有几张图片就生成几个
+                 var ul = focus.querySelector('ul');
+                 console.log(ul.children.length);
+                 var ol = focus.querySelector('ol');
+                 for (let i = 0; i < ul.children.length; i++) {
+                     //5.创建一个li
+                     var li = document.createElement('li');
+                     //13.记录当前小圆圈的索引号，通过自定义属性来做
+                     li.setAttribute('index',i);
+                     //6.把li插入到ol里面
+                     ol.appendChild(li);
+                     //8.小圆圈的排他思想，可以直接再生成小圆圈的同时直接绑定点击事件
+                     li.addEventListener('click',function(){
+                         //9.干掉所有人，把所有li清除current类名
+                         for (let j = 0; j < ol.children.length; j++) {
+                             ol.children[j].className = '';
+                         }
+                         //10.留下自己，当前li设置current
+                         this.className='current';
+                         //11.点击小圆圈，移动图片 移动的是ul
+                         //12.ul的移动距离，小圆圈的索引号，乘以图片的宽度
+                         var focusWidth = focus.offsetWidth;
+                         //14.当点击了某个li就获取当前li的索引号
+                         var index= this.getAttribute('index');
+                         //15.让其移动ul，，注意是负值
+                         animate(ul,-index * focusWidth, callback);
+                     })
+                 }
+                 //7.把ol里面的第一个li设置类名为current
+                 ol.children[0].className = 'current';
+             ```
+
+       5. 点击右侧按钮一次，就让图片滚动一张
+
+          1. 声明一个变量num。点击一次，自增1，让这个变量乘以图片宽度，就是ul的滚动距离。
+          2. 图片滚动无缝原理
+          3. 把ul 第一个li 复制一份，放到ul 最后面
+          4. 当图片滚动到克隆的最后一张图片时，让ul 快速的、不做动画的跳到最左侧，left 为0.
+          5. 同时num赋值为0，可以从新开始滚动图片
+
+       6. 克隆第一张图片
+
+          1. 克隆ul第一个li cloneNode()，加 true 深克隆赋值里面的子节点，false 浅克隆。
+
+          2. ```js
+             //7.把ol里面的第一个li设置类名为current
+             ol.children[0].className = 'current';
+             //克隆第一张图片li 到ul最后面（过渡效果）
+             var first = ul.children[0].cloneNode(true);
+             ul.appendChild(first);
+             //点击右侧按钮，图片滚动一张
+             var num = 0;
+             var focusWidth = focus.offsetWidth;
+             arrow_r.addEventListener('click',function(){
+                 if(num ==ul.children.length-1){
+                     ul.style.left=0;
+                     num=0;
+                 }
+                 num++;
+                 animate(ul, -num * focusWidth, callback);
+             })
+             ```
+
+       7. 点击右侧按钮，小圆圈跟随变化
+
+          1. 最简单做法，再声明一个变量circle，每次点击自增1。左侧按钮也需要这个变量，因此要声明全局变量。
+          2. 图片有5张，小圆圈只有4个少一个，必须加一个判断条件
+          3. 如果circle == 4，就重新复原为0.
+
+       8. 自动播放功能
+
+          1. 添加一个定时器
+          2. 自动播放轮播图，实现类似与点击了右侧按钮
+          3. 使用手动调用右侧按钮点击事件 arrow_r.click()
+          4. 鼠标经过focus就停止定时器
+          5. 鼠标离开focus就开启定时器
+
+    2. 节流阀
+
+       1. 放置轮播图按钮连续点击造成播放过快
+       2. 节流阀目的：当上一个函数动画内容执行完毕，再去执行下一个函数动画，让事件无法连续触发。
+       3. 核心思路：利用回调函数，添加一个变量来控制，锁住函数和解锁函数。
+       4. 开始设置一个变量 var flag = true
+          1. if(flag){ flag = false; do sth. } ， 关闭水龙头
+          2. 利用回调函数，动画执行完毕，flag = true， 打开水龙头
 
 
 
