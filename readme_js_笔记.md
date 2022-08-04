@@ -2458,7 +2458,7 @@
 
 43. ## 常见网页特效案例
 
-    1. 网页轮播图
+    1. **网页轮播图**
 
        1. 按钮显示
 
@@ -2587,15 +2587,360 @@
           4. 鼠标经过focus就停止定时器
           5. 鼠标离开focus就开启定时器
 
-    2. 节流阀
+    2. **节流阀** [例子](https://github.com/brant8/vue2-3-Css/blob/main/js%E9%BB%91%E9%A9%AC%E4%BB%A3%E7%A0%81/016demo_slider.html)
 
        1. 放置轮播图按钮连续点击造成播放过快
+
        2. 节流阀目的：当上一个函数动画内容执行完毕，再去执行下一个函数动画，让事件无法连续触发。
+
        3. 核心思路：利用回调函数，添加一个变量来控制，锁住函数和解锁函数。
+
        4. 开始设置一个变量 var flag = true
+
           1. if(flag){ flag = false; do sth. } ， 关闭水龙头
           2. 利用回调函数，动画执行完毕，flag = true， 打开水龙头
 
+       5. ```js
+          if(callback){
+              callback();
+          }
+          //等同于
+          callback && callback(); //短路运算
+          ```
+
+    3. **返回顶部特效**
+
+       1. 滚动窗口值文档中的特定位置
+
+       2. `window.scroll(x,y)`， 比如顶部window.scroll(0,0)。其中的x、y不加单位。
+
+       3. 带有动画的返回顶部，使用封装的动画函数
+
+       4. 把所有left相关的值改为跟页面垂直滚动距离相关即可。
+
+       5. 页面滚动了多少，可以通过`window.pageYOffset`得到
+
+       6. ```js
+          window.scroll（0，window.pgeYOffset + step);
+          ```
+
+       7. 窗口滚动，所以对象是window：`animate(window, 0, callback)`
+
+    4. **筋斗云案例**
+
+       1. 鼠标经过某个li，筋斗云跟着到当前li的位置
+
+       2. 鼠标离开li，筋斗云复原为原来的位置
+
+       3. 鼠标点击了某个li，筋斗云留在点击这个li的位置
+
+       4. 利用动画函数做动画效果
+
+       5. 原先筋斗云的起始位置是0
+
+       6. 经过某个li，把当前li的offsetLeft位置作为目标值即可
+
+       7. 鼠标离开li，把目标值设置为0
+
+       8. ```html
+          <script>
+              window.addEventListener('load',function(){
+                  var cloud = document.querySelector('.cloud');
+                  var c_nav =document.querySelector('.c-nav');
+                  var lis = c_nav.querySelectorAll('li');
+                  var current = 0;//筋斗云的起始位置
+                  //给所有li绑定事件
+                  for (let i = 0; i < lis.length; i++) {
+                      lis[i].addEventListener('mouseenter',function () {
+                          animate(cloud, this.offsetLeft);
+                      });
+                      lis[i].addEventListener('mouseleave',function () {
+                          animate(cloud, current);
+                      });
+                      lis[i].addEventListener('click',function () {
+                          current=this.offsetLeft
+                      })
+                  }
+              })
+          </script>
+          <div class="c-nav" id="c_nav">
+              <span class="cloud"></span>
+              <ul>
+                  <li class="current"><a href="#">首页新闻</a></li>
+                  <li><a href="#">师资力量</a> </li>
+                  <li><a href="#">活动策划</a> </li>
+                  <li><a href="#">企业文化</a> </li>
+                  <li><a href="#">招聘信息</a> </li>
+                  <li><a href="#">公司简介</a> </li>
+              </ul>
+          </div>
+          ```
+
+44. ## 移动端 触屏事件
+
+    1. 移动端浏览器兼容性较好，不需要考虑以前JS的兼容性问题，可以放心使用原生JS书写效果。
+
+    2. 移动端特有：触屏事件`touch`（触摸事件），Android和IOS都有。
+
+    3. **touch 对象 代表一个触摸点**。触摸点可能是一根手指，也可能是一根触摸笔。触屏事件可以相应用户手指（或触控笔）堆屏幕或者触控板操作。
+
+       | 触屏touch事件 | 说明                          |
+       | ------------- | ----------------------------- |
+       | touchstart    | 手指触摸到一个DOM元素的触发   |
+       | touchmove     | 手指在一个DOM元素上滑动时触发 |
+       | touchend      | 手指从一个DOM元素上移开时触发 |
+
+    4. 触摸事件对象 TouchEvent
+
+       1. 描述手指在触摸屏面的状态变化的事件。
+
+       2. 这类事件用于描述一个或多个触电，使开发者可以检测触电的移动，触点的增加和减少。
+
+       3. 
+
+          ```js
+          元素.addEventListener('touchstart',function(e){
+              console.log(e); //TouchEvent{...}
+          })
+          ```
+
+       4. 触摸事件对象常见对象列表（`console.log(e)`）
+
+          | 触摸列表       | 说明                                             | 举例                                           |
+          | -------------- | ------------------------------------------------ | ---------------------------------------------- |
+          | touches        | 正在触摸**屏幕**的所有手指的一个列表             | TouchEvent{ touches:{{0:Touch{..}, length:1} } |
+          | targetTouches  | 正在触摸当前**DOM元素**上的手指的一个列表        |                                                |
+          | changedTouches | 手指状态发生了改变的列表，从无到有，从有到无变化 |                                                |
+
+       5. 如果侦听的是一个DOM元素，touches和targetTouches是一样的。
+
+       6. 平时都是给元素注册触摸事件，重点记住targetTouches
+
+          ```js
+          console.log(e.targetTouches[0])//获取正在触摸dom元素的第一个手指信息，比如手指的坐标
+          ```
+
+    5. 移动端拖动元素
+
+       1. touchstart、touchmove、touchend可以实现拖动元素
+       2. 拖动元素需要当前手指的坐标值，可以使用`targetTouches[0]`里面的`pageX`和`pageY`
+       3. 移动端拖动原理：手指移动中，计算出手指移动举例。然后用原来的盒子的位置 + 手指移动的距离。
+       4. 手指移动的距离：手指滑动中的位置减去 手指刚开始触摸的位置
+
+    6. 拖动元素三部曲：
+
+       1. 触摸元素touchstart：获取手指初始坐标，同时获得盒子原来的位置
+       2. 移动手指touchmove：计算手指的滑动距离，并移动盒子
+       3. 离开手指touchend
+
+    7. 注意：**手指移动也会触发滚动屏幕**所以这里要阻止默认的屏幕滚动`e.preventDefault();`
+
+       ```html
+       <style>
+           div{
+               position:absolute;
+               left: 0;
+               width: 100px;
+               height: 100px;
+               background-color: pink;
+           }
+       </style>
+       <div>   </div>
+       <script>
+           //touchstart, touchmove, touchend
+           var div =document.querySelector('div');
+           var startX = 0;//获得手指初始位置
+           var startY = 0;
+           var x = 0;//获得盒子原来的位置
+           var y = 0;
+           div.addEventListener('touchstart',function(e){
+               startX = e.targetTouches[0].pageX;
+               startY = e.targetTouches[0].pageY;
+               x = this.offsetLeft;
+               y = this.offsetTop;
+           });
+           div.addEventListener('touchmove',function(e) {
+               //计算手指的移动距离：手指移动之后的坐标减去手指初始的坐标
+               var moveX = e.targetTouches[0].pageX - startX;
+               var moveY = e.targetTouches[0].pageY - startY;
+               //移动盒子
+               this.style.left = x + moveX + 'px';
+               this.style.top = y + moveY + 'px'; 
+               e.preventDefault(); //阻止默认移动屏幕
+           })
+       </script>
+       ```
+
+    8. 轮播图使用CSS3的过渡，判断：
+
+       1. CSS3使用过渡效果，比如 `ul.style.transition='all .3s';` `ul.style.transform='translateX(' + translatex + 'px)';`
+       2. 等CSS效果过渡完成之后，在判断监听过渡完成的事件 transitionend，比如`ul.addEventListener('transitionend',function(){...})`
+       3. 过渡效果要在监听事件之外
+
+    9. **classList属性，HTML5新增属性，返回元素的类名 伪数组**。IE10+支持。
+
+       1. ```html
+          <div class="one two"></div>
+          <script>
+          	//元素.classList 或者具体当中的class名 元素.classList[0]
+              //可以在元素中添加、移除、切换CSS类名
+              element.classList.add('类名'); //追加class类名、不会覆盖以前类名
+              element.classList.remove('类名');//移除类名
+              element.classList.toggle('类名');//切换类名
+              btn.addEventListener('click',function(){
+                  document.body.classList.toggle('bg');//一般使用button切换，比如开关等切换黑色背景
+                  //点一次有bg类，再点一次移除bg类
+              })
+          </script>
+          ```
+
+       2. 使用场景：轮播图小圆点跟随变化
+
+          1. 把ol里面li带有current类名的选出来去掉类名： remove
+
+          2. 让当前索引号的小li加上current： add
+
+          3. 但是：要等着CSS3过渡结束之后变化，要写到transitionend事件里面
+
+          4. ```js
+             //不使用排他思想的做法
+             ol.querySelector('.current').classList.remove('current');
+             ol.children[index].classList.add('current');
+             ```
+
+    10. **手指滑动轮播图**
+
+        1. 本质就是ul跟随手指移动，简单说就是移动端拖动元素
+
+        2. 触摸元素touchstart：获取手指初始坐标
+
+        3. 移动手指touchmove：计算手指的滑动距离，并且移动盒子
+
+           ```js
+           var startX = 0; //获取手指初始坐标
+           var moveX = 0; //移动距离，后面会使用，
+           ul.addEventListener('touchstart', function(e){
+               startX = e.targetTouches[0].pageX;
+           });
+           ul.addEventListener('touchmove', function(e){
+               moveX = e.targetTouches[0].pageX-startX;//计算移动距离
+               //移动盒子：盒子原来的位置 + 手指移动的距离
+               var translatex = -index * w + moveX;
+               //手指拖动的时候，不需要动画效果，要取消过渡效果
+               ul.style.transition = 'none';
+               ul.style.transform = 'translateX('+ translatex + 'px)';
+           });
+           ```
+
+        4. 离开手指touchend：根据滑动距离分不同情况
+
+           1. 如果移动距离小于某个像素，就回弹原来位置
+           2. 如果移动距离大于某个像素，就上一张或下一张图片滑动
+           3. 若用来判断是否拖动，可单独给一个变量更改true/false。（点击链接非滑动时可用）
+
+           ```js
+           ul.addEventListener('touchend', function(e){
+              //如果移动距离大于50像素就播放上一张或者下一张
+               if(Math.abs(moveX) > 50){
+                   //如果右滑：播放上一张 moveX是正值
+                   if(moveX > 0){
+                       index--;
+                   }else{//如果作画：播放下一张 moveX是负值
+                       index++;
+                   }
+                   var translatex = -index *w;
+                   ul.style.transition = 'all .3s';
+               	ul.style.transform = 'translateX('+ translatex + 'px)';
+               }else{
+                   //小于50像素就回弹
+                   var translatex = -index * w;
+                   ul.style.transform = 'translateX('+ translatex + 'px)';
+               }
+           });
+           ```
+
+    11. **click延时**解决方案
+
+        1. 移动端click事件会有300ms的演示，原因是移动端屏幕等待 双击会缩放(double tap to zoom)页面。
+
+        2. 解决方案：
+
+           1. 禁止缩放。浏览器禁用默认的双击缩放行为并且去掉300ms的点击延迟
+
+              ```html
+              <meta name = "viewport" content="user-scalable=no"
+              ```
+
+           2. 利用touch事件自己封装这个事件解决300ms延迟。
+
+              1. 当手指触摸屏幕，记录当前触摸时间。
+              2. 当手指离开屏幕，用离开的时间减去触摸的时间。
+              3. 如果时间小于150ms，并且没有滑动屏幕，那么就定义为点击。
+
+              ```js
+              function tap(obj,callback){
+                  var isMove = false;
+                  var startTime = 0;//记录触摸的时候的时间变量
+                  obj.adEventListener('touchstart',function(e){
+                      startTime = Date.now();//记录触摸时间
+                  });
+                  obj.addEventListener('touchmove',function(e){
+                      isMove=true;//看看是否有滑动，有滑动算拖拽，不算点击
+                  });
+                  obj.addEventListener('touchend',function(e){
+                      if(!isMove && (Date.now - startTime) < 150){
+                          //如果手指触摸和离开时间小于150ms算点击
+                          callback && callback();//执行回调函数
+                      }
+                      isMove = false; //取反 重置
+                      startTime=0;
+                  });
+              }
+              //调用
+              tap(div,function(){ 
+                  //执行代码 
+              })；
+              ```
+
+           3. 使用插件。fastclick插件解决300ms延迟。（js第三方文件）
+
+              ```js
+              if('addEventListener' in document){//查看document是否有该事件
+                  document.addEventListener('DOMContentLoaded',function(){ //等DOM元素全部加载完毕
+                      FastClick.attach(document.body);//FastClick为导入改js文件后
+                  },false);
+              }
+              //原FastClick以 ;function(){。。。} 开头是因为方法之间用 ； 隔开，以防导入时其他方法没有加分号
+              //剩余代码按照正常写法即可
+              ```
+
+45. ## Swiper插件 轮播图手机端
+
+    1. 引入插件相关文件（中英版） [下载地址](https://www.swiper.com.cn/download/index.html)
+
+    2. 使用大概：
+
+       1. 使用在线demo查看所需样式，[点击查看地址](https://www.swiper.com.cn/demo/index.html) ，含有PC和移动端
+
+       2. 下载文件包中有demo目录
+
+       3. 目录中的样式按编号与在线样式编号一致即可。
+
+       4. 具体代码与CSS、HTML、JS代码匹配 以及 swiper.min.css和 swiper.min.js文件
+
+       5. 注意：分页需要使用`load`才可以 ，具体自定义[案例地址](https://github.com/brant8/vue2-3-Css/blob/main/js%E9%BB%91%E9%A9%AC%E4%BB%A3%E7%A0%81/019demo_swiper.html) .
+
+          ```js
+          window.addEventListener('load',function(){
+              var swiper = new Swiper(".mySwiper", {
+                  pagination: {
+                      el: ".swiper-pagination",
+                  },
+              });
+          })
+          ```
+
+       6. 
 
 
 

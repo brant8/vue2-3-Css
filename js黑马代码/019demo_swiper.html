@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!--1.swiper的css-->
+    <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css">
+    <!--2.swiper的js-->
+    <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"> </script>
+    <!--3. 自定义css-->
+    <style>
+        html,
+        body {
+            position: relative;
+            height: 100%;
+        }
+
+        body {
+            background: #eee;
+            font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            color: #000;
+            margin: 0;
+            padding: 0;
+        }
+        /*4. swiper页面css*/
+        .swiper {
+            width: 100%;
+            height: 100%;
+        }
+
+        .swiper-slide {
+            text-align: center;
+            font-size: 18px;
+            background: #fff;
+
+            /* Center slide text vertically */
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-box-pack: center;
+            -ms-flex-pack: center;
+            -webkit-justify-content: center;
+            justify-content: center;
+            -webkit-box-align: center;
+            -ms-flex-align: center;
+            -webkit-align-items: center;
+            align-items: center;
+        }
+
+        .swiper-slide img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .container{
+            width: 1200px;
+            height: 600px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+    <!--5.Swiper 固定代码，slide1可以换成图片-->
+        <div class="swiper mySwiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide"><img src="https://cdn.pixabay.com/photo/2022/07/26/13/55/egg-7345934_960_720.jpg"/></div>
+                <div class="swiper-slide"><img src="https://cdn.pixabay.com/photo/2022/07/25/15/18/cat-7344042_960_720.jpg"/></div>
+                <div class="swiper-slide"><img src="https://cdn.pixabay.com/photo/2020/04/30/03/26/rufous-5111261_960_720.jpg"/></div>
+                <div class="swiper-slide"><img src="https://cdn.pixabay.com/photo/2022/07/13/22/27/butterfly-7320158_960_720.jpg"/></div>
+                <div class="swiper-slide">Slide 5</div>
+                <div class="swiper-slide">Slide 6</div>
+                <div class="swiper-slide">Slide 7</div>
+                <div class="swiper-slide">Slide 8</div>
+                <div class="swiper-slide">Slide 9</div>
+            </div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+    <!--6. Initialize Swiper -->
+    <script>
+        window.addEventListener('load',function(){
+            var swiper = new Swiper(".mySwiper", {
+                pagination: {
+                    el: ".swiper-pagination",
+                },
+            });
+        })
+    </script>
+</body>
+</html>
