@@ -2928,10 +2928,11 @@
 
        4. 具体代码与CSS、HTML、JS代码匹配 以及 swiper.min.css和 swiper.min.js文件
 
-       5. 注意：分页需要使用`load`才可以 ，具体自定义[案例地址](https://github.com/brant8/vue2-3-Css/blob/main/js%E9%BB%91%E9%A9%AC%E4%BB%A3%E7%A0%81/019demo_swiper.html) .
+       5. 注意：最好使用`load`添加轮播方式 ，具体自定义[案例地址](https://github.com/brant8/vue2-3-Css/blob/main/js%E9%BB%91%E9%A9%AC%E4%BB%A3%E7%A0%81/019demo_swiper.html) .
 
           ```js
           window.addEventListener('load',function(){
+              //轮播图主要播放方式的选择
               var swiper = new Swiper(".mySwiper", {
                   pagination: {
                       el: ".swiper-pagination",
@@ -2940,7 +2941,464 @@
           })
           ```
 
-       6. 
+       6. 官方参考使用方法： [地址](https://www.swiper.com.cn/usage/index.html) , [官方AP](https://www.swiper.com.cn/api/pagination/69.html) .
+
+       7. 样式若需要修改，查找相对应的元素，在定义CSS/style中修改覆盖即可。（引用顺序）
+
+       8. 其他常见移动端插件,移动端一般叫做TouchSlide
+
+          1. superslide
+          2. iscroll
+
+46. ## 移动端视频插件
+
+    1. H5提供了video标签，但是浏览器支持情况不同，不同的视频格式文件，可以通过source解决。
+
+    2. 外观样式、暂停、播放、全屏功能只能自己写代码解决，此时可以用其他插件解决。
+
+       ```html
+       <!--比如视频插件zy.media.js-->
+       <div class="playvideo">
+           <div class="zy_media">
+               <video data-config='{"mediaTitle": "测试视频---视频“}' controls>
+                   <source src="C:\Users\win10pure\Downloads\20210305-093530_F.MOV" type="video/mp4">
+                   您的浏览器不支持HTML5视频
+               </video>
+               <!-- 默认HTML5代码
+               <video src="xx.mp4" controls></video>   -->
+           </div>
+           <div id="modelView">&nbsp;</div>
+       </div>
+       ```
+
+47. ## Bootstrap轮播图
+
+    1. [原生复制](https://getbootstrap.com/docs/3.4/javascript/#carousel-methods)遇到的问题：轮播图与自定义`.focus`类尺寸不协调。
+       1. `<div class=focus><轮播图代码></div>`
+       2. 查看首页代码，boostrap的`carousel`只有`relative`没有给高度宽度，而父类`.focus`给了高宽。
+       3. 赋值高度与宽度给`.carousel`和`.carousel img`
+       4. 若无法生效，强制`!important`高宽度。
+
+    2. Methods为控制速度等其他特效
+    3. [案例](https://github.com/brant8/vue2-3-Css/blob/main/js%E9%BB%91%E9%A9%AC%E4%BB%A3%E7%A0%81/020demo_bootstrap.html)
+
+48. ## 本地存储
+
+    1. 数据存储在用户浏览器中
+
+    2. 设置、读取方便、甚至页面刷新不丢失数据
+
+    3. 容量较大，`sessionStorage`约 5M（几百万字）、`localStorage`约 20M。
+
+    4. 只能存储字符串，可以将对象`JSON.stringify()`编码后存储
+
+    5. **window.sessionStorage**
+
+       1. 生命周期为关闭浏览器窗口
+
+       2. 在同一个窗口(页面)下数据可以共享
+
+       3. 以键值对的形式存储使用
+
+       4. 数据操作
+
+          ```js
+          //存储数据
+          sessionStorage.setItem(key, value) //省略window
+          //获取数据
+          sessionStorage.getItem(key)
+          //删除数据
+          sessionStorage.removeItem(key)
+          //删除所有数据
+          sessionSotrage.clear()
+          ```
+
+       5. 浏览器查看存储路径信息：Application - Storage - Session Storage
+
+    6. **window.localStorage**
+
+       1. 声明周期永久生效，除非手动删除， 否则关闭页面也会存在
+
+       2. 可以多窗口（页面）共享（统一浏览器可以共享）
+
+       3. 以键值对的形式存储使用
+
+          ```js
+          //存储数据
+          localStorage.setItem(key, value)
+          //获取数据
+          localStorage.getItem(key)
+          //删除数据
+          localStorage.removeItem(key)
+          //删除所有数据
+          localStorage.clear()
+          ```
+
+       4. 浏览器查看存储路径信息：Application - Storage - Local Storage
+
+    7. 案例：记住用户名
+
+       ```html
+       <input type="text" id="username"><input type="checkbox" name="" id="remember">记住用户名
+       <script>
+           var username = document.querySelector('#username');
+           var remember = document.querySelector('#remember');
+           if(localStorage.getItem('username')){
+               username.value = localStorage.getItem('username');//文本框的值
+               remember.checked = true;
+           }
+           remember.addEventListener('change',function(){//复选框 状态发生改变
+               if(this.checked){
+                   localStorage.setItem('username',username.value);
+               }else{
+                   localStorage.removeItem('username');
+               }
+           })
+       </script>
+       ```
+
+49. ## jQuery
+
+    1. JavaScript库 概述：一个封装好的特定的集合（方法和函数）。jQuery中j就是JavaScript，Query查询，就是查询js，把 js 中的 DOM 操作做了封装，可以快速查询使用里面的功能。
+
+    2. jQuery版本
+
+       1. 1x：兼容IE678等低版本浏览器，不再更新
+       2. 2x：不兼容IE678等低版本浏览器，不再更新
+       3. 3x：不兼容IE678等低版本浏览器，主要更新维护版本
+
+    3. 基本用法之 等页面DOM加载完毕再执行js代码
+
+       ```js
+       //方式一：
+       $(document).ready(function(){
+           ...
+       })
+       //方式二：
+       $(function(){
+           ...
+       })
+       //相当于原生js中的DOMContentLoaded（比load更快）
+       //不同于原生js中的load事件，时等页面文档、外部js文件、css文件、图片加载完毕才执行内部代码
+       ```
+
+    4. `$`是jQuery的别称，代码中可以使用`jQuery`代替`$`，为了方便，通常直接使用`$`。
+
+    5. `$`是jQuery中的顶级对象，相当于原生JavaScript中的window。把元素利用`$`包装成jQuery对象，就可以使用jQuery的方法
+
+    6. **jQuery对象和DOM对象**
+
+       1. 用原生JS获取来的对象就是DOM对象。
+          1. 比如`var myDiv = document.querySelector('div')`;
+
+       2. jQuery伙房获取的元素就是jQuery对象。
+          1. `$('div');`
+
+       3. `console.log(myDiv)` 与 `console.log($('div')) `获取的对象不一样
+          1. jQuery获取以伪数组形式得到对象，有索引值`0:div`和长度`length: 1`
+          2. DOM获取的有很多的属性和方法。
+
+       4. **jQuery对象只能使用jQuery方法，DOM对象使用原生的JavaScript属性和方法**。
+
+    7. jQuery对象和DOm对象相互转换
+
+       1. DOM对象转换为jQuery对象：
+          1. `$(DOM对象)` 或 `$(DOM标签)`
+
+       2. jQuery对象转换为DOM对象：
+          1. `$(DOM)[index]` ：index是索引号，一般取0即可。
+          2. `$(DOM).get(index)`：index是索引号
+
+50. ## jQuery常用API-选择器
+
+    1. jQuery选择器：`$('选择器')` 。里面选择器**直接写CSS选择器**即可， 但是要加引号。
+
+       | 名称       | 用法            | 描述                     |
+       | ---------- | --------------- | ------------------------ |
+       | ID选择器   | $("#id")        | 获取指定ID的元素         |
+       | 全选择器   | $('*')          | 匹配所有元素             |
+       | 类选择器   | $('.class')     | 获取同一类class的元素    |
+       | 标签选择器 | $("div")        | 获取同一类标签的所有元素 |
+       | 并集选择器 | $("div, p, li") | 选取多个元素             |
+       | 交集选择器 | $("li.current") | 交集元素                 |
+
+    2. jQuery层级选择器
+
+       | 名称       | 用法       | 描述                                                         |
+       | ---------- | ---------- | ------------------------------------------------------------ |
+       | 子代选择器 | $("ul>li") | 使用>号，湖区亲儿子层级的元素；注意，并不会获得孙子层级的元素 |
+       | 后代选择器 | $("ul li") | 使用空格，代表后代选择器，获取ul下的所有li元素，包括孙子等   |
+
+    3. **jQuery隐式迭代**
+
+       1. jQuery设置样式：$('DOM').css('属性'，'值')
+       2. 页面多个DOM标签时，一次性获取并且可以使用`.css()`一次性给所有赋值
+       3. **遍历内部DOM元素**（伪数组形式存储）的过程叫做隐式迭代。
+       4. 比如`$('div').css('background-color','pink');`，把每个div都设置背景颜色，相当于原生JS 的 for循环
+
+    4. **jQuery筛选选择器**
+
+       | 语法       | 用法          | 描述                                                        |
+       | ---------- | ------------- | ----------------------------------------------------------- |
+       | :first     | $('li:first') | 获取第一个li元素                                            |
+       | :last      | $('li:last')  | 获取最后一个li元素                                          |
+       | :eq(index) | $("li:eq(2)") | 获取到的li元素中，选择索引号伪2的元素，索引号index从0开始。 |
+       | :odd       | $("li:odd")   | 获取到的li元素中，选择索引号伪奇数的元素                    |
+       | :even      | $("li:even")  | 获取到的li元素中，选择索引号伪偶数的元素                    |
+
+    5. **jQuery筛选方法**
+
+       | 语法/均为方法        | 用法                             | 说明                                                   |
+       | -------------------- | -------------------------------- | ------------------------------------------------------ |
+       | `parent()`           | `$("li").parent()`               | 查找父级                                               |
+       | `children(selector)` | `$("ul").children("li")`         | 相当于`$("ul>li")`，最近一级（亲儿子）                 |
+       | `find(selector)`     | `$("ul").find("li")`             | 相当于`$("ul li")`，后代选择器                         |
+       | `siblings(selector)` | `$(".first").siblings("li")`     | 查找兄弟节点，不包括自己本身                           |
+       | `nextAll([expr])`    | `$(".first").nextAll()`          | 查找当前元素之后的所有同辈元素                         |
+       | `prevtAll([expr])`   | `$(".last").prevAll()`           | 查找当前元素之前的所有同辈元素                         |
+       | `hasClass(class)`    | `$('div').hasClass("protected")` | 检查当前的元素是否含有某个特定的类，如果有，则返回true |
+       | `eq(index)`          | `$("li").eq(2)`                  | 相当于`$("li:eq(2)")`,index从0开始                     |
+
+    6. **jQuery排他思想**
+
+       1. 想要多选一的效果，排他思想：当前元素设置样式，其余的兄弟元素清除样式。
+
+          ```js
+          $(function(){
+              //1.隐式迭代 给所有的按钮都绑定了点击事件
+              $("button").click(function(){
+              //2.当前元素变化背景颜色
+              $(this).css("background","pink");
+              //3.其余兄弟去掉背景颜色
+              $(this).siblings("button").css("background","");
+          })
+          })
+          ```
+
+    7. 案例：tab分栏 [案例地址](https://github.com/brant8/vue2-3-Css/blob/main/js%E9%BB%91%E9%A9%AC%E4%BB%A3%E7%A0%81/023demo_jquery_tab.html)
+
+       1. 核心原理：鼠标经过左侧某个li，就让内容区盒子对应图片显示，其余图片隐藏。
+       2. 需要得到当前li的索引号，就可以显示对应索引号的图片
+       3. jQuery得到当前元素索引号`$(this).index()`
+       4. 中间对应的图片，可以通过`eq(index)`方法取选择
+       5. 显示元素show()，隐藏元素hide()
+       6. 链式编程：$(元素).css(..).$(其他元素).css(..)
+          1. 比如：`$(this).css("color","red).siblings().css('color',"")`
+
+51. ## jQuery常用API-操作CSS方法
+
+    1. jQuery可以使用css方法来修改简单元素样式，也可以操作类，修改多个样式
+
+    2. 操作一：参数只写属性名，则是返回属性值。
+
+       ```js
+       $(this).css("color");
+       ```
+
+    3. 操作二：参数是属性名，属性值，逗号分隔，是设置一组样式；*属性必须加引号*，值如果是数字可以不用跟单位和引号。
+
+       ```js
+       $(this).css("color","red");
+       ```
+
+    4. 操作三：参数可以是对象形式，方便设置多组样式。属性名和属性值用冒号隔开，属性可以不用加引号。
+
+       ```js
+       $(this).css({
+           "color":"white", 
+           "font-size":"20px",
+           "background-color":"red"
+       });
+       //或者
+       $(this).css({
+           color:"white", 
+           font-size:"20px",
+           backgroundColor:"red" //不加引号用驼峰
+       });
+       ```
+
+    5. 设置类样式方法
+
+       1. 作用等同于以前的classList，可以操作类样式，注意操作类里面的参数不要加点。
+
+       2. 添加类
+
+          ```js
+          $("div").click(function(){
+          	$(this).addClass("current");
+          })
+          ```
+
+       3. 删除类
+
+          ```js
+          $("this").removeClass("current");
+          ```
+
+       4. 切换类
+
+          ```js
+          //原生js：使用变量点击取反
+          $("this").toggleClass("current");
+          ```
+
+    6. 案例：tab栏切换
+
+       1. 点击上部的li，当前li添加current类，其余兄弟移除类
+
+       2. 点击的同时，得到当前 li 的索引号
+
+       3. 让下部里面相应索引号的item显示，其余的item隐藏
+
+          ```js
+          $(function(){
+              $(".tab_list li").click(function(){
+                  //链式
+                  $(this).addClass('current').siblings().removeClass('current');
+                  var index = $(this).index();
+                  $(".tab_con .item").eq(index).show().siblings().hide();
+              })
+          })
+          ```
+
+       4. 原生 js写法
+
+          ```js
+          //tab原生JS写法
+          var tab_list = document.querySelector(".tab_list");
+          var lis = tab_list.querySelectorAll('li');
+          var items = document.querySelectorAll('item');
+          //for循环绑定点击事件
+          for(var i =0;i<lis.length;i++){
+              //开始给5个li 设置索引号
+              lis[i].setAttribute('index',i);
+              lis[i].onclick=function(){
+                  //上面模块选项卡，点击某一个，当前这个底色会变红，其余不变（排他思想），修改类名的方式
+                  //干掉所有人，其余的li清除 class
+                  for(var i =-;i<lis.length;i++){
+                      lis[i].className="";
+                  }
+                  //留下自己
+                  this.className = 'current';
+                  //下面的显示内容模块
+                  var index = this.getAttribute('index');
+                  console.log(index);
+                  //干掉所有人，让其余的item这些div 隐藏
+                  for(var i=0;i<items.length;i++){
+                      items[i].style.display='none';
+                  }
+                  //留下自己，让对应的item显示出来
+                  items[index].style.display='block';
+              }
+          }
+          ```
+
+    7. **类操作与className区别**
+
+       1. 原生JS 中 className会覆盖元素原先里面的类名。
+
+       2. jQuery里面类操作知识堆指定类进行操作，不影响原先的类名。
+
+          ```html
+          <div class="one"></div>
+          <script>
+          	var one = document.querySelector('.one');
+              one.className = "two";//覆盖原先的one
+              //既有one也有two，追加类名
+              $(".one").addClass("two");
+          </script>
+          ```
+
+52. ## jQuery效果
+
+    1. **显示与隐藏**：`show()`、`hide()`、`toggle()`
+
+       1. 语法规范：`show([speed,[easing],[fn]])`
+          1. 显示参数，参数都可以省略，无动画直接显示
+          2. speed：三种预定速度之一的字符串("slow", "normal", or "fast")或表示动画市场的毫秒数值，如1000。
+          3. easing：(Optional)用来指定切换效果，默认是"swing"，可用参数"linear"。
+          4. fn：回调函数，再动画完成时执行的函数，每个元素执行一次。
+
+       2. 语法规范：`hide([speed,[easing],[fn]])`
+       3. 语法规范：`toggle([speed,[easing],[fn]])`
+
+    2. **滑动**：`slideDown()`、`slideUp()`、`slideToggle()`
+
+       1. 语法规范：`slideDown([speed,[easing],[fn]])`
+
+    3. **淡入淡出**：`fadeIn()`、`fadeOut()`、`fadeToggle()`、`fadeTo()`
+
+       1. 语法规范：`slideIn([speed],[easing],[fn]])`
+       2. 语法规范：`slideOut([speed],[easing],[fn]])`
+       3. 语法规范：`slideTo([speed], opacity, [easing],[fn]])`; 渐进方式调整到指定的不透明度（修改）
+          1. opacity：透明度必须且，取值 0~1 之间。
+          2. speed：必须写。
+          3. easing、fn：可选
+
+       4. 语法规范：`slideToggle([speed,[easing],[fn]])`
+
+    4. **自定义动画**：`animate()`
+
+    5. **事件切换**：`hover([over,] out)`
+
+       1. over：鼠标移到元素上要触发的函数（相当于mouseenter）
+
+       2. out：鼠标移出元素要触发的函数（相当于mouse leave）
+
+          ```js
+          $(".nav>li").hover(function(){..}, function(){..});
+          //场景 导航效果
+          $(".nav>li").hover(function(){ //over
+              $(this).children("ul").slideDown(200);
+          }, function(){//out
+              $(this).children("ul").slideUp(200);
+          });
+          ```
+
+       3. hover(fn)：只写一个函数，在鼠标移动到该元素和离开该元素时都会触发该函数。
+
+          ```js
+          $(".nav>li").hover(function(){ //只写一个函数通常配合Toggle
+              $(this).children("ul").slideToggle(200);
+          });
+          ```
+
+    6. **jQuery动画对立即其停止排队方法**
+
+    7. 动画或效果队列：动画或者效果一旦触发就会执行，如果多次触发，就会造成多个动画或者效果队列执行。
+
+       1. 比如导航栏`nav li`来回移动hover出现下拉菜单，会全部触发，造成所有动画一起出现。
+
+    8. 停止排队：`stop()`
+
+       1. stop()：用于停止动画或效果
+
+       2. 注意：stop()写到动画或者效果的前面，相当于停止结束上一次的动画。
+
+          ```js
+          $(".nav>li").hover(function(){ 
+              //stop()必须写到动画的前面，结束上一次的动画 比如：多次打开下拉导航，结束上次导航
+              $(this).children("ul").stop().slideToggle(200);
+          });
+          ```
+
+    9. 案例：突出当前图片 [案例链接](https://github.com/brant8/vue2-3-Css/blob/main/js%E9%BB%91%E9%A9%AC%E4%BB%A3%E7%A0%81/025demo_jquery_fade.html)
+
+       ```js
+       $(function(){
+           $(".wrap li").hover(function(){
+               //鼠标进入的时候，其他的li标签透明度：0.5
+               //当前元素的其他兄弟元素，400ms时候更改透明度为0.5
+               $(this).siblings().stop().fadeTo(400,0.5);
+           },function(){
+               //鼠标离开，其他li 透明度改为1
+               $(this).siblings().stop().fadeTo(400,1);
+           });
+       })
+       ```
+
+    10. 
+
 
 
 

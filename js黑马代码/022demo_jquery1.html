@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+
+    </style>
+</head>
+<body>
+
+    <div>我是div</div>
+    <div class="nav">我是nav div</div>
+    <p>我是p</p>
+    <ol>
+        <li>我是ol 的</li>
+        <li>我是ol 的</li>
+        <li>我是ol 的</li>
+        <li>我是ol 的</li>
+    </ol>
+    <ul>
+        <li>我是ul 的</li>
+        <li>我是ul 的</li>
+        <li>我是ul 的</li>
+        <li>我是ul 的</li>
+    </ul>
+    <script>
+        $(function(){
+            console.log($('.nav'));
+            $('div').css('background-color','pink');
+        });
+
+        $(function(){
+            //1.隐式迭代 给所有的按钮都绑定了点击事件
+            $("button").click(function(){
+                //2.当前元素变化背景颜色
+                $(this).css("background","pink");
+                //3.其余兄弟去掉背景颜色
+                $(this).siblings("button").css("background","");
+            })
+        })
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        .wrapper {
+            width: 1000px;
+            height: 475px;
+            margin: 0 auto;
+            margin-top: 100px;
+        }
+
+        .tab {
+            border: 1px solid #ddd;
+            border-bottom: 0;
+            height: 36px;
+            width: 320px;
+        }
+
+        .tab li {
+            position: relative;
+            float: left;
+            width: 80px;
+            height: 34px;
+            line-height: 34px;
+            text-align: center;
+            cursor: pointer;
+            border-top: 4px solid #fff;
+        }
+
+        .tab span {
+            position: absolute;
+            right: 0;
+            top: 10px;
+            background: #ddd;
+            width: 1px;
+            height: 14px;
+            overflow: hidden;
+        }
+
+        .products {
+            width: 1002px;
+            border: 1px solid #ddd;
+            height: 476px;
+        }
+
+        .products .main {
+            float: left;
+            display: none;
+        }
+
+        .products .main.selected {
+            display: block;
+        }
+
+        .tab li.active {
+            border-color: red;
+            border-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <ul class="tab">
+            <li class="tab-item active">国际大牌<span>◆</span></li>
+            <li class="tab-item">国妆名牌<span>◆</span></li>
+            <li class="tab-item">清洁用品<span>◆</span></li>
+            <li class="tab-item">男士精品</li>
+        </ul>
+        <div class="products">
+            <div class="main selected">
+                <a href="###"><img src="https://cdn.pixabay.com/photo/2020/04/30/03/26/rufous-5111261_960_720.jpg" alt=""/></a>
+            </div>
+            <div class="main">
+                <a href="###"><img src="https://cdn.pixabay.com/photo/2022/07/26/13/55/egg-7345934_960_720.jpg" alt=""/></a>
+            </div>
+            <div class="main">
+                <a href="###"><img src="https://cdn.pixabay.com/photo/2020/04/30/03/26/rufous-5111261_960_720.jpg" alt=""/></a>
+            </div>
+            <div class="main">
+                <a href="###"><img src="https://cdn.pixabay.com/photo/2022/07/26/13/55/egg-7345934_960_720.jpg" alt=""/></a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        //原生JS写法
+        var tab_list = document.querySelector(".tab_list");
+        var lis = tab_list.querySelectorAll('li');
+        var items = document.querySelectorAll('item');
+        //for循环绑定点击事件
+        for(var i =0;i<lis.length;i++){
+            //开始给5个li 设置索引号
+            lis[i].setAttribute('index',i);
+            lis[i].onclick=function(){
+                //上面模块选项卡，点击某一个，当前这个底色会变红，其余不变（排他思想），修改类名的方式
+                //干掉所有人，其余的li清除 class
+                for(var i =-;i<lis.length;i++){
+                    lis[i].className="";
+                }
+                //留下自己
+                this.className = 'current';
+                //下面的显示内容模块
+                var index = this.getAttribute('index');
+                console.log(index);
+                //干掉所有人，让其余的item这些div 隐藏
+                for(var i=0;i<items.length;i++){
+                    items[i].style.display='none';
+                }
+                //留下自己，让对应的item显示出来
+                items[index].style.display='block';
+            }
+        }
+    </script>
+
+    <script src="jquery-1.12.4.js"></script>
+    <script>
+        $(function () {
+            //需求:给tab栏的每一个li标签设置鼠标移入事件: 当前li添加active类,其他的兄弟li移除active类.
+            //    找到当前tab栏索引一致的div,让他添加 selected类,其他的兄弟div移除selected类.
+
+            //需求1
+            $('.tab>.tab-item').mouseenter(function () {
+                $(this).addClass('active').siblings('li').removeClass('active');
+
+                //获取鼠标当前移入的这个li标签的索引
+                var idx = $(this).index();
+
+                //需求2:
+                $('.products>.main').eq(idx).addClass('selected').siblings('div').removeClass('selected');
+            });
+
+        });
+    </script>
+
+</body>
+</html>

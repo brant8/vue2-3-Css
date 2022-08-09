@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    <input type="text">
+    <button class="set">存储数据</button>
+    <button class="get">获取数据</button>
+    <button class="remove">删除数据</button>
+    <script>
+        var inpt = document.querySelector('input');
+        var set = document.querySelector('.set');
+        set.addEventListener('click',function(){
+            //点击后，把表单里面的值存储起来
+            var val = inpt.value;
+            sessionStorage.setItem('uname',val);
+        });
+        var get = document.querySelector('.get');
+        get.addEventListener('click',function(){
+            //点击后，把表单里面的值存储起来
+            var val = inpt.value;
+            console.log(sessionStorage.getItem('uname'));
+        })
+
+    </script>
+
+    <input type="text" id="username"><input type="checkbox" name="" id="remember">记住用户名
+    <script>
+        var username = document.querySelector('#username');
+        var remember = document.querySelector('#remember');
+        if(localStorage.getItem('username')){
+            username.value = localStorage.getItem('username');
+            remember.checked = true;
+        }
+        remember.addEventListener('change',function(){
+            if(this.checked){
+                localStorage.setItem('username',username.value);
+            }else{
+                localStorage.removeItem('username');
+            }
+        })
+    </script>
+
+</body>
+</html>
