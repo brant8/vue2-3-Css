@@ -3100,12 +3100,12 @@
 
        4. **jQuery对象只能使用jQuery方法，DOM对象使用原生的JavaScript属性和方法**。
 
-    7. jQuery对象和DOm对象相互转换
+    7. **jQuery对象和DOM对象相互转换**
 
-       1. DOM对象转换为jQuery对象：
+       1. DOM对象**转换为jQuery对象**：
           1. `$(DOM对象)` 或 `$(DOM标签)`
 
-       2. jQuery对象转换为DOM对象：
+       2. jQuery对象**转换为DOM对象**：
           1. `$(DOM)[index]` ：index是索引号，一般取0即可。
           2. `$(DOM).get(index)`：index是索引号
 
@@ -3339,6 +3339,34 @@
 
     4. **自定义动画**：`animate()`
 
+       1. 语法规范：`animate(params,[speed],[easing],[fn])`
+
+       2. params：想要更改的样式属性，以对向行驶传递，必须写。属性名可以不用带引号，入股偶时符合属性则需要采取驼峰命名法borderLeft。*其余参数都可以省略*。
+
+       3. speed：三种预定速度之一的字符串("slow", "normal", or "fast")或表示动画市场的毫秒数值，如1000。
+
+       4. easing：(Optional)用来指定切换效果，默认是"swing"，可用参数"linear"。
+
+       5. fn：回调函数，在动画完成时执行的函数，每个元素执行一次。
+
+          ```html
+          <button>动起来</button>
+          <script>
+          $(function(){
+          	$("button").click(function(){
+                  $("div").animate({
+                      left:500,
+                      top:300,
+                      opacity: .4,
+                      width:600,
+                  },500);
+              })
+          }
+          </script>
+          ```
+
+       6. 
+
     5. **事件切换**：`hover([over,] out)`
 
        1. over：鼠标移到元素上要触发的函数（相当于mouseenter）
@@ -3389,7 +3417,7 @@
            $(".wrap li").hover(function(){
                //鼠标进入的时候，其他的li标签透明度：0.5
                //当前元素的其他兄弟元素，400ms时候更改透明度为0.5
-               $(this).siblings().stop().fadeTo(400,0.5);
+               $(this).siblings().stop().fadeTo(400,0.5); //注意stop()，没有stop突出想过来回摆动
            },function(){
                //鼠标离开，其他li 透明度改为1
                $(this).siblings().stop().fadeTo(400,1);
@@ -3397,7 +3425,812 @@
        })
        ```
 
-    10. 
+    10. 案例：王者荣耀英雄，手风琴特效 [案例地址](https://github.com/brant8/vue2-3-Css/blob/main/js%E9%BB%91%E9%A9%AC%E4%BB%A3%E7%A0%81/026demo_jquery_king.html)
+
+        1. 手风琴每个位置2张图片，头像和人物，头像压在人物介绍上层。
+
+        2. 小图片可看到，大图片不可见display:none。动画需要定位，absolute
+
+        3. 当前current默认可见大图，小图不可见
+
+        4. 鼠标经过当前li实现两个步骤
+
+        5. 当前li宽度变为224px，同时里面的小图片淡出，大图片淡入。
+
+        6. 其余兄弟li宽度变为69px，小图片淡入，大图片淡出
+
+           ```js
+           $(function(){
+               $(".king li").mouseenter(function(){
+                   //每个 效果之前都要注意 对象.stop()
+                   $(this).stop().animate({
+                       width:224,
+                   }).find(".small").stop().fadeOut().siblings(".big").stop().fadeIn();
+                   $(this).siblings("li").stop().animate({
+                       width:69
+                   }).find(".small").stop().fadeIn().siblings(".big").stop().fadeOut();
+               })
+           })
+           ```
+
+53. ## jQuery属性操作
+
+    1. 设置或获取元素**固有属性值** `element.prop()`
+
+       1. 获取： `$("a").prop("href")`
+
+       2. 设置：`$("a").prop("title","我还可以")`
+
+       3. 复选框：
+
+          ```js
+          $(function(){
+            $("input").change(function(){ //change相当于vue的watch事件
+                console.log($(this).prop("checked"));
+            })  
+          })
+          ```
+
+       4. 获取不到结果：undefined
+
+    2. 设置或获取元素**自定义属性值** `element.attr()`
+
+       1. 获取：`attr("属性")` ；类似原生`getAttribute()`
+       2. 设置：`attr("属性","属性值")`；类似原生`setAttribute()`；*设置完后可在DOM（HTML页面）看到该值*
+       3. 也可获取 H5自定义属性 `<div class="one" data-index="4">` 中的`data-index` (`data-`开头)
+
+    3. **数据缓存** `data()`
+
+       1. 可以在指定元素上存取数据，并不会修改DOM元素结构（*HTML页面看不到该元素和值*）。一旦页面刷新，之前存放的数据都将被移除。
+       2. data() 里面的数据是存放在元素的内存里面。
+       3. 设置：`$("span").data("uname","andy")`
+       4. 获取：`$("span").data("uname")`
+       5. 可获取HTML5自定义属性 `data-index`，得到的是数字型。
+          1. 获取不用写`data-`：`$("div").data("index")`
+
+    4. 案例：购物车案例 - 全选分析
+
+       1. 思路：里面3个小的复选框按钮（j-checkbox）选中状态（checked）跟着全选按钮（checkall）走。
+
+       2. 因为checked是复选框的固有属性，此时需要利用prop()方法获取和设置该属性
+
+       3. 把全选按钮状态赋给3个小复选框即可
+
+          ```js
+          $(function(){
+              $(".checkall").change(function(){
+                  //$(this).prop("checked");
+                  //多个全选按钮，头部一个，尾部一个；$(".j-checkbox, .checkall")表示不同位置的两个class
+                  $(".j-checkbox, .checkall").prop("checked",$(this).prop("checked"));
+              })
+          })
+          ```
+
+       4. 单击每个选项框，当每个选项框都勾选，全选也自动勾选
+
+       5. `:checked`选择器； 查找被选中的表单元素
+
+          ```js
+          $(function(){
+          	$(".j-checkbox").change(function(){
+                  //console.log( $(".jcheckbox:checked") ); 得到伪数组，包含length
+                  if( $(".jcheckbox:checked").length === $('.j-checkbox').length ){ //被选中的小的复选框个数
+                      $(".checkall").prop("checked", true);
+                  }else{
+                      $(".checkall").prop("checked", false);
+                  }
+              })
+          })
+          ```
+
+54. ## jQuery内容文本值
+
+    1. 主要针对 *元素的内容* 还有 *表单的值* 的操作。
+
+    2. 普通元素内容： `html()` ，相当于原生`innerHTML`
+
+       1. 获取：`$(element).html()`
+       2. 设置：`html('内容')`
+
+    3. 普通元素文本内容：`text()`，相当于原生`innerText`
+
+       1. 获取：`$(element).text()`
+       2. 设置：`$(element).text('内容')`
+
+    4. 表格元素的值：`val()` ,input等表格元素
+
+       1. 获取：`$(element).val()`
+       2. 设置：`$(element).val('内容')`
+
+    5. 案例：购物车商品数量赋值
+
+       1. 思路：首先声明一个变量，当我们点击+号increment，就让这个值++，然后赋值给文本框。
+
+       2. 注意：只能增加本商品的数量，就是当前+号的兄弟文本框itxt 的值
+
+       3. 修改表单的值是val() 方法
+
+       4. 注意：这个变量初始值应该是这个文本框的值，在这个值的基础上++，要获取表单的值。
+
+          ```js
+          // - 文本框input +
+          $(".increment").click(function(){
+              var n = $(this).siblings(".itxt").val();
+              console.log(n);
+              n++;
+              $(this).siblings(".itxt").val(n); //文本框、表单获取值val()
+          })
+          ```
+
+       5. 减号 decrement思路同理，但是如果文本框的值是1，就不能再减了。
+
+          ```js
+          $(".decrement").click(function(){
+              var n = $(this).siblings(".itxt").val();
+              if(n == 1){
+                  return false;
+              }
+              n--;
+              $(this).siblings(".itxt").val(n);
+          })
+          ```
+
+       6. 多层级父级
+
+          ```js
+          $('.four').parent().parent().parent(); //伪数组.substr(index) 可以得到其值
+          $('.four').parents(); //得到直至html的元素 的伪数组
+          $('.four').parents(".one"); //得到.one的父级元素
+          ```
+
+       7. 保留两位小数：`数字.toFixed(2)`
+
+       8. 用户直接修改表单里面的值，同样可以计算价格。表单用`change`事件
+
+55. ## jQuery元素操作
+
+    1. 主要遍历、创建、添加、删除元素操作。
+
+    2. **遍历元素**
+
+       1. jQuery隐式迭代时堆同一类元素做了同样的操作。如果想要给同一类元素做不同操作，就需要用到遍历。
+       2. 语法一：`$("div").each(function(index, domEle){ ... })`
+          1. `each()`方法遍历匹配的每一个元素。*主要用DOM处理，each每一个*。
+          2. 里面的回调函数有2个参数：`index`是每个元素的索引号，`demEle`是每个*DOM元素对象*，不是jquery对象。
+          3. 想要使用jquery方法，需要给这个dom元素转换为jquery对象`$(domEle)`
+
+       3. 语法二：`$.each(object, function(index, element){ ... })`
+          1. `$.each()`可以遍历任何对象。*主要用于数据处理，比如数组、对象*。
+          2. 里面有两个参数：index是每个元素的索引号；element 遍历内容
+          
+     ```js
+       $(function(){
+           //同一类元素同样操作
+           $("div").css("color","red"); //隐式遍历
+           //.each()遍历不同操作
+           var arr = ["red","green","blue"];
+           $("div").each(function(index,domEle){
+               //回调函数第一个参数一定是索引号，此处形参
+               console.log(index);//每次循环自动加1
+               //第二个参数是DOM元素对象，比如获取的结果：<div>2</div> ,DOM没有css方法，jQuery有
+               $(domEle).css("color","blue"); //举例
+               $(domEle).css("color",arr[i]); 
+           })
+           //$.each()遍历任何对象 , jQuery对象
+           $.each( $("div"),function(index,element){
+               console.log(index + " : " + element);
+           } );
+           //数组对象
+           $.each(arr, function(index, element){
+               console.log(index + " : " + element);
+           });
+           //对象
+           $.each({
+               name:"andy",
+               age:18
+           },function(index,ele){
+               console.log(index);//输出的是 name ,age 属性名
+               console.log(ele); // 输出的是 andy 18 属性值
+           })
+       })
+     ```
+
+    3. 案例：购物车不同商品数量相加
+
+       1. 注意场景应用，`$(domEle).text()`获取到的数字不是Int类型，需要转换`parseInt(值)`
+
+    4. **创建元素**
+
+       1. `$("创建元素内容")`
+
+          ```js
+          var li = $("<li>我是新创建的</li>")
+          ```
+
+       2. 需要添加后才能显示
+
+    5. **添加元素**
+
+       1. 内部添加：`.append("内容")`、`.prepend("内容")`
+
+          1. 把内容放入匹配元素内部最后面，类似原生`appendChild`
+
+          ```js
+          $("ul").append(li);  //li添加到ul内li的最后
+          $("ul").prepend(li); //li添加到ul内li的前面
+          ```
+
+       2. 外部添加：`.after("内容")`、`.before("内容")`
+
+          ```js
+          var div=$("<div>新生div</div>");
+          $(".test").after(div);  //把内容放入目标元素后面
+          $(".test").before(div); //把内容放入目标元素前面
+          ```
+
+       3. 内部添加元素，生成之后，是父子关系。
+
+       4. 外部添加元素，生成之后，是兄弟关系。
+
+    6. **删除元素**
+
+       1. `$(element).remove()`：删除匹配的元素（本身）
+       2. `$(element).empty()`：删除匹配的元素集合中所有的子节点及其内容、孩子
+       3. `$(element).html("")`：删除匹配的元素集合中所有的子节点及其内容、孩子
+
+    7. 案例：删除商品模块
+
+       1. 商品后面的删除按钮
+
+          ```js
+          $(".p-action a").click(function(){
+              //删除当前商品
+          	$(this).parents(".cart-item").remove();
+          })
+          ```
+
+       2. 删除选中的商品
+
+          ```js
+          $(".remove-batch").click(function(){
+              //删除小的复选框中的商品
+              $(".j-checkbox:checked").parents(".cart-item").remove();//隐式迭代
+          })
+          ```
+
+       3. 清空购物车，删除全部商品
+
+          ```js
+          $(".clear-all").click(function(){
+              //删除小的复选框中的商品
+              $(".cart-item").remove();//隐式迭代
+          })
+          ```
+
+56. ## jQuery尺寸、位置操作
+
+    1. **jQuery尺寸**
+
+       | 语法                                | 用法                                                  |
+       | ----------------------------------- | ----------------------------------------------------- |
+       | width() 、 height()                 | 取得匹配元素宽度和高度值，只算width、height           |
+       | innerWidth()、innerHeight()         | 取得匹配元素宽度和高度值，包含padding                 |
+       | outerWidth()、outerHeight()         | 取得匹配元素宽度和高度值，包含padding、border         |
+       | outerWidth(true)、outerHeight(true) | 取得匹配元素宽度和高度值，包含padding、border、margin |
+
+    2. 以上参数为空，则是获取相应值，返回的是数字型。
+
+    3. 如果参数为数字，则是修改相应值。
+
+    4. 参数可以不必写单位。
+
+    5. **jQuery位置**
+
+       1. 主要有：`offset()`、`position()`、`scrollTop()`、` scrollLeft()`
+
+    6. `offset()`：设置或获取元素偏移
+
+       1. 设置或返回被选元素 *相对于文档*  的偏移坐标，跟父级没有关系。
+       2. 偏移属性为：top、left；表示举例文档顶部和左侧的距离。
+          1. 比如`console.log( $(".son").offset().top )`
+
+       3. 设置元素的偏移：`.offset({ top:10, left:30 })`
+
+    7. `position()`：获取元素偏移（只能获取不能设置）
+
+       1. 获取距离带有定位父级位置（偏移），如果没有带有定位的父级，则以文档为准。
+
+    8. `scrollTop()`、` scrollLeft()`：设置或获取元素被卷去的头部和左侧
+
+       1. `scrollTop()`：设置或返回被选元素被卷去的头部。
+
+       ```js
+       $(function(){
+           //页面滚动事件
+           $(window).scroll(function(){
+               console.log($(document).scrollTop());
+           })
+       })
+       //带有动画的返回顶部
+       $(".back").click(function(){
+           $("body,html").stop().animate({ //animate只有元素才能做动画
+        // $(document).stop().animate({.. //文档无法做动画
+               scrollTop:0
+           })
+       })
+       ```
+
+    9. 案例：电梯导航
+
+       1. 侧边栏悬浮导航，点击快速定位到对应内容区域。
+
+       2. 核心算法：电梯导航模块和内容区模块一一对应。
+
+       3. 当点击电梯导航某个小模块，就可以拿到当前小模块的索引号。
+
+       4. 把animate移动的距离求出来：当前索引号内容区模块它的`offset().top`
+
+       5. 然后执行动画
+
+          ```js
+          $(".fixedtool li").click(function(){
+              console.log($(this).index());
+              //当每次点击li，就需要计算出页面要去往的位置
+              //选出对应索引号的内容区的盒子，计算他的offset().top
+              var current = $(".floor .w").eq($(this).index()).offset().top;
+              //页面动画滚动效果
+              $("body,html").stop().animate(function(){
+                  scrollTop:current
+              });
+              //点击之后，当让钱li添加current类名让其高亮，兄弟类移除current
+              $(this).addClass("current").siblings().removeClass();
+              //.removeClass()当只有一个类名时，无需添加removeClass("current")
+          })
+          ```
+
+       6. 使用滚动条页面滚动时，电梯导航做出相应变化，此功能要写道页面滚动事件中区。
+
+       7. 用到each，遍历内容区域大模块。each能拿到内容区域每一个模块元素和索引号
+
+       8. 判断条件：被卷去的头部大于等于 内容区域里面每个模块的`offset().top`
+
+          ```js
+          $(window).scroll(function(){
+              //页面滚动到某个区域内，左侧电梯导航li相应添加和删除current类
+              $(".floor .w").each(function(index,element){
+                  if(($(document).scrollTop() >= $(element).offset().top){
+                  	console.log(i);
+                  	$(".fixedtool li").eq(i).addClass("current").siblings().removeClass();
+                  }
+              })
+          })
+          ```
+
+       9. 当既有滚动和点击切换时，点击电梯导航时滚动条也会走动，造成电梯导航中的li会有其他非必要高亮显示，如不按顺序点击时。
+
+       10. 节流阀/互斥锁：点击li时，把页面滚动事件的li添加current行为锁住。
+
+           ```js
+           var flag=true;
+           if(flag){
+               //点击或滚动各自的事件
+               //动画执行完毕后，使用回调函数解锁，比如animate({..},function(){ flag = true; })
+           }
+           ```
+
+57. ## jQuery事件
+
+    1. 单个事件注册
+       1. 语法：`element.事件(function(){})`
+       2. 比如：`$("div").click(function(){ 事件处理程序 })`
+       3. 其他事件基本和原生一致：mouseover、mouseout、blur、focus、change、keydown、keyup、resize、scroll等
+
+    2. **事件处理`on()`绑定事件及优势一**
+
+       1. `on()`在匹配元素上绑定一个或多个事件事件处理函数
+
+       2. 语法：`element.on(events, [selector], fn)`
+
+       3. events：一个或多个用空格分隔的事件类型，如"click"或"keydown"
+
+       4. selector：元素的子元素选择器
+
+       5. fn：回调函数，即绑定在元素身上的侦听函数
+
+          ```js
+          //不同事件不同处理函数
+          $("div").on({
+              mouseenter:function(){
+                  $(this).css("background","skyblue");
+              },
+              click:function(){
+                  $(this).css("background","purple");
+              },
+              mouseleave:function(){
+                  $(this).css("background","blue");
+              }
+          })
+          //不同事件，如果事件处理程序相同
+          $("div").on({"mouseenter mouseout", function(){
+              $(this).toggleClass("current");
+           	},
+          })
+          ```
+
+    3. **`on()`方法优势二**：
+
+       1. 可以事件委派操作。事件委派定义就是，把原来加给子元素身上的事件绑定在父元素身上，就是把事件委派给父元素。
+
+          ```js
+          //jQuery隐式迭代，给ul和li分别绑定了点击事件
+          $("ul li").click();
+          //把点击事件委派给子元素 li；理论：点击li，li冒泡传递给ul的点击触发事件函数
+          $("ul").on("click","li",function(){
+              alert("hello world");
+          })
+          ```
+
+       2. 旧版本：bind()、live()、delegate()等方法来处理时间绑定或者事件委派，最新版本用on替代她们。
+
+    4. **`on()`方法优势3**：
+
+       1. 动态创建元素，`click()`没有办法绑定事件，`on()`可以给动态生成的元素绑定事件
+
+          ```js
+          $("ul li").click(function(){
+              alert(11);
+          });
+          var li = $("<li>我是后创建的</li>");
+          $("ol").append(li); //追加后点击后没有点击事件
+          //on方法绑定事件 动态
+          $("ol").on("click","li",function(){
+              alert(11);
+          });
+          var li = $("<li>我是后创建的</li>");
+          $("ol").append(li);  //追加后点击有绑定事件
+          ```
+
+    5. 案例：发布微博案例 [地址](https://github.com/brant8/vue2-3-Css/blob/main/js%E9%BB%91%E9%A9%AC%E4%BB%A3%E7%A0%81/027demo_jquery_on.html)
+
+       1. 点击发布按钮，动态创建一个li，放入文本框的内容和删除按钮，并且添加到ul中。
+
+       2. 点击的删除按钮，可以删除当前的微博留言。
+
+          ```js
+          $(function(){
+              //添加动态元素
+              $(".btn").on("click",function(){
+                  var li=$("<li></li>");
+                  li.html($(".txt").val() + "<a href='javascript:;'>删除</a>");
+                  $("ul").prepend(li);
+                  li.slideDown();
+                  $(".txt").val("");
+              });
+              //删除动态元素
+              $("ul").on("click","a",function(){
+                  $(this).parent().slideUp(function(){ //slideUp向上拉，但是HTML的DOM元素还在，只是display:none
+                      $(this).remove(); //删除该DOM元素
+                  });
+              })
+          })
+          ```
+
+    6. **`off()`解绑事件**
+
+       1. `off()`可以移除通过`on()`方法添加的事件处理程序
+
+          ```js
+          $(function(){
+              $("div").on({
+                  click:function(){
+                      console.log("click me");
+                  },
+                  mouseover:function(){
+                      console.log("hover over me");
+                  }
+              });
+              $("div").off(); //解除了div身上所有的事件
+              $("div").off("click");//解除了div身上的click事件
+              $("ul").off("click","li"); //解除事件委托
+          })
+          ```
+
+    7. **`one()`：事件只想触发一次**，可以使用`one()`来绑定事件。
+
+    8. **`trigger()`自动触发事件**
+
+       1. 方式一：`element.event()`
+
+          ```js
+          $(function(){
+              div("div").on("click",function(){
+                  alert(10);
+              });
+              //1.默认触发事件，不需要点击
+              $("div").click(); 
+              //2.自动触发事件
+              $("div").trigger("click");
+          })
+          
+          ```
+
+       2. 方式二：`element.trigger("事件名")`
+
+          1. 事件自动触发，比如轮播图，可以利用定时器自动触发右侧按钮点击事件，不必鼠标点击触发。
+
+       3. 方式三：`element.triggerHandler("事件名")`
+
+          1. 不会触发元素的默认行为。
+
+          2. ```js
+             $("input").on("focus",function(){//鼠标点击文本框
+                 $(this).val("你好");//没有自动事件时，手动点击文本框后自动赋值，默认情况，鼠标光标会在文本框闪烁
+             });
+             $("input").triggerHandler("focus"); //有自动事件后，文本框自动赋值，但是不会有光标
+             ```
+
+    9. **事件对象**
+
+       1. 事件被触发，就会有事件对象的产生。
+
+       2. `element.on(events,[selector],function(event){})`
+
+       3. 阻止默认行为：`event.preventDefault()` 或者 `return false`
+
+       4. 阻止冒泡：`event.stopPropagation()`
+
+          ```js
+          $(function(){
+              $(document).on("click",function(){
+                  console.log("click document");
+              });
+              $("div").on("click",function(event){
+                  console.log(event);
+                  event.stopPropagation();//阻止冒泡
+              });
+          })
+          ```
+
+58. ## jQuery其他方法
+
+    1. 对象拷贝：把某个对象拷贝（合并）给另外一个对象使用，可以使用`$.extend()`
+
+       1. 语法：`$.extend([deep], target, object1, [objectN])`
+
+       2. deep：如果设为true为深拷贝，默认为false浅拷贝。
+
+       3. target：要拷贝的目标对象
+
+       4. object1：待拷贝到第一个对象的对象
+
+       5. 浅拷贝是把被拷贝的对象  *复杂数据类型中的地址拷贝*  给目标对象，修改目标对象会影响被拷贝对象。
+
+          ```js
+          $(function(){
+              //目标有数据情况下，若冲突，会被覆盖（浅拷贝）
+              var targetObj = {};
+              var obj = {
+                  id;1,
+                  name:"andy",
+                  msg:{	//复杂对象，该msg会新开辟空间，并使用地址指指向msg的地址
+                  	age:18
+              	}
+              };
+              $.extend(targetObj,obj); //复制的时候，targetObj得到msg地址值，若更改其msg指，其他复制的和原数据也会受影响
+          })
+          ```
+
+       6. 深拷贝，前面加true，完全克隆（拷贝的对象，而不是地址），*修改目标对象不会影响被拷贝对象*。
+
+          ```js
+          $(function(){
+              var targetObj = {
+                  id:0,
+                  msg:{
+                      gender:male
+                  }
+              };
+              var obj = {
+                  id;1,
+                  name:"andy",
+                  msg:{	
+                  	age:18
+              	}
+              };
+              $.extend(true,targetObj,obj); //复制的时候，targetObj得到全部数据值，并且若目标对象原来有值，则会都保留。如msg，会新开辟空间保留msg:{gender:male, age:18}
+          })
+          ```
+
+59. ## jQuery多库共存
+
+    1. jQuery使用`$`作为标识符,suizhe jQuery的流行，其他js库也会用这`$`作为标识符，这样一起使用会引起冲突。
+
+       ```js
+       //$标识符的简单封装
+       $(function(){
+           function $(ele){
+               return document.querySelector(ele);
+           }
+           //调用
+           console.log($("div"));//此时$ 作为函数，非jQuery
+       })
+       ```
+
+    2. 客观需求：
+
+       1. 需要一个解决方案，让jQuery和其他的js库不存在冲突，可以同时存在，就叫做多库共存。
+
+    3. jQuery解决方案：
+
+       1. 把里面的`$`统一改为jQuery，比如`jQuery("div")`
+       2. jQuery使用自定义标识符， `var xx = $.noConflict()`
+
+60. ## jQuery插件
+
+    1. jQuery功能比较优先，想要更复杂的特效效果，可以借助于jQuery插件完成。
+
+    2. jQuery常用插件网站：
+
+       1. jQuery插件库：www.jq22.com
+       2. jQuery之家：www.htmleaf.com
+
+    3. 图片懒加载 - LazyLoad
+
+    4. 全屏滚动，类似幻灯片，fullPage.js
+
+    5. Bootstrap，引入bootstrap.js后可以在使用用看到特效
+
+    6. 【重点】案例：**toDoList** [案例地址](https://github.com/brant8/vue2-3-Css/blob/main/js%E9%BB%91%E9%A9%AC%E4%BB%A3%E7%A0%81/028demo_jquery_todoList.html)
+
+       1. 刷新页面不会丢失数据，因此需要用到本地存储localStorage
+
+       2. 思路：不管按下回车，还是点击复选框，都是把本地存储的数据加载到页面中，这样保证刷新关闭页面不会丢失数据
+
+       3. 存储的数据格式：`var todolist = { {title:'xxx', done:false},{...} }`
+
+       4. 本地存储只能存储字符串的数据格式，不能存数组`[ {},{} ]`。
+
+       5. **把数组对象转换为字符串格式**：`JSON.stringify(XX)`
+
+       6. `localStorage.setItem("todo", JSON.stringify(todolist))`；若保存的是非字符串，LocalStorage显示`Key: XX   Value: [object Object]`
+
+       7. 获取本地存储数据：`var data = localStorage.getItem("todo")`；得到字符串
+
+       8. **把字符串数据转换为 对象格式**：`JSON.parse(data)`，用于追加数据
+
+       9. 判断是否回车： ’keydown事件‘ - ’函数的event参数’  -  ‘event.keyCode === 13‘
+
+       10. 读取本地存储数据（数据转换成对象格式），遍历此数据`$.each()`，生成 li，添加到ol里。
+
+       11. 每次渲染/遍历之前，要先把里面的ol内容清空，`$("ol").empty()`，然后渲染加载最新的数据，否则会出现多次渲染重复输出。
+
+       12. 点击里面的a链接，不是删除li，而是删除本地鵆对应的数据。
+
+       13. 原理：先u后去本地存储数据，删除对应的数据，保存给本地存储，重新渲染列表li。
+
+       14. 给链接自定义属性记录当前索引号。根据索引号删除相关数据，数组的`splice(i,1)`方法
+
+           ```js
+           //div - a - a - a -div
+           //ul - li-a - li-a -li-a -ul
+           $("div a").click(function(){
+               console.log($(this).index()); //亲兄弟时 得到索引号0、1、2
+           })
+           $("ul a").click(function(){
+               console.log($(this).index());//非亲兄弟时 得到索引号0、0、0
+           })
+           //数组删除元素，arr.splice(开始删除的位置，1) 删除1个
+           ```
+
+       15. 动态创建元素使用on事件
+
+           ```html
+           <header>
+               <section>
+                   <label for="title">ToDoList</label>
+                   <input type="text" id="title" name="title" placeholder="添加ToDo" required="required" autocomplete="off" />
+               </section>
+           </header>
+           <section>
+               <h2>正在进行 <span id="todocount"></span></h2>
+               <ol id="todolist" class="demo-box">
+           
+               </ol>
+               <h2>已经完成 <span id="donecount"></span></h2>
+               <ul id="donelist">
+           
+               </ul>
+           </section>
+           <footer>
+               Copyright &copy; 2014 todolist.cn
+           </footer>
+           
+           <script>
+               $(function(){
+                   console.log("第一..");
+                   $("#title").on("keydown",function(event){
+                       console.log("第二.." + "event.key: "+ event.key + ", event.keyCode: "+ event.keyCode+", event.key: " + event.code);
+                       if(event.keyCode === 13){
+                           console.log("第三..")
+                           //先读取本地存储原来的数据（经过转换后的得到的数组）
+                           var local = getData();
+                           console.log(local);
+                           // 把local数组进行更新数据，把最新的数据追加给local数组
+                           local.push({ title:$(this).val(), done:false });
+                           saveData(local);
+                           load();
+                           $(this).val("");
+                       }
+                   });
+                   load();
+                   //删除操作
+                   $("ol,ul").on("click","a",function () {
+                       //获取本地存储
+                       var data = getData();
+                       console.log(data);
+                       //修改数据
+                       var index=$(this).attr("id");
+                       data.splice(index,1);
+                       //保存到本地存储
+                       saveData(data);
+                       //重新渲染页面
+                       load();
+                   });
+                   //完成和未完成选项操作
+                   $("ol,ul").on("click","input",function(){
+                       //先获取本地存储
+                       var data = getData();
+                       //修改数据
+                       console.log("修改状态是："+$(this));
+                       var index=$(this).siblings("a").attr("id");
+                       console.log(index);
+                       data[index].done = $(this).prop("checked");
+                       console.log(data);
+                       //保存数据到存储
+                       saveData(data);
+                       //重新渲染页面
+                       load();
+                   })
+           
+                   //读取本地存储的数据
+                   function getData(){
+                       var data = localStorage.getItem("todolist");
+                       if(data !== null){
+                           //本地存储的数据是字符串格式，
+                           return JSON.parse(data);
+                       }else{
+                           return []; //数据使用数组存储
+                       }
+                   }
+                   function saveData(data){
+                       localStorage.setItem("todolist", JSON.stringify(data));
+                   }
+                   //加载渲染数据
+                   function load(){
+                       var data = getData();
+                       console.log(data);
+                       $("ol,ul").empty();
+                       var todoCount = 0;
+                       var doneCount = 0;
+                       $.each(data,function(i,n){ //n元素内容
+                           console.log(n);
+                           if(n.done){
+                               $("ul").prepend("<li><input type='checkbox' checked='checked'><p>"+n.title+"</p><a href='javascript:;' id=" + i +"></a></li>");
+                               doneCount++;
+                           }else{
+                               $("ol").prepend("<li><input type='checkbox'><p>"+n.title+"</p><a href='javascript:;' id=" + i +"></a></li>");
+                               todoCount++;
+                           }
+                       });
+                       $('#todocount').text(todoCount);
+                       $('#donecount').text(doneCount);
+                   }
+           
+               })
+           </script>
+           ```
+
+       16. 
 
 
 
