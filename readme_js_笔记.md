@@ -4230,7 +4230,431 @@
            </script>
            ```
 
-       16. 
+61. ## 数据可视化
+
+    1. 应用场景：通用报表、移动端图表、大屏可视化、图编辑&图分析、地理可视化
+
+    2. 常见数据可视化库
+
+       1. D3.js，目前Web端评价最高的Javascript可视化工具库（入手难）
+       2. **ECharts.js**百度出品的一个开源Javascript数据可视化库（WPS）
+       3. **Highcharts.js**国外的前端数据可视化库，非商用免费，国外许多大公司使用（Office）
+       4. AntV蚂蚁金服全新一代数据可视化解决方案
+
+    3. ECharts基本使用
+
+       1. 下载并引入echarts.js文件
+       2. 准备一个具备大小的DOM容器
+       3. 初始化echarts实例（每个图标都要有自己的实例）
+       4. 指定配置项和数据(option)
+       5. 将配置项设置给echarts实例对象
+
+       ```html
+       <div class="box"></div>
+       <script>
+           // 1.基于准备好的dom，初始化echarts实例
+           var myChart = echarts.init(document.querySelector('.box'));
+           // 2.指定图表的配置项和数据
+           var option = {
+               title: {
+                   text: 'ECharts 入门示例'
+               },
+               tooltip: {},
+               legend: {
+                   data: ['销量']
+               },
+               xAxis: {
+                   data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
+               },
+               yAxis: {},
+               series: [
+                   {
+                       name: '销量',
+                       type: 'bar',
+                       data: [5, 20, 36, 10, 10, 20]
+                   }
+               ]
+           };
+           // 3.使用刚指定的配置项和数据显示图表。
+           myChart.setOption(option);
+       </script>
+       ```
+
+    4. 相关基础配置讲解：
+
+       1. title：标题组件
+       2. tooltip：提示框组件
+       3. legend：图例组件
+       4. toolbox：工具栏
+       5. grid：直角坐标系内绘图网格
+       6. xAxis：直角坐标系grid中的x轴
+       7. yAxis：直角坐标系grid中的y轴
+       8. series：系列列表。每个系列通过type决定自己的图表类型（什么类型的图标）
+          1. stack：数据堆叠，在前面数据基础上累加（非单例数据，实为累加数据），若不需要，可以给其不同值或者删掉即可。
+
+       9. color：调色盘颜色列表
+
+    5. 案例：数据可视化项目
+
+       1. 适配方案一：（采用）
+
+          1. **flexible.js**：检测浏览器宽度，修改html文字大小
+
+             1. 屏幕分为24等分、在setRemUnit()更改值，10 -> 24.
+             2. PC端效果图1920px
+
+          2. **rem单位**：页面元素根据rem适配大小，配合VSCode的cssrem插件（更改Root Font Size 为80）。
+
+             1. 基准值 1920/24=80px、rem值自动生成（正常输入XXXpx值，插件切换rem值供选择） 
+
+          3. flex布局：页面快速布局
+
+          4. PC端约束屏幕在1024 - 1920之间适配
+
+             ```css
+             @media screen and (max-width:1024px){
+                 html{
+                     font-size:42.66px!important;
+                 }
+             }
+             @media screen and (min-width:1920px){
+                 html{
+                     font-size:80px!important;
+                 }
+             }
+             ```
+
+          5. 
+
+       2. 适配方案二：
+
+          1. @media媒体查询
+
+       3. 背景图片缩放并且显示全部：`background-size: contain`；其他参数`cover`
+
+          1. 或者：`background:url(../xx.jpg) no-repeat 0 0 /contain`
+
+       4. flex均等分
+
+          ```css
+          .fat{
+              display:flex;
+          }
+          .fat .son{ /*注意权重*/
+              flex: 3;
+          }
+          .fat .son:nth-child(2) {
+              flex:4;
+          }
+          ```
+
+       5. 边框图片：盒子大小不一，但是边框样式相同，此时可以用边框图片来完成。
+
+          1. CSS3中，新增`border-image`属性，允许一副图像作为元素的边框。
+
+          2. 边框图片切图原理：[图](https://github.com/brant8/vue2-3-Css/blob/main/pictures/javascript_border_image.png)
+
+             1. 把四个角切出去（九宫格的由来），中间部分可以铺排、拉伸或者环绕。
+             2. 四个角：top-left、top-right、bottom-right、bottom-left
+             3. 方位：top、right、left、bottom
+             4. 中间：内容区
+
+             | 属性                | 描述                                                         | 举例                                            |
+             | ------------------- | ------------------------------------------------------------ | ----------------------------------------------- |
+             | border-image-source | 用在边框的图片的路径（哪个图片）                             | `border-image-source: url(images/border.png) ;` |
+             | border-image-slice  | 图片边框向内偏移（切割）。（剪裁的尺寸，一定不加单位，上右下左顺序） | `border-image-slice: 30 30 30 30;`              |
+             | border-image-width  | 图片边框的宽度（需要加单位）（不是边框的宽度是边框图片的宽度），*大小不会挤压文字* | `border-image-width:30px；`                     |
+             | border-image-repeat | 图像边框是否应平铺（repeat）、铺满（round）或拉伸（stretch），默认拉伸 | `border-image-repeat:repeat`                    |
+
+          3. 注：平铺时，图片无法铺满则只会显示一半；铺满表示完整显示该图平铺。
+
+          4. 图片边框宽度` border-image-width` 默认和边框宽度`border-width`一样。
+
+             1. 只需设置`border-width`或者`border-image-width`其中一个即可。
+
+          5. 被切割的内容区，会在盒子中间，若切割不是对称则错位。[图片](https://github.com/brant8/vue2-3-Css/blob/main/pictures/javascript_border_image2.png)
+
+             1. 解决思路：在内容区设立一个盒子，因为绝对定位也无法影响其位置；让其拉伸与父盒子一样宽高即可，使用top、left定位。
+
+             ```html
+             <div class="viewport"> <!--大容器盒子-->
+                 <div class="column"> <!--flex排列-->
+                     <div class="panel"> <!--盒子切割部分-->
+                         <div class="inner"> <!--内部拉伸部分-->
+                             123
+                         </div>
+                     </div>
+                 </div>
+             </div>
+             <style>
+                 .panel{
+                     position:relative;
+                     border:15px solid transparent;/*透明色*/
+                     border-width: 0.6375rem .475rem .25rem 1.65rem;
+                     border-image-source:url(../images/border.png);
+                     border-image-slice:51 38 20 132;
+                 }
+                 .inner{ /*内部盒子没有设置宽高，进行了拉伸； 相当于切割的“＃”中间内容区扩展到整个“#”字*/
+                     position:absolute;
+                     top: -0.6375rem;
+                     left: -1.65rem;
+                     right: -0.475rem;
+                     bottom: -0.25rem;
+                     background-red:red;
+                     padding: .3rem .45rem;/*让盒子内的内容不会贴着边输出*/
+                 }
+             </style>
+             ```
+
+          6. flex平均分配的布局
+
+             ```css
+             .overview{
+                 height: 1.375rem;
+             } 
+             overview ul{
+                 display:flex;
+                 justify-content: space-between;
+             }
+             ```
+
+          7. 立即执行函数策略：
+
+             1. JS文件中会有大量的变量名，特别是Echarts使用，需要大量初始化Echarts对象。
+             2. 为了放置变量名冲突（污染），采用立即执行函数策略：`(function(){...})()`；（注意：需要入口函数，或者引入的js库放在html最底）
+
+          8. 无缝滚动原理：
+
+             1. 先克隆 marquee 里面所有的行（row）
+
+                ```js
+                $(".marquee-view .marquee").each(function(){ //tab有多个选项
+                    var rows=$(this).children().clone();
+                    $(this).append(rows);
+                })
+                ```
+
+             2. 通过CSS3动画滚动
+
+                ```CSS
+                .marquee-view .marquee{
+                    animation:move 15s linear infinite; /*匀速运动，无限*/
+                }
+                @keyframes move{
+                    0%{}
+                    100%{
+                        transform: translateY(-50%); /*经过自身高度的一半（克隆后的高度）*/
+                    }
+                }
+                /*鼠标经过marquee 就停止动画*/
+                .marquee-view .marquee:hover{
+                    animation-play-state: paused;
+                }
+                ```
+
+62. ## JavaScript高级
+
+    1. 类和对象
+
+       1. 创建类`class A{}`
+       2. 创建对象：`new A()`
+
+    2. **类constructor构造函数**
+
+       1. `constructor()`方法是类的构造函数（默认方法），用于传递参数，返回实例对象，通过new 命令生成对象实例时，自动调用该方法。如果没有显示定义，类内部会自动给我们创建一个`constructor()`
+
+          ```js
+          class Star{
+              constructor(uname){
+                  this.uname = uname; //this指向创建的实例
+              }
+          }
+          var fj = new Star('李四');
+          console.log(fj.uname);
+          ```
+
+       2. 通过class 关键字创建类，类名习惯性定义首字母大写
+
+       3. 类里面的constructor函数，可以接收传递过来的参数，同时返回实例对象
+
+       4. constructor函数只要new 生成实例，就会自动调用这个函数，如果不写，类也会自动生成这个函数
+
+       5. 生成实例new  不能省略
+
+       6. 语法规范：创建类，类名后面不要加小括号，生成实例，类名后面加小括号，构造函数不需要加function。
+
+       7. 类中所有的函数不需要写function；多个方法之间，不需要用逗号分隔。
+
+    3. **类的继承**
+
+       1. 子类可以继承父类的属性和方法。
+
+          ```js
+          class Father{
+              constructor(x,y){
+                  this.x=x;
+                  this.y=y;
+              }
+              sum(){
+                  console.log(this.x+this.y); //此处的this指向构造器中传过来的参数
+              }
+          }
+          class Son extends Father{
+              constructor(x,y){
+                  this.x=x; //此处需要使用super，方可以调用父类的sum方法传参计算
+                  this.y=y;
+                  //正确写法
+                  super(x,y);//super必须在子类this之前调用
+              }
+          }
+          var son = new Son(1,2); //此处子类的this指向子类的构造器参数
+          son.sum(); //没有用super会出错，
+          ```
+
+    4. **`super`关键字**
+
+       1. 用于访问和调用对象父类上的函数。可以调用父类的构造函数，也可以调用父类的普通函数。
+
+    5. 继承中，如果实例化子类输出一个方法，先看子类有没有这个方法，如有有就先执行子类的。
+
+    6. 继承中，如果子类里面没有，就去查找父类有没有这个方法，如果有，就执行父类的这个方法（就近原则）。
+
+    7. `super()`必须在子类this之前调用
+
+    8. ES6中，类没有变量提升，所以**必须先定义类**，才能通过类实例化对象。
+
+    9. 类里面的共有的属性和方法一定要加`this`使用。
+
+       ```js
+       var that;
+       var _that;
+       class Star{
+           constructor(uname,age){ //this指向实例对象
+               that = this;
+               this.uname = uname;
+               this.age = age;
+               this.sing();
+               this.btn=document.querySelector('button');
+               this.btn.onnclick=this.sing; //使用括号sing()表示立即调用；不加括号表示点击后调用
+           }
+           sing(){
+               console.log(this);
+               console.log(this.uname);
+               console.log(that.uname);
+           }
+           dance(){
+               _that = this;
+               console.log(this);
+           }
+       }
+       var ldh = new Star('刘德华');
+       console.log(that === ldh); //true
+       console.log(_that === ldh);//true
+       ```
+
+    10. **`this`指向问题**
+
+        1. constructor里面的this 指向的时 创建的实例对象。
+        2. dance方法中的this 指向的实例例对象
+        3. sing方法中的this指向的是btn 这个按钮，因为是这个按钮调用了这个函数
+           1. sing方法中的 `this.uname` 输出是`undefined`
+           2. 若要使用实例对象的this可以使用赋值方法that 
+
+    11. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1. # ES6尚硅谷
+
+2. ## ECMAScript：
+
+   1. Ecma国际通过ECMA-262标准化的脚本程序设计语言。
+   2. TC39委员会进行维护，成员都是浏览器大厂公司。
+   3. ES6本本变动内容最多，具有里程碑意义，许多新的语法特性。 ES6于2015年。
+   4. ES6对于各个浏览器的兼容性： [地址](http://kangax.github.io/compat-table/es6/)
+
+3. ## `let`声明与特性
+
+   1. 声明方式
+
+      ```js
+      let a;
+      let a,b,c,d;
+      let e=100;
+      let f=512,g="ivyou",h=[];
+      ```
+
+   2. `let`变量不能重复声明；`var`可以重复声明
+
+   3. `let`块级作用域：全局、函数、eval。 `var`没有全局作用域。
+
+   4. `let`不存在变量提升。
+
+      ```js
+      //比如var, console输出在声明之前，会显示undefined。代码执行之前会先收集
+      console.log(song);
+      var song="恋爱达人";
+      //相当于先声明，未赋值然后再console输出与赋值
+      var song;
+      //let此处会报错
+      console.log(song);
+      let song="恋爱达人";
+      ```
+
+   5. 不影响作用域链。
+
+      ```js
+      {
+          let school="尚硅谷";
+          function(){
+              console.log(school); //顺着作用域链往上找，不是向外找
+          }
+          fn();
+      }
+      ```
+
+   6. 案例：
+
+      ```js
+      //获取div元素对象
+      let items = document.getElementsByClassName('item');
+      //遍历并绑定事件
+      for(var i=0;i<items.length;i++){ //items.length=3 3个div
+          items[i].onclick=function(){
+              //修改当前元素的背景颜色
+              this.style.background = 'pink'; //可以成功
+              items[i].style.background = 'pink';//报错失败
+          }
+      }
+      //循环相当于如下
+      { var i = 0; }
+      { var i = 1; }
+      { var i = 2; }
+      //若循环后使用输出得到结果i=3，越界异常
+      console.log(window.i)
+      for(let i=0;i<items.length;i++){ 
+          items[i].onclick=function(){
+              items[i].style.background = 'pink';//成功
+          }
+      }
+      ```
+
+   7. 
 
 
 
