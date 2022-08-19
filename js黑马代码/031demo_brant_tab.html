@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .tabs{
+            display: block;
+            width: 300px;
+            height: 100px;
+        }
+        ul li{
+            float: left;
+            display: block;
+            margin-left: 20px;
+        }
+        ul .active{
+            background-color: pink;
+        }
+        .contents{
+            display: block;
+            width: 200px;
+            height: 200px;
+        }
+        .contents section{
+            display: none;
+        }
+        .contents .active{
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+
+<div class="tab">
+    <div class="tabs">
+        <ul>
+            <li class="active">tab1</li>
+            <li>tab2</li>
+            <li>tab3</li>
+        </ul>
+    </div>
+    <div class="contents">
+        <section class="active">content1</section>
+        <section>content2</section>
+        <section>content3</section>
+    </div>
+</div>
+
+<p>
+    讲解：
+    https://stackoverflow.com/questions/750486/javascript-closure-inside-loops-simple-practical-example
+</p>
+<script>
+    var lis = document.querySelectorAll('li');
+    var secs = document.querySelectorAll('section')
+
+    console.log("out for - lis :"+lis);
+
+    for (let i = 0; i < lis.length; i++) { //使用var是全局，使用let有块级，参考上面链接
+        console.log("fori - lis[i]"+lis[i]);
+        console.log("fori - secs[i]"+secs[i]);
+        // console.log(this);
+
+        lis[i].onclick=function () {
+            var num = this.setAttribute('index',i);
+            for (var j = 0; j < lis.length; j++) {
+                console.log("click - forj - lis[j] : "+lis[j]);
+                lis[j].className='';
+                secs[j].className='';
+                console.log("click - forj - secs[j]"+secs[j]);
+            }
+
+            console.log("click - i : "+ i);
+            console.log("click - lis[i] : "+lis[i]);
+            console.log("click - this : "+ this);
+            // console.log("lis[i].index : " + lis[i].index());
+
+            this.className = 'active';
+            console.log("click - secs[i] : "+secs[i]);
+             secs[i].className='active';
+        }
+    }
+</script>
+
+</body>
+</html>

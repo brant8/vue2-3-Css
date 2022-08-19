@@ -4560,7 +4560,213 @@
            1. sing方法中的 `this.uname` 输出是`undefined`
            2. 若要使用实例对象的this可以使用赋值方法that 
 
-    11. 
+    11. 案例：[面向对象版tab栏切换](https://github.com/brant8/vue2-3-Css/blob/main/pictures/030demo_obj_tab.html)
+
+        1. 点击tab蓝，可以切换效果
+
+        2. 点击+号，可以添加tab项和内容
+
+        3. 点击x号，可以删除当前tab项和内容项
+
+        4. 双击tab项文字或者内容项文字，可以修改里面的文字内容
+
+        5. var和let对于for循环以及function使用的疑难解答，[地址](https://stackoverflow.com/questions/73408209/javascript-object-and-non-object-inside-for-loop-after-click)
+
+        6. 添加元素
+
+           1. 以前做法：动态创建元素createElement,但是元素内容较多，需要`innerHTML`赋值，在`appendChild`追加到父元素里面。
+           2. **现在高级做法**：利用`insertAdjacentHTML()`可以直接把字符串格式元素**添加到父元素中**。
+           3. 语法：`element.insertAdjacentHTML(position, text);`
+           4. position是相对于元素的位置，必须使用以下字符串之一
+              1. `beforebegin`：元素自身的前面
+              2. `afterbegin`：插入元素内部的第一个子节点之前
+              3. `beforeend`：插入元素内部的最后一个子节点之后
+              4. afterend`：元素自身的后面。
+
+           5. `appendChild`不支持追加字符串的子元素，`insertAdjacentHTML`支持追加字符串的元素。
+
+        7. 添加元素后的问题，页面展示有bug，比如后加的元素没有动画效果
+
+           1. 解决：类似套娃，产生新的元素后，重新调用获取全部元素，querySelectorAll，再重新进行事件绑定（封装成方法方便调用）
+
+        8. 删除功能：关闭按钮没有索引号，但是其父亲`li`有索引号。
+
+        9. 编辑选项卡li和section里面的文字，实现修改功能
+
+           1. 双击事件：`ondbclick`
+
+           2. 如果双击文字，默认选定文字，此时需要双击禁止选中文字。
+
+              ```js
+              window.getSelection ? window.getSelection().removeAllRanges() : document.selection.empty();
+              ```
+
+           3. 双击文字的时候，在里面生成一个文本框，当失去焦点或者按下回车后把文本框输入的值给原先的元素即可
+
+63. ## 构造函数和原型
+
+    1. ES6之前，JS中并没有引入类的概念。
+
+    2. ES6，ECMAScript 6.0,2016.-6发版。目前浏览器主流ES5版本，多数高级版本浏览器支持ES6，不过只实现了ES6的部分特性功能。现已支持。
+
+    3. **创建对象三种形式**
+
+       1. 利用`new Object()`创建对象
+
+          ```js
+          var obj1 = new Object();
+          ```
+
+       2. 利用对象**字面量**创建对象
+
+          ```js
+          var obj2 = {};
+          ```
+
+       3. 利用构造函数创建对象
+
+          ```js
+          function Star(uname){  //构造函数构造对象 ES6之前的使用方式
+              this.uname = uname;
+              this.sing = function(){
+                  console.log('嫦娥');
+              }
+          }
+          var ldh = new Star('刘德华');
+          ldh.sing();
+          ```
+
+    4. 构造函数：一种特殊的韩式，用来初始化对象，即对象成员变量赋初始值，与new 一起使用。可以把对象中一些公共的属性和方法抽取出来，封装到此函数中。
+
+       1. 注意点一：**构造函数**用于创建某一类对象，**其首字母要大写**。
+       2. 构造函数要和new 一起使用才有意义。
+
+    5. **new** 在执行时会做四件事
+
+       1. 在内存中创建一个新的空对象
+       2. 让this 指向这个新的对象
+       3. 执行构造函数里面的代码，给这个新对象添加属性和方法。
+       4. 返回这个新对象（所以构造函数里面不需要return）。
+
+    6. 构造函数中的属性和方法称为成员，成员可以添加。
+
+       1. **实例成员**：
+          1. 构造函数内部通过`this`添加的成员。
+          2. 实例成员只能通过实例化的对象来访问。
+          3. 如 `ldh.uname`
+          4. 不可以通过构造函数来访问实例成员
+
+       2. **静态成员：**
+          1. 在构造函数本上上添加的成员
+          2. 如 `Star.sex = '男'`
+          3. 静态成员只能通过构造函数来访问
+          4. 不能通过对象来访问
+
+    7. 构造函数的问题：
+
+       1. 构造函数方法`var sing = function(){}`很好用，但是其复杂数据类型会存在浪费内存问题。[图示](https://github.com/brant8/vue2-3-Css/blob/main/pictures/javascript_construct.png)
+       2. 复杂类型另辟内存空间：`ldh.sing === zxy.sing`为false
+
+    8. **构造函数原型 prototype**
+
+       1. 构造函数通过原型分配的函数是所有对象所共享的。
+
+       2. Javascript规定，**每一个构造函数都有一个prototype属性**，指向另一个对象。
+
+       3. 注意：这个prototype就是一个对象，这个对象的所有属性和方法，都会被构造函数所拥有。
+
+          ```js
+          console.dir(Star);
+          //输出：ƒ Star(uname,age)
+          //		prototype: {constructor: ƒ}  	//花括号为一个对象
+          ```
+
+       4. 把那些不变的方法，直接定义在prototype 对象上，这样所有对象的实例就可以共享这些方法。
+
+          ```js
+          function Star(uname,age){
+              this.uname = uname;
+              this.age = age;
+              this.sing = function(){
+                  console.log('我唱歌');
+              }
+          }
+          //原型对象 共享方法 ，所有实例共享同一个方法
+          Star.prototype.singing = function(){
+              console.log("我唱歌");
+          }
+          var ldh = new Star('刘德华', 18);
+          ldh.sing();
+          ldh.singing();
+          ```
+
+    9. **对象原型`__proto__`**
+
+       1. 对象都会有一个属性`__proto__`：指向构造函数的prototype原型对象，之所以我们对象可以使用构造函数，prototype原型对象的属性和方法，就是因为对象有`__proto__`原型的存在。
+
+       2. 对象身上系统自动添加`__proto__`： 
+
+          ```js
+          console.log(ldh);
+          //结果包含：[[Prototype]]: Object
+          //指向构造函数的原型对象
+          console.log(ldh.__proto__ === Star.prototype); //结果为true 
+          ```
+
+       3. `__proto__`对象原型和原型对象prototype 是等价的。
+
+       4. 方法的查找规则：
+
+          1. 首先看实例对象 ldh 身上是否有 sing方法，如果有就执行这个对象的sing
+          2. 如果没有sing 方法，因为有`__proto__`的存在，就去构造函数原型对象prototype身上查找sing这个方法。
+
+       5. `__proto__`对象原型的意义就在于为对象的查找机制提供一个方向，或者说一条路线，但是它是一个非标准属性，因此实际开发中，不可以使用这个属性，它只是内部指向原型对象prototype。[图](https://github.com/brant8/vue2-3-Css/blob/main/pictures/javascript_proto.png)
+
+    10. `constructor`构造函数
+
+        1. 对象原型`__proto__`和构造函数`prototype`原型对象 里面都有一个属性constructor，称为构造函数，因为它指回构造函数本身。
+
+           ```js
+           console.log(Star.prototype.constructor);
+           console.log(ldh.__proto__.constructor);
+           //均指向构造函数如下输出
+           ƒ Star(uname,age){
+                   this.uname = uname;
+                   this.age = age;
+                   this.sing = function(){
+                       console.log('我唱歌');
+                   }
+               }
+           ```
+
+        2. constructor主要记录该对象应用哪个构造函数，它可以让原型对象重新只想原来的构造函数。
+
+        3. 很多情况下，我们需要手动利用constructor 这个属性指回 原来的构造函数
+
+           ```js
+           Star.prototype.sing = function(){
+               console.log('我会唱歌');
+           };
+           Star.prototype.movie = function(){
+               console.log('我会');
+           }
+           //对象形式写法，失去constructor的指向
+           Star.prototype ={
+               sing: function(){..},
+               movie:function(){..}
+           };
+           //指向均为： ƒ Object() { [native code] }，需要手动重新添加指向
+           console.log(Star.prototype.constructor);
+           console.log(ldh.__proto__.constructor);
+           //
+           Star.prototype ={
+               constructor: Star, //手动重新添加指向
+               sing: function(){..},
+               movie:function(){..}
+           };
+           ```
+
+        4. 如果修改了原来的原型对象，如上例子，以对象形式给原型对象赋值，则必须手动的利用constructor指回原来的构造函数。
 
 
 

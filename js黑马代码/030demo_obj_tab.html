@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+  <link rel="stylesheet" href="../styles/ad_tab/tab.css">
+  <link rel="stylesheet" href="../styles/ad_tab/style.css">
+</head>
+<body>
+
+<main>
+  <h4>
+    Js 面向对象 动态添加标签页
+  </h4>
+  <div class="tabsbox" id="tab">
+    <!-- tab 标签 -->
+    <nav class="fisrstnav">
+      <ul>
+        <li class="liactive"><span>测试1</span><span class="iconfont icon-guanbi"></span></li>
+        <li><span>测试2</span><span class="iconfont icon-guanbi"></span></li>
+        <li><span>测试3</span><span class="iconfont icon-guanbi"></span></li>
+      </ul>
+      <div class="tabadd">
+        <span>+</span>
+      </div>
+    </nav>
+
+    <!-- tab 内容 -->
+    <div class="tabscon">
+      <section class="conactive">测试1</section>
+      <section>测试2</section>
+      <section>测试3</section>
+    </div>
+  </div>
+</main>
+
+<script>
+  var that;
+  class Tab{
+    constructor(id) {
+      that = this;
+      //获取元素
+      this.main = document.querySelector(id);
+      this.lis = this.main.querySelectorAll('li');//获取所有li
+      this.sections = this.main.querySelectorAll('section')//获取所有section
+      this.add = this.main.querySelector('.tabadd');
+      //li的父元素
+      this.ul = this.main.querySelector('.fisrstnav ul:first-child');
+      this.fsection = this.main.querySelector('.tabscon');
+      this.init();
+    }
+    init(){
+      this.updateNode(); //每次更新元素后回到此处刷新所有元素，重新所有元素绑定事件
+      //初始化操作让相关元素绑定事件
+      this.add.onclick=this.addTab;
+      for (var i = 0; i < this.lis.length; i++) {
+        this.lis[i].index = i;
+     // this.lis[i].onclick=function(){
+     //   console.log(this.index);
+     // }
+        this.lis[i].onclick = this.toggleTab;//不用toggleTab()
+        this.remove[i].onclick = this.removeTab;//关闭按钮 当前remove[i]没有索引号 通过li的索引i删除li，
+        this.spans[i].ondblclick = this.editTab;
+        this.sections[i].ondblclick = this.editTab;
+      }
+    }
+    //排他清除
+    clearClass(){
+      for (var i = 0; i < this.lis.length; i++) { //此处的this调用者是that，即构造器
+        this.lis[i].className='';
+        this.sections[i].className='';
+      }
+    }
+    //1.切换功能
+    toggleTab(){
+      that.clearClass();//实例对象调用
+      // console.log(this.index);
+      this.className='liactive';//此处的this指向li，即li为调用者
+      // this.sections[this.index].className = 'conactive'; //若使用this，则调用者还是li，但li下面没有section
+      that.sections[this.index].className = 'conactive'; //使用that外层定义，让that获得到构造器的this，即tab对象
+    }
+    //2.添加功能，使用高级方式添加元素
+    addTab(){
+      var random = Math.random();
+      that.clearClass(); //注意此处的this和that使用
+      //创建li元素和section元素
+      var li = '<li class="liactive"><span>测试1</span><span class="iconfont icon-guanbi"></span></li>';
+      var section = '<section class="conactive">'+ random +'</section>';
+      //把这两个元素追加到对应的父元素中
+      that.ul.insertAdjacentHTML('beforeend', li);
+      that.fsection.insertAdjacentHTML('beforeend', section);
+      //刷新页面元素
+      that.init();
+    }
+    //3.删除功能
+    removeTab(e){
+      e.stopPropagation();// 若不阻止冒泡，每次点击关闭x号都会弹到该section，防止触发li的切换点击事件
+      var index = this.parentNode.index;//获得父亲即li的索引号，此处点击的是X号关闭
+      console.log(index);
+      that.lis[index].remove();
+      that.sections[index].remove();
+      that.init();
+      //当删除的不是选中状态li的时候，原来的选中状态li 保持不变
+      if(document.querySelector('.liactive')) return; //即下面代码不再执行
+      //当删删除了选中状态的li 的时候，让前一个li处于选定状态
+      index--;
+      //手动调用点击事件，不需要鼠标触发
+      that.lis[index] && that.lis[index].click(); //逻辑中断
+    }
+    //4.修改功能
+    editTab(){
+      console.log("db click");
+      var str = this.innerHTML;
+      //双击禁止选中文字
+      window.getSelection ? window.getSelection().removeAllRanges() : document.selection.empty();
+      this.innerHTML = '<input type="text" />';
+      var input = this.children[0];
+      input.value = str;
+      input.select();//文本框里面的文字处于选中状态
+      //离开文本框，把文本框的值给span
+      input.onblur=function(){
+        this.parentNode.innerHTML = this.value;
+      };
+      input.onkeyup = function(e){
+        if(e.keyCode ===13){
+          //手动调用表单失去焦点事件， 不需要鼠标离开操作
+          this.blur();
+        }
+      }
+    }
+
+    //获取所有的li和section
+    updateNode(){
+      this.lis = this.main.querySelectorAll('li');
+      this.sections = this.main.querySelectorAll('section');
+      this.remove = this.main.querySelectorAll('.icon-guanbi');//动态添加元素，需要从新获取对应的元素
+      this.spans = this.main.querySelectorAll('.fisrstnav li span:first-child');
+    }
+  }
+  new Tab("#tab");
+</script>
+
+
+</body>
+</html>

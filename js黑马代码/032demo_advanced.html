@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div>123</div>
+
+<script>
+    function Star(uname,age){
+        this.uname = uname;
+        this.age = age;
+        this.sing = function(){
+            console.log('我唱歌');
+        }
+    };
+    // Star.prototype.singing = function(){
+    //     console.log("我唱歌");
+    // }
+    // Star.prototype.movie = function(){
+    //     console.log('我会演电影');
+    // }
+    Star.prototype ={
+        sing: function(){
+            console.log("我唱歌");
+        },
+        movie:function(){
+            console.log('我会演电影');
+        }
+    };
+
+
+    var ldh = new Star('刘德华', 18);
+    var zxy = new Star('张学友', 20);
+    console.log(ldh.sing === zxy.sing);
+    console.dir(Star);
+    ldh.sing();
+    // ldh.singing();
+    console.log(Star.prototype.constructor);
+    console.log(ldh.__proto__.constructor);
+</script>
+
+</body>
+</html>
