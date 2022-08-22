@@ -4722,7 +4722,7 @@
 
        5. `__proto__`对象原型的意义就在于为对象的查找机制提供一个方向，或者说一条路线，但是它是一个非标准属性，因此实际开发中，不可以使用这个属性，它只是内部指向原型对象prototype。[图](https://github.com/brant8/vue2-3-Css/blob/main/pictures/javascript_proto.png)
 
-    10. `constructor`构造函数
+    10. **`constructor`构造函数**
 
         1. 对象原型`__proto__`和构造函数`prototype`原型对象 里面都有一个属性constructor，称为构造函数，因为它指回构造函数本身。
 
@@ -4767,6 +4767,51 @@
            ```
 
         4. 如果修改了原来的原型对象，如上例子，以对象形式给原型对象赋值，则必须手动的利用constructor指回原来的构造函数。
+
+    11. 构造函数、实例、原型对象
+
+        1. Star构造函数 ->  (`Star.prototype`) ->Star原型对象prototype
+        2. Star原型对象prototype -> (`Star.prototype.constructor`) -> Star构造函数
+        3. Star构造函数 -> ldh对象实例`ldh.__proto__.constructor` -> (`ldh.__proto__`)  ->Star原型对象prototype
+
+    12. **原型链**
+
+        1. `Star.prototype.__proto__ === Object.prototype`结果为true
+        2. `console.log(Object.prototype.__proto__)`结果为null
+        3. ![图](https://github.com/brant8/vue2-3-Css/blob/main/pictures/javascript_protochain.png)
+
+    13. Javascript成员查找机制（规则）
+
+        1. 当访问一个对象的属性（包括方法）时，首先查找这个对象自身有没有该属性。
+
+        2. 如果没有就查找它的原型（也就是`__proto__`指向的prototype原型对象）。
+
+        3. 如果还没有就查找原型对象的原型（Object的原型对象）。
+
+        4. 以此类推一致找到Object位置（null）
+
+           ```js
+           function Star(uname,age){
+               this.uname=uname;
+               this.age=age;
+           }
+           Star.prototype.sing = function(){
+               console.log('我会爬山');
+           }
+           //Star.prototype.sex = '女';
+           //Object.prototype.sex = '男';
+           var ldh = new Star('刘德华',18);
+           //ldh.sex='男';
+           console.log(ldh.sex);
+           //Object.prototype有一个默认的toString方法: ƒ toString()
+           console.log(Object.prototype);
+           console.log(ldh); //没有toString，但是可以跟Object查找
+           console.log(Star.prototype;)//没有toString，但是可以跟Object查找
+           ```
+
+    14. 原型对象this指向
+
+        1. 
 
 
 

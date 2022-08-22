@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+
+<script>
+    function Star(uname,age){
+        this.uname = uname;
+        this.age = age;
+    }
+    var that;
+    Star.prototype.sing = function(){
+        console.log('我会唱歌');
+        // var there = this;
+        that = this;
+    }
+    var ldh = new Star('刘德华',18);
+    //构造函数中，里面的this指向的时对象实例ldh
+    ldh.sing();
+    console.log(that === ldh);
+    // console.log(there);
+    //2.原型对象函数里面的this，指向的时实例对象ldh
+</script>
+
+</body>
+</html>
