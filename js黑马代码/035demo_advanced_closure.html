@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+  <ul class="nav">
+    <li>榴莲</li>
+    <li>臭豆腐</li>
+    <li>鲱鱼罐头</li>
+    <li>大猪蹄子</li>
+  </ul>
+  <script>
+    //利用动态添加属性方式
+    var lis = document.querySelector('.nav').querySelectorAll('li');
+    for(var i = 0; i< lis.length; i++){//同步任务
+      // console.log(lis[i]);
+
+      lis[i].index = i;
+      lis[i].onclick = function(){//异步任务
+        console.log(i); //每次输出都是4
+        console.log(this.index); //正常输出
+      }
+    }
+    //利用闭包的方式得到当前li的索引号
+    for (var i = 0; i < lis.length; i++) {
+      //利用for循环创建了4个立即执行函数
+      (function(i){//接收外面(下面)括号的i传递进来的
+        console.log(i);
+      })(i);//把i作为参数传递
+    }
+  </script>
+
+
+  <ul class="nav2">
+      <li>榴莲</li>
+      <li>臭豆腐</li>
+      <li>鲱鱼罐头</li>
+      <li>大猪蹄子</li>
+  </ul>
+  <script>
+      var lis = document.querySelector('.nav2').querySelectorAll('li');
+      for(var i = 0; i< lis.length; i++){ //同步任务
+          (function(i){
+              setTimeout(function(){
+                  console.log(lis[i].innerHTML); //若无立即执行函数，err: undefined (reading 'innerHTML')
+              },3000);
+          })(i);
+      }
+
+  </script>
+
+
+</body>
+</html>

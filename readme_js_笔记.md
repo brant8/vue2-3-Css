@@ -4560,7 +4560,7 @@
            1. sing方法中的 `this.uname` 输出是`undefined`
            2. 若要使用实例对象的this可以使用赋值方法that 
 
-    11. 案例：[面向对象版tab栏切换](https://github.com/brant8/vue2-3-Css/blob/main/pictures/030demo_obj_tab.html)
+    11. 案例：[面向对象版tab栏切换](https://github.com/brant8/vue2-3-Css/blob/main/js%E9%BB%91%E9%A9%AC%E4%BB%A3%E7%A0%81/030demo_obj_tab.html)
 
         1. 点击tab蓝，可以切换效果
 
@@ -4809,9 +4809,896 @@
            console.log(Star.prototype;)//没有toString，但是可以跟Object查找
            ```
 
-    14. 原型对象this指向
+    14. 原型对象this指向 [地址](https://github.com/brant8/vue2-3-Css/blob/main/js%E9%BB%91%E9%A9%AC%E4%BB%A3%E7%A0%81/033demo_proto_this.html)
 
-        1. 
+        1. 构造函数中，里面的this指向的时对象实例ldh
+        2. 原型对象函数里面的this，指向的时实例对象ldh
+
+    15. 扩展内置对象
+
+        1. 可以通过原型对象，对原来的内置对象进行扩展自定义的方法。比如给数组增加自定义求偶数和的功能。
+
+           ```js
+           console.log(Array.prototype);
+           Array.prototype.sum=function(){
+               var sum=0;
+               for( var i = 0; i <this.length; i++){
+                   sum +=this[i];
+               }
+               return sum;
+           }
+           var arr = [1,2,3];
+           console.log(arr.sum());
+           ```
+
+        2. 对象式写法：覆盖（不可取）
+
+           ```js
+           Array.prototype={
+               sum: function(){
+                   var sum=0;
+               	for( var i = 0; i <this.length; i++){
+                   	sum +=this[i];
+               	}
+               	return sum;
+               }
+           }
+           console.log(Array.prototype);
+           var arr = [1,2,3];
+           console.log(arr.sum());//报错，相当于把Array的prototype对象覆盖掉了
+           ```
+
+        3. 数组和字符串内置对象不能给原型对象覆盖操作`Array.prototype={}`，只能是`Array.prototype.xxx = function(){}`的方式。
+
+64. ## 继承
+
+    1. ES6之前并没有提供`extends`继承。可以通过构造函数+原型对象模拟实现继承，被称为组合继承。
+
+    2. ES6之前通过 构造函数+ 原型实现面向对象编程。
+
+    3. `call()`
+
+       1. 调用这个函数，并且修改函数运行时的this 指向。
+
+          ```js
+          fun.call(thisArg, arg1, arg2,...)
+          ```
+
+       2. thisArg： 当前调用函数this的指向对象
+
+       3. arg1，arg2：传递的其他参数
+
+          ```js
+          function fn(x,y){
+              console.log("喝咖啡");
+              console.log(this);//默认指向window
+          }
+          //以前调用方式：
+          fun();
+          //使用call调用
+          fn.call(); //相当于window.fn.call()
+          var o = {
+              name='andy';
+          }
+          fn.call(o,1,2); //this指向对象o；并且fn可以接收参数1，2
+          ```
+
+    4. 借用**构造函数继承父类型属性** [示例讲解图](https://github.com/brant8/vue2-3-Css/blob/main/pictures/javascript_protochain2.png)
+
+       1. 原理：通过`call()`把父类型的 this指向子类型的 this，这样就可以实现子类型继承夫类型的属性。
+
+          ```js
+          //父构造函数
+          function Father(uname,age){
+              //this指向父构造函数的对象实例
+              this.uname=uname;
+              this.age=age;
+          }
+          Father.prototype.money = function()[
+              console.log(10000);
+          ]
+          //子构造函数
+          function Son(uname,age){
+              //this指向子构造函数的对象实例
+              Father.call(this,uname,age); //修改父中的this，让其指向子，即可使用父构造函数的属性
+          }
+          //Son.prototype=Father.prototype; //Ⅰ.若赋值原型对象，当修改了子原型对象，父原型对象也会跟着一起变化
+          ----
+          //Ⅲ.Father原型对象Father.prototype 与 Father 实例对象new Father() 非同一个对象
+          //Ⅳ.Father实例对象可以通过__proto__访问Father原型对象
+          Son.prototype = new Father();
+          //Ⅴ.如果利用对象的形式修改了原型对象，别忘了利用constructor指回原来的构造函数
+          Son.prototype.constructor = Son;
+          ----
+          Son.prototype.exam = function(){
+              console.log('考试'); 
+          }
+          var son = new Son('刘德华',18);
+          console.log(son);
+          console.log(Father.prototype); //Ⅱ.此时Father原型对象也有了exam()
+          console.log(Son.prototype.constructor);//
+          ```
+
+65. ## 类
+
+    1. ES6通过类实现面向对象编程
+
+       ```js
+       class Star{}
+       console.log(typeof Star); //输出：function
+       console.log(Star.prototype); //{constructor: ƒ}
+       console.log(Star.prototype.constructor); //constructor指回类本身
+       Star.prototype.sing = function(){
+           console.log('并于');
+       }
+       ```
+
+    2. 类的本质其实还是一个函数function，可以认为 类就是构造函数的另一种写法。
+
+    3. 类的所有方法都定义在类的prototype属性上
+
+    4. 类的创建的实例，里面也有`__proto__`指向类的prototype原型对象
+
+    5. ES6的类的绝大部分功能，ES5都可以做到，新的class写法只是让对象原型的写法更加清晰、更像面向对象编程的语法。ES6的类其实就是语法糖。
+
+    6. 语法糖：一种便携写法，简单理解，即两种方法可以实现同样的功能，但是一种写法更加清晰、方便，那么这个方法就是语法糖。
+
+    7. **ES5新增方法**
+
+       1. **数组方法**	
+
+          1. 迭代遍历方法：`forEach()`、`map()`、`filter()`、`some()`、`every()`
+
+             ```0
+             array.forEach(function(currentValue, index, arr))
+             ```
+
+          2. currentValue：数组当前项的值
+
+          3. index：数组当前项的索引
+
+          4. arr：数组对象本身
+
+          5. `forEach()`例子
+
+             ```js
+             var arr = [1,2,3];
+             var sum=0;
+             arr.forEach(function(value,index, array){
+                 console.log('每个元素' + value);
+                 console.log('每个数组的索引号' + index);
+                 console.log('数组本身' + array);
+                 sum+= value;
+             })
+             ```
+
+          6. `filter()`例子
+
+             ```js
+             array.filter(function(currentValue,index,arr))
+             //filter()方法创建一个新的数组，新数组中的元素是通过检查指定数组中符合条件的所有元素，主要用于筛选数组
+             //他直接返回一个新数组（所有满足条件的元素）
+             var arr = [12,66,4,88];
+             var newArr=arr.filter(function(value,index){
+                 return value >=20;
+             })
+             ```
+
+          7. `some()`例子
+
+             ```js
+             //some()方法用于检测数组中的元素是否满足指定条件，通俗点：查找数组中是否有满足条件的元素
+             //返回值是布尔值，如果查找到这个元素，就返回true，如果查找不到就返回false。
+             //如果找到第一个满足条件的元素，则终止循环，不再继续查找
+             array.some(function(currentValue,index,arr))
+             ```
+
+          8. `map()`与`forEach()`相似，`every()`与`some()`相似
+
+          9. 案例：筛选查询数据表格中的数据
+
+             1. 使用innerHTML动态添加数据。并且使用appendChild追加元素到DOM。
+
+                ```js
+                //1.获取相应的元素
+                var tbody=document.querySelector('tbody');
+                var search_price = document.querySelector('.search-price');
+                var start = document.querySelector('.start');
+                var end = document.querySelector('.end');
+                setData(data);
+                //2.把数据渲染到页面中
+                function setData(mydata){
+                    //渲染前先清空tbody数据
+                    tbody.innerHTML='';
+                    mydata.forEach(function (value) {
+                        // console.log(value);
+                        var tr=document.createElement('tr');
+                        tr.innerHTML = '<td>'+ value.id+'</td><td>'+value.pname+'</td><td>'+value.price+'</td>';
+                        tbody.appendChild(tr);
+                    });
+                }
+                ```
+
+             2. 按价格条件查询数据。单击了按钮，可以根据商品价格筛选数组里面的对象。
+
+                ```js
+                search_price.addEventListener('click',function(){
+                    var newData = data.filter(function(data){
+                        return data.price >= start.value && data.price <= end.value;
+                    });
+                    //渲染筛选玩后的数据到页面中
+                    setData(newData);
+                });
+                ```
+
+             3. 根据商品名称（唯一值）查找商品，使用`some()`查找到后布尔值判断，并且追加到一个新数组。
+
+                ```js
+                search_pro.addEventListener('click',function(){
+                    var arr=[];
+                    data.some(function(value){
+                        if(value.pname === product.value){
+                            arr.push(value);//追加到新数组
+                            return true;
+                        }
+                    });
+                    setData(arr);
+                })
+                ```
+
+             4. 在`some()`里面遇到`return true`就会终止遍历，迭代效率更高。在`forEach()`和`filter()`使用`return true`不会终止遍历。
+
+       2. **字符串方法**
+
+          1. `trim()`方法回从一个字符换的两端删除空白字符
+
+             ```js
+             str.trim();
+             var input = document.querySelector('input');
+             console.log(input.value.trim());
+             ```
+
+             1. `trim()`方法并不会影响原字符串本身，它返回的是一个新的字符串。
+
+       3. **对象方法**
+
+          1. `Object.keys()`用于获取对象自身所有的属性
+
+             ```js
+             Object.keys(obj)
+             ```
+
+          2. 效果类似`for...in`； 返回一个由属性名组成的数组。
+
+             ```js
+             var obj = {
+                 id: 1,
+                 pname: '小米',
+                 price: 1999,
+                 num:2000
+             }
+             var arr = Object.keys(obj);
+             arr.forEach(function(value){
+                 console.log(value);
+             })
+             ```
+
+          3. `Object.defineProperty()`定义新属性或修改原有的属性。
+
+             ```js
+             Object.defineProperty(obj, prop, descriptor)
+             ```
+
+             1. obj：必须，目标对象
+
+             2. prop：必须：需要定义或修改的属性名字。若原来没有的属性，写完后自动添加进去。
+
+             3. `descriptor`： 必须。目标属性所拥有的特性。以对象形式`{}`书写
+
+                1. value：设置属性的值，默认为undefined
+                2. writable：值是否可以重写。`true | false`默认为false
+                3. enumerable：目标属性是否可以被枚举（能否遍历）。`true | false`默认false
+                4. configurable：目标属性是否可以被删除或是否可以再次修改特性`true | false`默认为false
+
+                ```js
+                var obj = {
+                    id: 1,
+                    pname: '小米',
+                    price: 1999,
+                    num:2000
+                };
+                //以前修改方式：
+                obj.num=1000;
+                Object.defineProperty(obj, 'num', {
+                    value:1000
+                }); //相当于obj.num=1000
+                Object.defineProperty(obj, 'id', {
+                    writable:false, //不允许修改这个属性值
+                    enumerable:false,//不允许被遍历显示
+                    configurable:false//不允许被修改特性，比如删除；如果再定义一次id，修改其特性为true会报错。
+                }); 
+                obj.id=2;//不能修改，值不变还是1
+                delete obj.id; //删除对象属性，此处无法删除，因设定
+                ```
+
+66. ## 函数进阶
+
+    1. [函数的定义方式](https://github.com/brant8/vue2-3-Css/blob/main/pictures/javascript_Function.png) 
+
+       ```js
+       //1. 函数声明方式function关键字（命名函数）
+       function fn(){};
+       //2. 函数表达式（匿名函数）
+       var fun = function(){};
+       //3. new Function('参数1','参数2','函数体') ； 
+       var f = new Function()
+       
+       var demo = new Function('console.log(123)');//函数体
+       var demo2 = new Function('a', 'b', 'console.log(a+b)');
+       demo2(1,2);
+       ```
+
+    2. **Function里面参数必须是字符串格式**
+
+       1. new Function执行效率低，不方便书写，较少使用。
+       2. 所有函数都是Function的实例对象。
+       3. **只要是对象，都有原型**`__proto__`。
+       4. 函数也属于对象  `console.log(demo2 instanceof Object)`
+
+    3. **函数的调用方式**
+
+       ```js
+       //1.普通函数
+       function fn(){
+           console.log('人生的巅峰' + this);
+       }
+       fn(); //相当于window.fn() this指向window, [object Window]
+       fn.call();
+       
+       //2.对象的方法
+       var o = {
+           sayHi:function(){
+               console.log('人生的巅峰');
+           }
+       }
+       o.sayHi(); //this指向o对象 [object Object]
+       
+       //3.构造函数
+       function Star(){}
+       Star.prototype.sing = function(){}
+       var ldh = new Star(); //构造函数this 指向 ldh这个实例对象，原型对象里面的this 也指向ldh实例对象
+       
+       //4.绑定事件函数
+       btn.onclick = function(){
+           console.log('...'+ this);//点击即调用函数 [object HTMLButtonElement]
+       }; 
+       
+       //5.定时器函数
+       setInterval(function(){},1000);//定时器 自动调用
+       window.setTimtout(function(){
+           console.log(this); //this指向Window， [object Window]
+       })
+       
+       //6.立即执行函数
+       (function(){
+           console.log('人生的巅峰' + this); //this指向 Window
+       })(); //自动调用立即执行
+       ```
+
+    4. **函数内this的指向**
+
+       1. this 的指向，是当调用函数的时候确定的。调用方式不同决定了this 的指向不同，一半指向我们的调用者。
+
+          | 调用方式     | this指向                                   |
+          | ------------ | ------------------------------------------ |
+          | 普通函数调用 | window                                     |
+          | 构造函数调用 | 实例对象，原型对象里面的方法也指向实例对象 |
+          | 对象方法调用 | 该方法所属对象                             |
+          | 事件绑定方法 | 绑定事件对象                               |
+          | 定时器函数   | window                                     |
+          | 立即执行函数 | window                                     |
+
+    5. **改变函数内部this指向**
+
+       1. JavaScript提供了一些函数方法来更优雅的处理函数内部 this 的指向问题，常用的`bind()`、`call()`、`apply()`。
+
+       2. **call方法**
+
+          ```js
+          //调用一个对象。 既是调用函数的方式，也是可以改变函数的this指向
+          fun.call(thisArg, arg1, arg2,...)
+          var o = { name:'andy' };
+          function fn(a,b){
+              console.log(this);
+              console.log(a+b);
+          };
+          fn.call(o,1,2);
+          //call第一个可以调用函数，第二个可以改变函数内的this指向。
+          //call的主要作用可以实现继承
+          function Father(uname){
+              this.uname=uname;
+          }
+          function Son(){
+              Fatjer.call(this,uname);
+          }
+          var son = new Son('刘德华');
+          ```
+
+       3. **apply方法** 与数组操作
+
+          ```js
+          //apply()方法调用一个函数。可以调用函数，也可以改变函数的this指向
+          fun.apply(thisArg, [argArray])
+          ```
+
+          1. thisArg：在fun函数运行时指定的this值
+
+          2. argsArray：传递的值，必须包含在数组里面`[arr]`
+
+          3. 返回值就是函数的返回值，因为它就是调用函数。
+
+             ```js
+             var o = {
+                 name: 'andy'
+             };
+             function fn(arr){
+                 console.log(this);
+                 console.log(arr);
+             };
+             fn.apply(o,['pink']);
+             //参数必须是数组形式（伪数组）
+             //apply的主要应用：利用apply， 借助于数学内置对象求最大值
+             //Math.max();
+             var arr = [1,66,3,99];
+             var max = Math.max.apply(null, arr);//null表示不需要改变this指向，求最大值
+             //最合适写法：, Math调用
+             var max = Math.max.apply(Math, arr);
+             ```
+
+       4. **bind方法**
+
+          ```js
+          //不会调用函数。但是能改变函数内部this指向
+          fun.bind(thisArg, arg1, arg2,...)
+          ```
+
+          1. thisArg：在fun函数运行时指定的this值。
+
+          2. arg1,arg2：传递的其他参数
+
+          3. 返回由指定的this 值和初始化参数改造的原函数拷贝。
+
+             ```js
+             var o = {
+                 name:'andy'
+             };
+             function fn(a,b){
+                 console.log(this);
+                 console.log(a+b)
+             }
+             var f = fn.bind(o, 1,2); //拷贝函数，不会调用原来的函数
+             f();
+             //应用场景：如果有的函数不需要立即调用，但又想改变这个函数内部的this时使用。
+             //比如：点击按钮，就禁用这个按钮，3秒之后开启这个按钮。
+             var btn = document.querySelector('button');
+             btn.onclick = function(){
+                 this.disabled = true; //这个this指向的时btn这个按钮
+                 setTimeout(function(){
+                     this.disabled = false;//定时器的this指向window对象，window没有disabled属性
+                 },3000);
+                 //正确写法
+                 setTimeout(function(){ //相当于setTimeout(ƒ.bind(btn),3000)，改变函数this指向为btn
+                     this.disabled = false; 
+                 }.bind(this),3000)//不能用apply或者call，会立即调用，只能用bind 
+             }
+             //其他使用场景
+             for(var i =0;i<this.lis.length;i++){
+                 this.lis[i].onclick = this.toggleTab.bind(this.lis[i],this);
+                 //toggleTab为函数 toggleTab(that){..}  ,this.lis[i]让其指向其自己，this（构造器的this）作为参数传参
+             }
+             ```
+
+67. ## 严格模式 Strict Mode
+
+    1. JavaScript除了提供正常模式外，还提供了严格模式。ES5 的严格模式采用具有限制性JavaScript变体的一种方式，即在严格的条件下运行JS代码。
+
+    2. 严格模式在IE10 以上版本的浏览器才支持。
+
+       1. 消除了JS语法的一些不合理、不严谨支持，如不声明变量。
+       2. 消除代码运行的不安全之处，提高编译器效率。
+       3. 仅用了ECMAScript未来本本可能定义的一些语法。比如关键字：class，enum，export，extends，import，super不能做变量名。
+
+    3. 严格模式可以应用到整个脚本或个别函数中。
+
+       1. 为这个脚本文件开启严格模，在所有语句之前放一个特定语句：`"use strict";`或`'use strict';`
+
+          ```html
+          <div></div>
+          <script>
+          'use strict'; //下面的代码就会按照严格模式执行代码
+          //...
+          </script>
+          <script>
+          (function(){ //独立作用域
+              'use strict';
+              //...
+          })();
+          </script>
+          <script>
+          function fn1(){
+              'use strict'; //仅限当前函数内的代码按照严格模式执行
+          }
+          function fn2(){  //冈普通式
+          }
+          </script>
+          ```
+
+    4. 严格模式中的变化：语法和行为的改变
+
+       1. **变量规定**
+
+          1. 在正常模式中，如果一个变量没有声明就赋值，默认是全局变量。严格模式禁止这种模式，变量都必须先用`var`命令声明，然后再用。
+          2. 严禁删除已经声明变量。例如：`delete x；`语法是错误的。
+
+       2. **this指向问题**
+
+          1. 以前全局作用域中的`this`指向 `window` 对象
+
+          2. 严格模式下全局作用域中函数中的`this`是`undefined`。
+
+          3. 以前构造函数是不加`new`也可以调用，当普通函数，`this`指向全局对象。
+
+          4. 严格模式下，如果构造函数不加new调用，`this`会报错。
+
+             ```js
+             function Star(){
+                 this.sex='male'; 
+             }
+             Star(); //不加new当作普通函数，对象即window
+             console.log(window.sex);
+             ```
+
+          5. new实例化的构造函数指向创建的对象实例。
+
+          6. 定时器的`this`还是指向`window`
+
+          7. 事件、对象还是指向调用者
+
+       3. **函数变化**
+
+          1. 函数不能有重名的参数
+
+             ```js
+             function fn(a,a){
+                 console.log(a+a);
+             }
+             fn(1,2); //结果为4 相当于a=1; a=2然后前一个被覆盖掉
+             ```
+
+          2. 函数必须声明在顶层。新版本的JavaScript会引入“块级作用域”（ES6中引入）。为了与新版本接轨，不允许在非函数的代码块内声明函数。
+
+             ```js
+             function fn(){ 
+             	function f(){} //合法
+             }
+             if(true){
+                 function f(){} //语法错误
+                 f();
+             }
+             for(var i = 0; i<5;i++){
+                 function f2(){}//语法错误
+                 f2();
+             }
+             ```
+
+68. ## 高阶函数
+
+    1. 高阶函数是对其他函数进行操作的函数。它接收函数作为参数或将函数作为返回值输出。
+
+       ```js
+       function fn(callback){
+           callback && callback();
+       }
+       fn(function(){
+       	console.log('hello');
+       })
+       //或者
+       function fn(){
+           return function(){}
+       }
+       fn();
+       ```
+
+69. ## 闭包
+
+    1. 变量作用域：全局变量和局部变量。
+
+    2. 函数内部可以使用全局变量。函数外部不可以使用局部变量。
+
+    3. 当函数执行完毕，本作用域内的局部变量会销毁。
+
+    4. **闭包 closure** 指有权*访问*另一个函数作用域中*变量*的*函数*。
+
+       1. 即：一个作用域可以访问另外一个函数内部的局部变量。
+
+          ```js
+          function fn(){
+              var num = 10;	
+              function fun(){//fun()为闭包函数
+                  console.log(num); //即在fun()函数内可以访问fn()内的num的变量，此时产生了闭包
+              }
+              fun();
+          }
+          fn(); //chrome浏览器，在fn()打断点，刷新浏览器。右侧菜单↓一步步走完显示闭包Closure(fn)
+          ```
+
+       2. 在`fn()`外使用`num`
+
+          ```js
+          function fn(){
+              var num = 10;	
+              function fun(){
+                  console.log(num); 
+              }
+              return fun; //使用return返回函数
+          }
+          var f = fn();//此时可以在fn()外部作用域访问num局部变量，即产生了闭包
+          ```
+
+       3. 闭包的主要作用：延伸了变量的作用范围
+
+       4. 案例：点击li输出当前li的索引号
+
+          ```html
+          <ul class="nav">
+              <li>榴莲</li>
+              <li>臭豆腐</li>
+              <li>鲱鱼罐头</li>
+              <li>大猪蹄子</li>
+          </ul>
+          <script>
+              //利用动态添加属性方式
+          	var lis = document.querySelector('.nav').querySelectorAll('li');
+              for(var i = 0; i< lis.length; i++){//同步任务
+                  lis[i].index = i;
+                  lis[i].onclick = function(){//异步任务
+                      console.log(i); //每次输出都是4
+                      console.log(this.index); //正常输出
+                  }
+              }
+              //利用闭包的方式得到当前li的索引号
+              for (var i = 0; i < lis.length; i++) {
+                //利用for循环创建了4个立即执行函数
+                (function(i){//接收外面(下面)括号的i传递进来的
+                    console.log(i);
+                })(i);//把i作为参数传递
+              }
+          </script>
+          ```
+
+       5. 立即执行函数，也称为小闭包；立即函数里面的任何一个函数都可以使用外面括号传递进去的变量。
+
+       6. 立即执行函数里面的`this`指向`window`。
+
+       7. 异步任务只有触发时才会执行。
+
+70. ## 递归
+
+    1. 如果一个函数在内部可以调用其本身，那么这个函数就是递归函数。递归函数的作用和循环效果一样。
+
+    2. 由于递归函数很容易发生“栈溢出”错误（stack overflow），所以必须要加退出条件return。
+
+    3. 斐波那契数列（兔子序列）：
+
+       1. 前两个数字之和等于第三个数：1、2、3、5、8...
+
+          ```js
+          function fb(n){
+              if(n ===1 || n===2){
+                  return 1;
+              }
+              return fb(n-1) + fb(n-2);
+          }
+          ```
+
+    4. 案例：利用递归遍历数据
+
+       1. 模拟json数据，输入任意id获得数据对象（有子数据目录结构形式）
+
+          ```js
+          var data = [{
+              id:1,
+              name:'家电',
+              goods:[{
+                  id:11,
+                  gname:'冰箱'
+              },{
+                  id:12,
+                  gname:'洗衣机'
+              }],
+          },{
+              id:2,
+              name:'服饰'
+          }];
+          //输入id号，就可以返回数据对象
+          //1.利用forEach 遍历里面的每一个对象
+          function getID(json,id){
+              var obj = {};
+              json.forEach(function(item){ //forEach自身遍历完毕自动结束递归，不需要再加退出条件
+                  console.log(item);//当前例子输出2个元素对象
+                  if(item.id == id){
+                      console.log(item);
+                      obj = item;
+                      //2.想要得到里层的数据，比如id为11，可以利用递归函数
+                      //需要确保里面有goods这个数组并且长度不为0
+                  }else if(item.goods && item.goods.length>0){
+                      obj = getID(item.goods,id);
+                  }
+              })
+              return obj;
+          }
+          
+          console.log(getID(data,1));
+          getID(data,2);
+          getID(data,11);
+          ```
+
+    5. **浅拷贝**：
+
+       1. 只是拷贝最外面一层，更深层次对象级别的只拷贝引用。
+
+          ```js
+          var obj = {
+          	id:1,
+              name:"andy",
+              msg:{
+                  age:18
+              }
+          };
+          var o={};
+          //以前拷贝方式
+          for(var k in obj){
+              //k是属性名， obj[k]属性值
+              o[k] = obj[k];
+          }
+          //复杂数据，msg拷贝过来的是地址
+          o.msg.age=20;//验证是地址，修改值后影响原数据
+          ```
+
+       2. ES6 浅拷贝 语法糖：`Object.assign(target, ...sources)`
+
+          ```js
+          Object.assign(o, obj);
+          ```
+
+    6. **深拷贝**：
+
+       1. 拷贝多层，每一级别的数据都会拷贝。
+
+          ```js
+          //函数递归深层拷贝
+          var obj = {
+          	id:1,
+              name:"andy",
+              msg:{
+                  age:18
+              },
+              color:['pink','red']
+          };
+          var o={};
+          function deepCopy(newobj, oldobj){
+              for(var k in oldobj){
+                  //判断属性值属于哪种数据类型（一层还是多层）
+                  //1.获取属性值 oldobj[k]
+                  var item = oldobj[k];
+                  //2.判断这个指是否是数组
+                  if(item instanceof Array){	//注意先写Array再写Object
+                      newobj[k] = [];//相当于 o.color = []
+                      deepCopy(newobj[k], item);
+                  }else if(item instanceof Object){
+                  //3.判断这个值是否是对象
+                      newobj[k]={};
+                      deepCopy(newobj[k], item);
+                  }else{
+                  //4.属于简单数据类型
+                      newobj[k]=item;
+                  }
+              }
+          }
+          deepCopy(o, obj);
+          ```
+
+71. ## 正则表达式
+
+    1. Regular Expression 用于匹配字符串中字符组合的模式。在JavaScript中，正则表达式也是对象。
+
+    2. 场景使用：匹配、替换、提取、验证。
+
+    3. **创建正则表达式**：
+
+       1. 通过调用`RegExp`对象的构造函数创建
+
+          ```js
+          var regexp = new RegExp(/表达式/);
+          ```
+
+       2. 通过字面量创建
+
+          ```js
+          var regexp = /表达式/;
+          ```
+
+    4. **测试正则表达式**
+
+       1. `test()`正则对象方法，用于检测字符串是否符合该规则，该对象会返回`true`或`false`，其参数是测试字符串。
+
+          ```js
+          //regexObj.test(str)
+          var rg=/abc/;
+          rg.test('abcde');
+          ```
+
+       2. regexObj：写的正则表达式
+
+       3. str：要测试的文本
+
+       4. 检测str文本是否符合写的正则表达式规范。
+
+    5. 正则表达式的组成
+
+       1. 元字符：在正则中具有特殊意义的专用符号，比如`^`,`$`,`+`等， [参考火狐](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions)
+
+       2. 正则表达式里面不需要加用引号，不管是数字型还是字符串型。
+
+          ```js
+          var rg=/abc/; //表示要包含abc这个字符的
+          ```
+
+    6. **边界符**：提示字符所处的位置
+
+       | 边界符 | 说明                           | 举例     |
+       | ------ | ------------------------------ | -------- |
+       | `^`    | 表示匹配行首的文本（以谁开始） | `/^abc/` |
+       | `$`    | 表示匹配行尾的文本（以谁结束） | `/abc$/` |
+
+    7. 字符类：
+
+       | 字符类 | 说明                                                         | 举例           |
+       | ------ | ------------------------------------------------------------ | -------------- |
+       | `[]`   | 表示有一些列字符可供选择，只需要匹配其中一个就可以了（多选一） | `/[abc]/`      |
+       | `[-]`  | 方括号内部范围符`-`；字符组合`/[a-zA-Z/`                     | `/[a-z]/`      |
+       | `[^]`  | 表示取反；如例子表示不要字母开头的                           | `/^[^a-zA-Z]/` |
+
+    8. 量词符
+
+       | 量词    | 说明                           | 举例          |
+       | ------- | ------------------------------ | ------------- |
+       | `*`     | 重复零次或更多次               | `/^a*$/`      |
+       | `+`     | 重复一次或更多次               | `/^a+$/`      |
+       | `?`     | 重复零次或一次                 | `/^a?$/`      |
+       | `{n}`   | 重复n次                        | `/^a{3}$/`    |
+       | `{n,}`  | 重复n次或更多次                | `/^a{3,}$/`   |
+       | `{n,m}` | 重复n到m次（逗号后不能有空格） | `/^a{3,16}$/` |
+
+       ```js
+       var reg = /^abc{3}$/ //表示abccc，让c重复3次
+       var reg = /^（abc）{3}$/ //abc重复3次
+       var reg = /^[abc]$/ //a或b或c且限1个
+       ```
+
+    9. 预定义类
+
+       | 预定类 | 说明                                                         | 例子 |
+       | ------ | ------------------------------------------------------------ | ---- |
+       | `\d`   | 匹配0-9之间的任一数组，相当于`[0-9]`                         |      |
+       | `\D`   | 匹配所有0-9以外的字符，相当于`[^0-9]`                        |      |
+       | `\w`   | 匹配任意的字母、数字和下划线，相当于`[A-Za-z0-9]`            |      |
+       | `\W`   | 出所有字母、数字和下划线以外的字符，相当于`[^A-Za-z0-9]`     |      |
+       | `\s`   | 匹配空格（包括换行符、制表符、空格符等），相当于`[\t\r\n\v\f]` |      |
+       | `\S`   | 匹配非空格符的字符，相当于`[^\t\r\n\v\f]`                    |      |
+
+    10. 
+
 
 
 
@@ -4906,7 +5793,6 @@
       ```
 
    7. 
-
 
 
 
