@@ -5661,7 +5661,7 @@
        | `^`    | 表示匹配行首的文本（以谁开始） | `/^abc/` |
        | `$`    | 表示匹配行尾的文本（以谁结束） | `/abc$/` |
 
-    7. 字符类：
+    7. **字符类**：
 
        | 字符类 | 说明                                                         | 举例           |
        | ------ | ------------------------------------------------------------ | -------------- |
@@ -5669,7 +5669,7 @@
        | `[-]`  | 方括号内部范围符`-`；字符组合`/[a-zA-Z/`                     | `/[a-z]/`      |
        | `[^]`  | 表示取反；如例子表示不要字母开头的                           | `/^[^a-zA-Z]/` |
 
-    8. 量词符
+    8. **量词符**
 
        | 量词    | 说明                           | 举例          |
        | ------- | ------------------------------ | ------------- |
@@ -5681,12 +5681,13 @@
        | `{n,m}` | 重复n到m次（逗号后不能有空格） | `/^a{3,16}$/` |
 
        ```js
+       var reg = /^a$/ //以^和$开头和结尾，限制只能有一个
        var reg = /^abc{3}$/ //表示abccc，让c重复3次
        var reg = /^（abc）{3}$/ //abc重复3次
        var reg = /^[abc]$/ //a或b或c且限1个
        ```
 
-    9. 预定义类
+    9. **预定义类**
 
        | 预定类 | 说明                                                         | 例子 |
        | ------ | ------------------------------------------------------------ | ---- |
@@ -5697,7 +5698,313 @@
        | `\s`   | 匹配空格（包括换行符、制表符、空格符等），相当于`[\t\r\n\v\f]` |      |
        | `\S`   | 匹配非空格符的字符，相当于`[^\t\r\n\v\f]`                    |      |
 
-    10. 
+    10. **符号**
+
+       | 符号 | 说明                                                     | 例子                          |
+       | ---- | -------------------------------------------------------- | ----------------------------- |
+       | `|`  | 表示或者的意思；比如电话号码010-12345678或者0530-1234567 | `/^\d{3}-\d{8}|\d{4}-\d{7}$/` |
+
+       ```js
+       //中文
+       var reg = /[\u4e00-\u9fa5]/; //从一开始的中尉unicode
+       ```
+
+    11. **replace**替换
+
+        1. 可以实现替换字符串操作，用来替换的参数可以是一个字符串或是一个正则表达式
+
+           ```js
+           stringObject.replace(regexp/substr, replacement)
+           ```
+
+        2. 第一个参数：被替换的字符串 或者 正则表达式
+
+        3. 第二个参数：替换为的字符串
+
+        4. 返回值是一个替换完毕的新字符串
+
+           ```js
+           var str = 'andy和red,andy和red';
+           var newStr = str.replace('andy','baby');//只替换第一个成baby
+           var newStr = str.replace(/andy/,'baby'); //只替换第一个成baby
+           var newStr = str.replace(/andy|candy/g,'baby'); //多个敏感词，全部换成baby
+           ```
+
+        5. `/正则表达式/[switch]`：正则表达式参数
+
+           1. `g`：全局匹配
+           2. `i`：忽略大小写
+           3. `gi`：全局匹配且忽略大小写
+
+72. ## ES6
+
+    1. `let`：ES6新增的用于声明变量的关键字。
+
+       1. `let` 声明的变量旨在所处于的块级`{}`有效。
+
+       2. `var`关键字不具备块级作用域。
+
+       3. **防止循环变量变成全局变量**。比如`fori`循环。
+
+          ```js
+          for(let i=0; i<2;i++){
+              //()括号内let变量与{}绑定，{}外无法访问
+          }
+          ```
+
+       4. 不存在变量提升
+
+          ```js
+          console.log(a);//a is not defined
+          let a = 20;
+          ```
+
+       5. 暂时性死区
+
+          ```js
+          var tmp=123;
+          if(true){
+              console.log(tmp);//报错
+              tmp = 'abc';
+              let tmp;
+          }
+          ```
+
+    2. 分析([黑马讲解](https://www.bilibili.com/video/BV1DY41177dM?p=96&spm_id_from=pageDriver&vd_source=31dc1543590614dbc49f7bf7cfc36195))
+
+       ```js
+       var arr=[];
+       for(var i=0; i<2; i++){ //var为全局
+           arr[i] = function(){//函数需要调用才能执行，因此循环的时候函数内的 i 值为循环结束后的
+               console.log(i);
+           }
+       }
+       arr[0]();
+       arr[1]();
+       //同步与异步
+       for(letvar i=0; i<2; i++){
+           arr[i] = function(){//let为块级，所以循环后根据 i 的值生成多个块级
+               console.log(i);
+           }
+       }
+       arr[0]();
+       arr[1]();
+       ```
+
+    3. `const`：声明常量，即值（内存地址）不能变化的量。
+
+       1. 具有块级作用域
+       2. 声明常量时必须赋值
+       3. 赋值后值不能修改
+       4. 数组 或 对象赋值后，地址值不变，通过索引内容可改。但不能直接使用变量赋值。
+
+    4. let、const、var区别
+
+       | var          | let            | const          |
+       | ------------ | -------------- | -------------- |
+       | 函数级作用域 | 块级作用域     | 块级作用域     |
+       | 变量提升     | 不存在变量提升 | 不存在变量提升 |
+       | 值可更改     | 值可更改       | 值不可更改     |
+
+73. ## 解构赋值
+
+    1. es6中允许从数组中提取值，按照对应位置，对变量赋值。对象也可以实现解构。
+
+       ```js
+       let ary = [1,2,3];
+       let [a,b,c] = ary;
+       console.log(a);
+       console.log(b);
+       console.log(c);
+       ```
+
+    2. 如果解构不成功，变量的值为`undefined`。
+
+       ```js
+       let [foo] = [];
+       let [bar,foo] = [1];
+       ```
+
+    3. **解构对象**
+
+       1. 按照一定模式，从数组或对象中提取值，将提取出来的值赋值给另外的变量。
+
+          ```js
+          let person = {name:'张三', age:20};
+          let {name, age} = person;
+          console.log(name);
+          console.log(age);
+          
+          let {name:myName, age:myAge} = person; //myName myAge属于别名
+          console.log(myName);
+          console.log(myAge);
+          ```
+
+    4. **箭头函数**
+
+       1. ES6中新增的定义函数方式
+
+          ```js
+          ()=>{}
+          const fn = ()=>{
+              console.log(123);
+          }
+          fn();
+          ```
+
+       2. 函数体中只有一句代码，且代码的执行结果就是返回值，可以省略大括号。
+
+          ```js
+          function sum(num1, num2){
+              return num1 + num2;
+          }
+          const sum = (num1,num2) => num1 + num2;
+          ```
+
+       3. 如果参数只有一个，可以省略小括号
+
+          ```js
+          function fn(v){
+              return v;
+          }
+          const fn = v => v;
+          ```
+
+       4. 箭头函数**不绑定**`this`关键字，箭头函数中的`this`，指向的时函数定义位置的上下文`this`。
+
+          ```js
+          const obj = {name:'张三'};
+          function fn(){
+              console.log(this); //调用时，this指向obj对象
+              return ()=>{ //箭头函数没有自己的this
+                  console.log(this); //this指向定义箭头函数区域的位置，即fn函数区的this，而obj调用fn，则指向obj对象
+              }
+          }
+          const resFn = fn.call(obj);
+          resFn();
+          ```
+
+       5. 分析：**对象不能产生作用域**
+
+          ```js
+          var obj = { //2.obj对象不能产生作用域
+              age: 20,
+              say: () => {
+                  alert(this.age); //3.this实际被定义在全局区域下，即window区域
+              }
+          }
+          obj.say(); //1.输出undefined
+          ```
+
+    5. **剩余参数**
+
+       1. 剩余参数语法允许我们将一个不定数量的参数表示为一个数组。
+
+          ```js
+          function sum(first, ...args){
+              console.log(first);//10
+              console.log(args);//[20,30]
+          }
+          sum(10,20,30);
+          const sum = (...args) => {
+              let total = 0;
+              args.forEach( (item)=>{
+                  total += item;
+              });
+              return total;
+          };
+          sum(10,20);
+          ```
+
+       2. 剩余参数和解构配合
+
+          ```js
+          let students = ['wangwu','zhangsan','lisi'];
+          let [s1, ...s2] = students; //让s2接收剩余数组数据
+          console.log(s1); //'wangwu'
+          console.log(s2); //['zhangsan','lisi']
+          ```
+
+74. ## ES6的内置对象扩展
+
+    1. **扩展运算符**
+
+       1. 可以将数组或者对象转为用逗号分隔的参数序列。
+
+          ```js
+          let arr = [1,2,3];
+          ...arr; //1,2,3
+          console.log(...arr); //拆分成1 2 3, console.log把逗号省略
+          console.log(1,2,3); //等同上面
+          ```
+
+       2. 扩展运算符还可以用于合并数组。
+
+          ```js
+          let arr1 = [1,2,3];
+          let arr2 = [3,4,5];
+          let arr3 = [...arr1, ...arr2];
+          //或者
+          arr1.push(...arr2);
+          ```
+
+       3. **将类数组（伪数组）或可遍历对象转换为真正的数组**
+
+          ```js
+          let oDivs = document.getElementsByTagName('div');
+          oDivs = [...oDivs];
+          //伪数组不能使用数组的方法
+          ```
+
+    2. **Array的扩展方法**
+
+       1. `Array.from()`： 构造函数方法
+
+       2. 将类数组或可遍历对象转换为真正的数组
+
+          ```js
+          let arrayLike = {
+              '0': 'a',
+              '1': 'b',
+              '2': 'c',
+              length: 3
+          };
+          let arr2 = Array.from(arrayLike); // ['a','b','c']
+          ```
+
+       3. 方法还可以接收第二个参数，作用类似于数组的map方法，用来对每个元素进行处理，将处理后的值放入返回的数组。
+
+          ```js
+          let arrayLike = {
+              '0': '1',
+              '1': '2',
+              length: 2
+          };
+          let newArr = Array.from(arrayLike, item => item*2);
+          ```
+
+       4. `find()`：用于找出第一个符合条件的数组成员，如果没有找到返回`undefined`
+
+          ```js
+          let arr = [{
+              id:1,
+              name:'张三'
+          },{
+              id:2,
+              name:'李四'
+          }];
+          let target = arr.find((item,index) => item.id == 2);
+          ```
+
+       5. `findIndex()`：实例方法，用于找出第一个符合条件的数组成员的位置，如果没有找到返回`-1`
+
+          ```js
+          let arr = [1,5,10,15];
+          let index = arr.findIndex((value,index) => value>9);
+          console.log(index); //2
+          ```
+
+       6. 
 
 
 
