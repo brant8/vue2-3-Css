@@ -6196,7 +6196,392 @@
       }
       ```
 
-   7. 
+4. ## `const`：
+
+   1. 一般**常量**使用大写，一定要赋初始值，常量值不能修改。
+   2. 块级作用域
+   3. 对于数组和对象的元素修改，不算做对常量的修改，不会报错。
+
+   ```js
+   const TEAM = ['red','blue'];
+   TEAM.push('yellow');
+   ```
+
+5. ## 解构赋值
+
+   1. ES6允许按照一定模式从数组和对象中提取值，对变量进行赋值，这被称为**解构赋值**。
+
+   ```js
+   //数组解构
+   const TEAM = ['red','blue'];
+   let [hong, lan] = TEAM;
+   console.log(hong);
+   //对象解构
+   const zhao = {
+       name:'zhao',
+       age:'unknown',
+       xiaopin:function(){ //方法解构用的比较多
+           console.log('show');
+       }
+   };
+   let {name,age,xiaopin} = zhao;
+   console.log(name);
+   console.log(xiaopin);
+   xiaopin();
+   //
+   zhao.xiaopin();
+   let {xiaopin} = zhao; //同名赋值
+   xiaopin();
+   ```
+
+6. ## **模板字符串**：反引号
+
+   1. 内容中可以直接出现换行符
+
+   ```js
+   let str = `字符串`;
+   console.log(str, typeof str);
+   let out = `${str} 是可以换行的`;
+   ```
+
+7. ES6允许在**大括号里面**，直接写入变量和函数，作为对象的属性和方法。
+
+   ```js
+   let name = '尚硅谷';
+   let change = function(){
+       console.log('我可以改变你！');
+   };
+   const school = {
+       name, 
+       change,
+       improve:function(){
+           console.log("函数书写方式之一");
+       },
+       other(){
+           console.log("函数简写方式");
+       }
+   }
+   ```
+
+8. ## ES6允许使用**箭头定义函数**`=>`
+
+   1. 箭头函数特性：**`this`是静态的**，this始终指向函数声明时所在作用域下的this值。
+   2. 不能作为构造函数实例化对象。
+   3. 不能使用`arguments`变量
+   4. 箭头函数的简写：
+      1. 省略小括号：当形参有且只有一个的时候
+      2. 省略花括号：当代码体只有一条语句的时候，此时return必须省略，而且语句的执行结果就是函数的返回值
+
+
+   ```js
+   let fn = function(){
+   }
+   let fn = (a,b)=>{
+       return a+b;
+   }
+   //1.this指向
+   function getName(){
+       console.log(this.name);
+   }
+   let getName2 = ()=>{
+       console.log(this.name);
+   };
+   window.name = '尚硅谷';
+   const school = {
+       name: "shangguigu",
+   }
+   //直接调用
+   getName(); //尚硅谷
+   getName2();//尚硅谷
+   //call方法调用
+   getName.call(school);//shangguigu
+   getName2.call(school);//尚硅谷
+   //2.不能作为构造实例化对象
+   let Person = (name,age)=>{
+       this.name = name;
+       this.age = age;
+   }
+   let met = new Person('xiao',30);
+   console.log(me); //error：Person is not a constructor
+   //3.不能使用arguments变量（函数内部有一个特殊变量保存实参）
+   let fn = ()=>{
+       console.log(arguments);
+   }
+   fn(1,2,3); //arguments is not defined
+   //4.省略花括号
+   let pow = n => n*n;
+   ```
+
+   1. 案例：箭头函数的使用场景
+
+   ```js
+   //需求，点击div 2s后变粉色
+   let ad = document.querySelector('div');
+   ad.addEventListener('click',function(){
+       //非箭头函数时
+       let _this = this;
+       setTimeout(function () {
+           console.log(this);//window
+           _this.style.background = 'pink';
+       },2000);
+       //使用箭头函数
+       setTimeout(()=> {
+           console.log(this);//<div id="ad" style="background: skyblue;"></div>
+           this.style.background = 'skyblue';
+       },4000)
+   })
+   ```
+
+   1. 案例：需求，从数组中返回偶数的元素
+
+   ```js
+   const arr = [1,5,6,7,30];
+   //普通写法
+   const result = arr.filter(function(item){
+       if(item % 2 === 0){
+           return true;
+       }else{
+           return false;
+       }
+   });
+   console.log(result);
+   //箭头函数普通写法
+   const result2 = arr.filter( item => {
+       if(item % 2 === 0){
+           return true;
+       }else{
+           return false;
+       }
+   });
+   console.log(result2);
+   //箭头函数简洁写法
+   const result3 = arr.filter( item => item % 2 === 0);
+   console.log(result3)
+   ```
+
+   1. 箭头函数总结：
+
+      1. 箭头函数适合与`this`无关的回调，如 定时器、数组的方法回调。
+      2. 箭头函数不适合与`this`有关的回调，如 事件回调、对象的方法
+
+      ```js
+      { //不适合对象的方法
+          name:"尚硅谷",
+              getName:()=>{
+                  this.name; //指向外层
+              }
+      }
+      ```
+
+9. ## ES6允许给函数参数赋值**初始值**
+
+   1. 形参初始值：有默认值的参数，一般位置要靠后（潜规则）
+
+      ```js
+      function add(a,b,c=10){
+          return a+b+c;
+      }
+      let result = add(1,2);
+      ```
+
+   2. 与解构赋值结合
+
+      ```js
+      //普通写法
+      function connect(options){
+      	let host = options.host;
+          let username = options.username;
+      }
+      //解构赋值写法，且有默认值
+      function connect({host="127.0.0.1", username,password,port}){
+          console.log(host);
+          console.log(username);
+      }
+      connect({
+          host:'localhost',
+          username:'root',
+          password:'root',
+          port:3306
+      })
+      ```
+
+10. ## Rest
+
+    1. ES6引入`rest`参数，用于获取函数的实参，用来代替 `arguments`
+    2. rest参数必须要放到参数最后。
+
+    ```js
+    //ES5获取实参的方式
+    function data(){
+        console.log(arguments);
+    }
+    data('白芷','阿娇','思慧');
+    //Arguments(3) ['白芷', '阿娇', '思慧', callee: ƒ, Symbol(Symbol.iterator): ƒ]
+    
+    //ES6获取实参的方式
+    function data(...args){
+        console.log(args);
+    }
+    data('白芷','阿娇','思慧');
+    //['白芷', '阿娇', '思慧']
+    ```
+
+11. ## 扩展运算符
+
+    1. `...`扩展预算夫能将数组转换为逗号分隔的参数序列。
+
+       ```js
+       const tfboys = ['red','blue','pink'];
+       function fn(){
+           console.log(arguments);
+       }
+       fn(tfboys);//一个数组3个元素
+       //Arguments [Array(3), callee: ƒ, Symbol(Symbol.iterator):
+       fn(...tfboys);//相当于fn('red','blue','pink')；单个元素逐一放进去
+       //Arguments(3) ['red', 'blue', 'pink', callee: ƒ, Symbol(Symbol.iterator): ƒ]
+       ```
+
+    2. 案例：数组合并
+
+       ```js
+       const a = [1,2,3];
+       const b = [5,6,7];
+       const c = a.concat(b); //以前合并数组方式
+       const d = [...a, ...b];
+       ```
+
+    3. 案例：数组克隆
+
+       ```js
+       const a = [1,2,3];
+       const b = [...a]; //注意浅拷贝、深拷贝问题
+       ```
+
+    4. 案例：伪数组转为真数组
+
+       ```js
+       const divs = document.querySelectorAll('div');
+       const divArr = [...divs];
+       ```
+
+12. ## Symbol
+
+    1. ES6引入新的原始数据类型Symbol，表示独一无二的值。
+
+    2. 是JavaScript语言的第七种数据类型，是一种类似于字符串的数据类型
+
+    3. Symbol特点
+
+       1. 值是唯一的，用来解决命名冲突的问题。唯一性外部不可见，内部定义。
+
+       2. Symbol的值不能与其他数据进行运算。
+
+       3. Symbol定义的对象属性不能使用`for...in`循环遍历。但是可以使用`Reflect.ownKeys`来获取对象的所有键名。
+
+          ```js
+          //创建Symbol
+          let s1 = Symbol();
+          console.log(s1, typeof s1);
+          //添加表示的Symbol
+          let s2 = Symbol('尚硅谷'); //描述性字符串
+          let s3 = Symbol('尚硅谷');
+          console.log(s2 === s3); //false
+          let s4 = Symbol.for('尚硅谷');
+          let s5 = Symbol.for('尚硅谷');
+          console.log(s4, typeof s4);
+          console.log(s4 === s5 //true
+          //不能运算
+          let result = s+100;//err
+          let result = s>100;//err
+          let result = s+s;//err
+          ```
+
+    4. 数据类型：USONB - you are so niubility
+
+       1. u：undefined
+       2. s：string、symbol
+       3. o：object
+       4. n：null、number
+       5. b：boolean
+
+    5. **Symbol的主要作用：向对象添加属性值**。
+
+       ```js
+       //向对象中添加方法 up down
+       let game = {...};//很多个方法
+       //声明一个对象
+       let methods = {
+       	up:Symbol(),
+       	down:Symbol()
+       }
+       //安全的向对象扩展方法一
+       game[methods.up] = function(){
+           console.log("向上");
+       }
+       game[methods.down] = function(){
+           console.log("下降");
+       }
+       //向对象添加方法
+       let youxi = {
+           name:"狼人杀",
+           say:function(){},
+           Symbol():function(){}//err;Symbol()是一个动态值，不是固定属性
+           [Symbol('say')]:function(){ //正确做法，相当于一个普通的属性名
+           }
+       }
+       
+       ```
+
+    6. **Symbol内置值**：除了定义自己使用的Symbol的值以外，ES6还提供了11个内置的Symbol值，指向语言内部使用的方法。（了解即可）
+
+       | 内置值                    | 说明                                                         | 举例 |
+       | ------------------------- | ------------------------------------------------------------ | ---- |
+       | Symbol.hasInstance        | 当其他对象使用instanceof运算符，判断是否为该对象的实例时，会调用此方法 |      |
+       | Symbol.isConcatSpreadable | 对象的Symbol.isConcatSpreadable属性等于的时一个布尔值，表示该对象用于Array.prototype.concat()时，是否可以展开。 |      |
+       | Symbol.unscopables        | 该对象制定了使用with关键字时，哪些属性会被with环境排除。     |      |
+       | Symbol.match              | 当执行str.match(myObject)时，如果该属性存在，会调用它，返回该属性的返回值。 |      |
+       | Symbol.replace            | 当该对象被str.replace(myObject)方法调用时，会返回该方法的返回值 |      |
+       | Symbol.search             | 当该对象被str.search(myObject)方法调用时，会返回该方法的返回值。 |      |
+       | Symbol.split              | 当该对象被str.split(myObject)方法调用时，会返回该方法的返回值。 |      |
+       | Symbol.iterator           | 对象进行for...of循环时，会调用Symbol.iterator方法，返回该对象的默认遍历器 |      |
+       | Symbol.toPrimitive        | 该对象被转为原始类型的值时，会调用这个方法，返回该对象对应的原始类型值 |      |
+       | Symbol.toStringTag        | 在对象上调用toString方法时，返回该方法的返回值               |      |
+       | Symbol.species            | 创建衍生对象时，会使用改该属性                               |      |
+
+       ```js
+       class Person{
+           static [Symbol.hasInstance](param){ //自动执行场景
+               console.log(param); //[可选 来自o的参数]  返回：{}
+               console.log("我被用来检测类型了"); //返回：我被用来检测类型了
+               return true; //[可选] 返回：true
+           }
+       }
+       let o = {};
+       console.log(o instanceof Person);
+       ```
+
+13. ## 迭代器Iterator
+
+    1. 迭代器是一种接口，为各种不同的数据解构提供统一的访问机制。任何数据结构只要部署Iterator接口，就可以完成遍历操作。
+
+    2. ES6创造了一种新的遍历命令`for...of`循环，Iterator接口主要供`for...of`消费。
+
+    3. **原生具备iterator接口的数据**（可以用`for of`遍历）
+
+       1. Array、Arguments、Set、Map、String、TypedArray、NodeList
+       2. iterator接口：实际就是对象里面的属性，`Symbol.iterator`
+
+       ```js
+       const xiyou = ['唐僧','孙悟空','猪八戒','沙僧'];
+       for(let v of xiyou){
+           console.log(v); // 唐僧 。。
+       }
+       for(let v in xiyou){
+           console.log(v); // 0 1 2 3 保存键名
+       }
+       ```
+
+    4. 
 
 
 

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        div{
+            width: 200px;
+            height: 200px;
+            background-color: #58a;
+        }
+    </style>
+</head>
+<body>
+
+<div id="ad"></div>
+<script>
+    //需求-1，点击div 2s后变粉色
+    let ad = document.querySelector('div');
+    ad.addEventListener('click',function(){
+        let _this = this;
+        setTimeout(function () {
+            //div选择器、和this均能使用
+            console.log(this);//window
+            _this.style.background = 'pink';
+        },2000);
+        setTimeout(()=> {
+            console.log(this);//<div id="ad" style="background: skyblue;"></div>
+            this.style.background = 'skyblue';
+        },4000)
+    })
+    //需求-2，从数组中返回偶数的元素
+    const arr = [1,5,6,7,30];
+    const result = arr.filter(function(item){
+        if(item % 2 === 0){
+            return true;
+        }else{
+            return false;
+        }
+    });
+    console.log(result);
+    const result2 = arr.filter( item => {
+        if(item % 2 === 0){
+            return true;
+        }else{
+            return false;
+        }
+    });
+    console.log(result2);
+    const result3 = arr.filter( item => item % 2 === 0);
+    console.log(result3);
+</script>
+
+</body>
+</html>
