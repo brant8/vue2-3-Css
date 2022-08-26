@@ -5956,7 +5956,7 @@
           //伪数组不能使用数组的方法
           ```
 
-    2. **Array的扩展方法**
+    2. **Array的扩展方法** [火狐Array.prototype.filter() 等其他参考](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array/filter)
 
        1. `Array.from()`： 构造函数方法
 
@@ -5983,7 +5983,7 @@
           let newArr = Array.from(arrayLike, item => item*2);
           ```
 
-       4. `find()`：用于找出第一个符合条件的数组成员，如果没有找到返回`undefined`
+       4. `find()`：用于找出**第一个**符合条件的数组成员，如果没有找到返回`undefined`
 
           ```js
           let arr = [{
@@ -5996,15 +5996,112 @@
           let target = arr.find((item,index) => item.id == 2);
           ```
 
-       5. `findIndex()`：实例方法，用于找出第一个符合条件的数组成员的位置，如果没有找到返回`-1`
+       5. `findIndex()`：实例方法，用于找出**第一个**符合条件的数组成员的位置，如果没有找到返回`-1`
 
           ```js
           let arr = [1,5,10,15];
-          let index = arr.findIndex((value,index) => value>9);
+          let index = arr.findIndex((value,index) => value > 9);
           console.log(index); //2
           ```
 
-       6. 
+       6. `includes()`：实例方法，表示某个数组是否包含给定的值，返回布尔值。
+
+          ```js
+          [1,2,3].includes(2); //true
+          [1,2,3].includes(4);//false;
+          ```
+
+    3. **String的扩展方法**
+
+       1. 模板字符串：可以解析变量
+
+          ```js
+          let name = '张三';
+          let sayHello = `hello, my name is ${name}`; //hello, my name is 张三
+          ```
+
+       2. 模板字符串：可以换行
+
+          ```js
+          let result = {
+              name: 'zhangsan',
+              age:20,
+              gender: '男'
+          };
+          let html = `<div>
+          	<span>${result.name}</span>
+          	<span>${result.age}</span>
+          	<span>${result.gender}</span>
+          </div>`
+          ```
+
+       3. 模板字符串：可以调用函数
+
+          ```js
+          const sayHello = function(){
+              return 'halo呀';
+          };
+          let greet = `${sayHello()} hah`;
+          console.log(greet);
+          ```
+
+       4. `startsWith()`和`endsWith()`
+
+          1. `startsWith()`：表示参数字符串是否在原字符串的头部，返回布尔值
+
+          2. `endsWith()`：表示参数字符串是否在原字符串的尾部，返回布尔值
+
+             ```js
+             let str = "hello world!";
+             str.startsWith("hello");
+             str.endsWith('!')；
+             ```
+
+       5. `repeat()`：实例方法，表示将源字符串重复n次，返回一个新字符串
+
+          ```js
+          'x'.repeat(3); //"xxx"
+          'hello'.repeat(2); //"hellohello"
+          ```
+
+    4. **Set数据结构**
+
+       1. ES6提供了新的数据解构Set。**Set类似于数组**，但是成员的值都是唯一的，没有重复的值。
+
+       2. Set本身时一个构造函数，用来生成Set数据结构。
+
+          ```js
+          const s = new Set();
+          console.log(s.size); // 0
+          //Set函数可以接收一个数组作为参数，用来初始化
+          const set = new Set(['a','b','b']); 
+          console.log(set.size); // 2
+          const arr = [...set]; //转成数组
+          ```
+
+       3. `add(value)`：添加某个值，返回Set结构本身
+
+       4. `delete(value)`：删除某个值，返回一个布尔值，表示删除是否成功
+
+       5. `has(value)`：返回一个布尔值，表示改制是否为Set的成员
+
+       6. `clear()`：清除所有成员，没有返回值
+
+          ```js
+          const s = new Set();
+          s.add(1).add(2).add(3); //向set结构添加值
+          s.delete(2); //删除set结构中的2
+          s.has(1); //表示set结构中是否有1这个值，返回布尔值
+          s.clear();  //清除set结构中的所有值
+          ```
+
+       7. `forEach`()：Set结构的实例与数组一样，也有forEach方法，对于每个成员执行某个操作，没有返回值。
+
+          ```js
+          s.forEach(value => console.log(value))
+          ```
+
+       8. 
 
 
 
