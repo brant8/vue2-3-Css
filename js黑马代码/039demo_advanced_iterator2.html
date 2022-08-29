@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+    //带参数传入
+    //函数代码的分隔符：yield
+    function * gen(arg){
+        console.log(arg);
+        let one = yield '一只没有耳朵';
+        console.log(one);
+        yield '一只没有尾巴';
+        yield '真奇怪';
+    }
+    let iterator = gen('AAA'); //带参数传入
+    console.log(iterator.next()); //第一次遍历传入
+    // iterator.next('BBB');
+</script>
+</body>
+</html>

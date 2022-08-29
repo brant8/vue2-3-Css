@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+
+<script>
+  const banji = {
+      name:"终极",
+      stus:[
+          'zhangsan',
+          'lisi',
+          'wangwu'
+      ],
+      [Symbol.iterator](){
+          let index = 0;
+          let _this = this;
+          return {//1.返回一个对象 {}为一个对象
+            next:function(){ //2. 要有next方法
+                //return {value:'abc', done: false}; // 3、4.返回对象要包含done和value属性
+                if(index < _this.stus.length) {
+                    const result = {value: _this.stus[index], done: false};
+                    index++;
+                    return result;
+                }else{
+                    return {value: undefined, done: true};
+                }
+            }
+          };
+      }
+  };
+
+  //遍历这个对象
+  for(let v of banji){
+      console.log(v); //banji is not iterable
+  }
+</script>
+
+
+</body>
+</html>

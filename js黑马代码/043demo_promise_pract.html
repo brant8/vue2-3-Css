@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<script>
+    const fs = require('fs');
+    fs.readFile('./resources/text1.txt',(err,data1)=>{
+        fs.readFile('./resources/text2.txt',(err,data2)=>{
+            fs.readFile('./resources/text3.txt',(err,data3)=>{
+                let result = data1 + data2 + data3;
+                console.log(result);
+            });
+        });
+    });
+    const p = new Promise((resolve,reject)=>{
+        fs.readFile('./resources/text1.txt',(err,data)=>{
+            resolve(data);
+        })
+    });
+    //错误形式
+    p.then(value => {
+        console.log(value.toString());
+    })
+    //正确形式
+    p.then(value => {
+        return new Promise((resolve, reject)=>{
+            fs.readFile('./resources/text2.txt',(err,data)=>{
+                resolve([value,data]);
+            })
+        })
+    }).then(value => {
+        return new Promise((resolve,reject)=>{
+            fs.readFile('./resources/text3.txt',(err,data)=>{
+                value.push(data);
+                resolve(value);
+            })
+        })
+    }).then(value => {
+        console.log(value.join('\r\n'));
+    })
+</script>
+
+</body>
+</html>

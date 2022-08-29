@@ -6373,7 +6373,7 @@
       }
       ```
 
-9. ## ES6允许给函数参数赋值**初始值**
+   2. ## ES6允许给函数参数赋值**初始值**
 
    1. 形参初始值：有默认值的参数，一般位置要靠后（潜规则）
 
@@ -6405,183 +6405,510 @@
       })
       ```
 
-10. ## Rest
+   3. ## Rest
 
-    1. ES6引入`rest`参数，用于获取函数的实参，用来代替 `arguments`
-    2. rest参数必须要放到参数最后。
+      1. ES6引入`rest`参数，用于获取函数的实参，用来代替 `arguments`
+      2. rest参数必须要放到参数最后。
 
-    ```js
-    //ES5获取实参的方式
-    function data(){
-        console.log(arguments);
-    }
-    data('白芷','阿娇','思慧');
-    //Arguments(3) ['白芷', '阿娇', '思慧', callee: ƒ, Symbol(Symbol.iterator): ƒ]
-    
-    //ES6获取实参的方式
-    function data(...args){
-        console.log(args);
-    }
-    data('白芷','阿娇','思慧');
-    //['白芷', '阿娇', '思慧']
-    ```
+      ```js
+      //ES5获取实参的方式
+      function data(){
+          console.log(arguments);
+      }
+      data('白芷','阿娇','思慧');
+      //Arguments(3) ['白芷', '阿娇', '思慧', callee: ƒ, Symbol(Symbol.iterator): ƒ]
+      
+      //ES6获取实参的方式
+      function data(...args){
+          console.log(args);
+      }
+      data('白芷','阿娇','思慧');
+      //['白芷', '阿娇', '思慧']
+      ```
 
-11. ## 扩展运算符
+   4. ## 扩展运算符
 
-    1. `...`扩展预算夫能将数组转换为逗号分隔的参数序列。
+      1. `...`扩展预算夫能将数组转换为逗号分隔的参数序列。
 
-       ```js
-       const tfboys = ['red','blue','pink'];
-       function fn(){
-           console.log(arguments);
-       }
-       fn(tfboys);//一个数组3个元素
-       //Arguments [Array(3), callee: ƒ, Symbol(Symbol.iterator):
-       fn(...tfboys);//相当于fn('red','blue','pink')；单个元素逐一放进去
-       //Arguments(3) ['red', 'blue', 'pink', callee: ƒ, Symbol(Symbol.iterator): ƒ]
-       ```
+         ```js
+         const tfboys = ['red','blue','pink'];
+         function fn(){
+             console.log(arguments);
+         }
+         fn(tfboys);//一个数组3个元素
+         //Arguments [Array(3), callee: ƒ, Symbol(Symbol.iterator):
+         fn(...tfboys);//相当于fn('red','blue','pink')；单个元素逐一放进去
+         //Arguments(3) ['red', 'blue', 'pink', callee: ƒ, Symbol(Symbol.iterator): ƒ]
+         ```
 
-    2. 案例：数组合并
+      2. 案例：数组合并
 
-       ```js
-       const a = [1,2,3];
-       const b = [5,6,7];
-       const c = a.concat(b); //以前合并数组方式
-       const d = [...a, ...b];
-       ```
+         ```js
+         const a = [1,2,3];
+         const b = [5,6,7];
+         const c = a.concat(b); //以前合并数组方式
+         const d = [...a, ...b];
+         ```
 
-    3. 案例：数组克隆
+      3. 案例：数组克隆
 
-       ```js
-       const a = [1,2,3];
-       const b = [...a]; //注意浅拷贝、深拷贝问题
-       ```
+         ```js
+         const a = [1,2,3];
+         const b = [...a]; //注意浅拷贝、深拷贝问题
+         ```
 
-    4. 案例：伪数组转为真数组
+      4. 案例：伪数组转为真数组
 
-       ```js
-       const divs = document.querySelectorAll('div');
-       const divArr = [...divs];
-       ```
+         ```js
+         const divs = document.querySelectorAll('div');
+         const divArr = [...divs];
+         ```
 
-12. ## Symbol
+   5. ## Symbol
 
-    1. ES6引入新的原始数据类型Symbol，表示独一无二的值。
+      1. ES6引入新的原始数据类型Symbol，表示独一无二的值。
 
-    2. 是JavaScript语言的第七种数据类型，是一种类似于字符串的数据类型
+      2. 是JavaScript语言的第七种数据类型，是一种类似于字符串的数据类型
 
-    3. Symbol特点
+      3. Symbol特点
 
-       1. 值是唯一的，用来解决命名冲突的问题。唯一性外部不可见，内部定义。
+         1. 值是唯一的，用来解决命名冲突的问题。唯一性外部不可见，内部定义。
 
-       2. Symbol的值不能与其他数据进行运算。
+         2. Symbol的值不能与其他数据进行运算。
 
-       3. Symbol定义的对象属性不能使用`for...in`循环遍历。但是可以使用`Reflect.ownKeys`来获取对象的所有键名。
+         3. Symbol定义的对象属性不能使用`for...in`循环遍历。但是可以使用`Reflect.ownKeys`来获取对象的所有键名。
 
-          ```js
-          //创建Symbol
-          let s1 = Symbol();
-          console.log(s1, typeof s1);
-          //添加表示的Symbol
-          let s2 = Symbol('尚硅谷'); //描述性字符串
-          let s3 = Symbol('尚硅谷');
-          console.log(s2 === s3); //false
-          let s4 = Symbol.for('尚硅谷');
-          let s5 = Symbol.for('尚硅谷');
-          console.log(s4, typeof s4);
-          console.log(s4 === s5 //true
-          //不能运算
-          let result = s+100;//err
-          let result = s>100;//err
-          let result = s+s;//err
-          ```
+            ```js
+            //创建Symbol
+            let s1 = Symbol();
+            console.log(s1, typeof s1);
+            //添加表示的Symbol
+            let s2 = Symbol('尚硅谷'); //描述性字符串
+            let s3 = Symbol('尚硅谷');
+            console.log(s2 === s3); //false
+            let s4 = Symbol.for('尚硅谷');
+            let s5 = Symbol.for('尚硅谷');
+            console.log(s4, typeof s4);
+            console.log(s4 === s5 //true
+            //不能运算
+            let result = s+100;//err
+            let result = s>100;//err
+            let result = s+s;//err
+            ```
 
-    4. 数据类型：USONB - you are so niubility
+      4. 数据类型：USONB - you are so niubility
 
-       1. u：undefined
-       2. s：string、symbol
-       3. o：object
-       4. n：null、number
-       5. b：boolean
+         1. u：undefined
+         2. s：string、symbol
+         3. o：object
+         4. n：null、number
+         5. b：boolean
 
-    5. **Symbol的主要作用：向对象添加属性值**。
+      5. **Symbol的主要作用：向对象添加属性值**。
 
-       ```js
-       //向对象中添加方法 up down
-       let game = {...};//很多个方法
-       //声明一个对象
-       let methods = {
-       	up:Symbol(),
-       	down:Symbol()
-       }
-       //安全的向对象扩展方法一
-       game[methods.up] = function(){
-           console.log("向上");
-       }
-       game[methods.down] = function(){
-           console.log("下降");
-       }
-       //向对象添加方法
-       let youxi = {
-           name:"狼人杀",
-           say:function(){},
-           Symbol():function(){}//err;Symbol()是一个动态值，不是固定属性
-           [Symbol('say')]:function(){ //正确做法，相当于一个普通的属性名
+         ```js
+         //向对象中添加方法 up down
+         let game = {...};//很多个方法
+         //声明一个对象
+         let methods = {
+         	up:Symbol(),
+         	down:Symbol()
+         }
+         //安全的向对象扩展方法一
+         game[methods.up] = function(){
+             console.log("向上");
+         }
+         game[methods.down] = function(){
+             console.log("下降");
+         }
+         //向对象添加方法
+         let youxi = {
+             name:"狼人杀",
+             say:function(){},
+             Symbol():function(){}//err;Symbol()是一个动态值，不是固定属性
+             [Symbol('say')]:function(){ //正确做法，相当于一个普通的属性名
+             }
+         }
+         
+         ```
+
+      6. **Symbol内置值**：除了定义自己使用的Symbol的值以外，ES6还提供了11个内置的Symbol值，指向语言内部使用的方法。（了解即可）
+
+         | 内置值                    | 说明                                                         | 举例 |
+         | ------------------------- | ------------------------------------------------------------ | ---- |
+         | Symbol.hasInstance        | 当其他对象使用instanceof运算符，判断是否为该对象的实例时，会调用此方法 |      |
+         | Symbol.isConcatSpreadable | 对象的Symbol.isConcatSpreadable属性等于的时一个布尔值，表示该对象用于Array.prototype.concat()时，是否可以展开。 |      |
+         | Symbol.unscopables        | 该对象制定了使用with关键字时，哪些属性会被with环境排除。     |      |
+         | Symbol.match              | 当执行str.match(myObject)时，如果该属性存在，会调用它，返回该属性的返回值。 |      |
+         | Symbol.replace            | 当该对象被str.replace(myObject)方法调用时，会返回该方法的返回值 |      |
+         | Symbol.search             | 当该对象被str.search(myObject)方法调用时，会返回该方法的返回值。 |      |
+         | Symbol.split              | 当该对象被str.split(myObject)方法调用时，会返回该方法的返回值。 |      |
+         | Symbol.iterator           | 对象进行for...of循环时，会调用Symbol.iterator方法，返回该对象的默认遍历器 |      |
+         | Symbol.toPrimitive        | 该对象被转为原始类型的值时，会调用这个方法，返回该对象对应的原始类型值 |      |
+         | Symbol.toStringTag        | 在对象上调用toString方法时，返回该方法的返回值               |      |
+         | Symbol.species            | 创建衍生对象时，会使用改该属性                               |      |
+
+         ```js
+         class Person{
+             static [Symbol.hasInstance](param){ //自动执行场景
+                 console.log(param); //[可选 来自o的参数]  返回：{}
+                 console.log("我被用来检测类型了"); //返回：我被用来检测类型了
+                 return true; //[可选] 返回：true
+             }
+         }
+         let o = {};
+         console.log(o instanceof Person);
+         ```
+
+   6. ## 迭代器Iterator
+
+      1. 迭代器是一种接口，为各种不同的数据解构提供统一的访问机制。任何数据结构只要部署Iterator接口，就可以完成遍历操作。
+
+      2. ES6创造了一种新的遍历命令`for...of`循环，Iterator接口主要供`for...of`消费。
+
+      3. **原生具备iterator接口的数据**（可以用`for of`遍历）
+
+         1. Array、Arguments、Set、Map、String、TypedArray、NodeList
+         2. iterator接口：实际就是对象里面的属性，`Symbol.iterator`
+
+         ```js
+         const xiyou = ['唐僧','孙悟空','猪八戒','沙僧'];
+         for(let v of xiyou){
+             console.log(v); // 唐僧 。。
+         }
+         for(let v in xiyou){
+             console.log(v); // 0 1 2 3 保存键名
+         }
+         ```
+
+      4. 工作原理：
+
+         1. 创建一个指针**对象**，指向当前数据解构的起始位置。
+         2. 第一次调用对象的next方法，指针指向数据结构的第一个成员。
+         3. 接下来不断调用next方法，指针一直往后移动，直到指向最后一个成员。
+         4. 每调用next方法返回一个包含value和done属性的对象。
+         5. 注：需要自定义遍历数据的时候，要想到迭代器。
+
+         ```js
+         //1.
+         let iterator = xiyou[Symbol.iterator]();
+         console.log(iterator);// //Array Iterator {..next: ƒ next()..}
+         //2.
+         console.log(iterator.next());//{value: '唐僧', done: false}
+         //3.
+         console.log(iterator.next());//{value: undefined, done: true} 遍历第五次(沙僧后)，done表示遍历结束
+         
+         ```
+
+      5. **自定义遍历数据**案例
+
+         ```js
+         const banji = {
+               name:"终极",
+               stus:[
+                   'zhangsan',
+                   'lisi',
+                   'wangwu'
+               ],
+               [Symbol.iterator](){ 
+                   let index = 0;
+                   let _this = this;
+                   return {//1.返回一个对象 {}为一个对象
+                     next:function(){ //2. 要有next方法
+                         //return {value:'abc', done: false}; // 3、4.返回对象要包含done和value属性
+                         if(index < _this.stus.length) {
+                             const result = {value: _this.stus[index], done: false};
+                             index++;
+                             return result;
+                         }else{
+                             return {value: undefined, done: true};
+                         }
+                     }
+                   };
+               }
+           };
+         
+           //遍历这个对象
+           for(let v of banji){
+               console.log(v); //若没有Symbol时：err, banji is not iterable
            }
-       }
-       
-       ```
+         //也可以用banji.stus.forEach遍历
+         ```
 
-    6. **Symbol内置值**：除了定义自己使用的Symbol的值以外，ES6还提供了11个内置的Symbol值，指向语言内部使用的方法。（了解即可）
+   7. ## 生成器
 
-       | 内置值                    | 说明                                                         | 举例 |
-       | ------------------------- | ------------------------------------------------------------ | ---- |
-       | Symbol.hasInstance        | 当其他对象使用instanceof运算符，判断是否为该对象的实例时，会调用此方法 |      |
-       | Symbol.isConcatSpreadable | 对象的Symbol.isConcatSpreadable属性等于的时一个布尔值，表示该对象用于Array.prototype.concat()时，是否可以展开。 |      |
-       | Symbol.unscopables        | 该对象制定了使用with关键字时，哪些属性会被with环境排除。     |      |
-       | Symbol.match              | 当执行str.match(myObject)时，如果该属性存在，会调用它，返回该属性的返回值。 |      |
-       | Symbol.replace            | 当该对象被str.replace(myObject)方法调用时，会返回该方法的返回值 |      |
-       | Symbol.search             | 当该对象被str.search(myObject)方法调用时，会返回该方法的返回值。 |      |
-       | Symbol.split              | 当该对象被str.split(myObject)方法调用时，会返回该方法的返回值。 |      |
-       | Symbol.iterator           | 对象进行for...of循环时，会调用Symbol.iterator方法，返回该对象的默认遍历器 |      |
-       | Symbol.toPrimitive        | 该对象被转为原始类型的值时，会调用这个方法，返回该对象对应的原始类型值 |      |
-       | Symbol.toStringTag        | 在对象上调用toString方法时，返回该方法的返回值               |      |
-       | Symbol.species            | 创建衍生对象时，会使用改该属性                               |      |
+         1. 生成器是ES6提供的一种异步编程解决方案，语法行为与传统函数完全不同。
 
-       ```js
-       class Person{
-           static [Symbol.hasInstance](param){ //自动执行场景
-               console.log(param); //[可选 来自o的参数]  返回：{}
-               console.log("我被用来检测类型了"); //返回：我被用来检测类型了
-               return true; //[可选] 返回：true
-           }
-       }
-       let o = {};
-       console.log(o instanceof Person);
-       ```
+         2. 生成器其实就是一个特殊的函数。异步编程： 纯回调函数
 
-13. ## 迭代器Iterator
+            ```js
+            function * gen(){
+                console.log("hello nihao ");
+            }
+            let iterator = gen();
+            console.log(iterator); // 没有立刻执行输出， 结果： gen {<suspended>}
+            //gen {<suspended>}
+            //[[GeneratorLocation]]: VM349:1
+            //	[[Prototype]]: Generator
+            //        [[Prototype]]: Generator
+            //            next: ƒ next()
+            iterator.next(); //使用next方法才能执行
+            ```
 
-    1. 迭代器是一种接口，为各种不同的数据解构提供统一的访问机制。任何数据结构只要部署Iterator接口，就可以完成遍历操作。
+            ```js
+            //函数代码的分隔符：yield
+            function * gen(){
+                //第一段
+                console.log(111);
+                yield '一只没有耳朵';
+                //第二段
+                console.log(222);
+                yield '一只没有尾巴';
+                //第三段
+                console.log(333);
+                yield '真奇怪';
+                //第四段 {value: undefined, done: true}
+                console.log(444);
+            }
+            let iterator = gen(); //带参数传入
+            iterator.next(); 
+            //可以使用 for..of循环遍历
+            for(let v of gen()){
+                console.log(v);
+            }
+            ```
 
-    2. ES6创造了一种新的遍历命令`for...of`循环，Iterator接口主要供`for...of`消费。
+            ```js
+            //带参数传入
+            function * gen(arg){
+                console.log(arg);
+                let one = yield '一只没有耳朵';
+                console.log(one);
+                yield '一只没有尾巴';
+                yield '真奇怪';
+            }
+            let iterator = gen('AAA'); //带参数传入
+            iterator.next(); //第一次遍历传入
+            //next可以传入实参
+            iterator.next('BBB'); //此次（第二次）传入的实参，将作为第一个yield 调用后 的返回结果
+            ```
 
-    3. **原生具备iterator接口的数据**（可以用`for of`遍历）
+         3. 案例：生成器函数实例
 
-       1. Array、Arguments、Set、Map、String、TypedArray、NodeList
-       2. iterator接口：实际就是对象里面的属性，`Symbol.iterator`
+               1. 需求：1s 后控制台输出 111， 2s后输出222，3s后输出333.
 
-       ```js
-       const xiyou = ['唐僧','孙悟空','猪八戒','沙僧'];
-       for(let v of xiyou){
-           console.log(v); // 唐僧 。。
-       }
-       for(let v in xiyou){
-           console.log(v); // 0 1 2 3 保存键名
-       }
-       ```
+            ```js
+            //异步编程： 文件操作、网络操作（ajax、request）、数据库操作
+            //生成器函数完成异步任务
+            function one(){
+                setTimeout(()=>{
+                    console.log(111);
+                    iterator.next();//若不在函数添加遍历器，则只遍历one()，后续不遍历
+                },1000);
+            }
+            function two(){
+                setTimeout(()=>{
+                    console.log(222);
+                    iterator.next();
+                },2000);
+            }
+            function three(){
+                setTimeout(()=>{
+                    console.log(333);
+                    iterator.next();
+                },3000);
+            }
+            function * gen(){
+                yield one();
+                yield two();
+                yield three();
+            }
+            //调用生成器函数
+            let iterator = gen();
+            iterator.next();
+            ```
 
-    4. 
+         4. **案例：先获取用户数据、再获取订单数据、再获取商品数据**
+
+            ```js
+            //解决回调地狱问题
+            function getUsers(){
+                setTimeout(()=>{
+                    let data = '用户数据';
+                    //调用next方法，并且将数据传入
+                    iterator.next(data);
+                },1000);
+            }
+            function getOrders(){
+                setTimeout(()=>{
+                    let data = '订单数据';
+                    iterator.next(data);
+                },1000);
+            }
+            function getGoods(){
+                setTimeout(()=>{
+                    let data = '商品数据';
+                    iterator.next(data);
+                },1000);
+            }
+            //不适用单独调用方法，因为数据之间有关联
+            /*
+              getUsers();
+              getOrders();
+              getGoods();
+             */
+            function * gen(){
+                let users = yield getUsers();
+                console.log(users);
+                let orders = yield getOrders();
+                console.log(orders);
+                let goods = yield getGoods();
+                console.log(goods);
+            }
+            //调用生成器函数
+            let iterator = gen();
+            iterator.next();
+            ```
+
+   8. ## Promise
+
+         1. Promise是ES6引入的异步编程的新解决方案。语法上Promise是一个构造函数，用来封装异步操作并可以获取其成功或失败的结果。
+
+               1. Promise 构造函数：`Promise(excutor){}`
+               2. `Promise.prototype.then`方法
+               3. `Promise.prototype.catch`方法
+
+         2. **异步编程：主要指一些文件IO操作、数据库IO、网络请求**。
+
+         3. 作用：解决回调套娃。
+
+            ```js
+            //1. 实例化Promise对象
+            const p = new Promise(function(resolve, reject){  //异步操作
+                setTimeout(function(){
+                    let data = '数据库中的用户数据';
+                    //2. 得到数据后，可以调用resolve、reject两个函数改变const p的状态
+                    resolve(data); //3. p结果显示成功状态
+                    //7. 若得到的结果失败，不用resolve，使用reject
+                    let err = '数据读取失败';
+                },1000);
+            });
+            //4. 得到resolve状态成功后，可以调用promise对象的then方法（前一个），失败调用后一个方法
+            //p.then(function(){},function(){}); then参数里面都是函数
+            p.then(function(value){
+                //5. resolve成功后，调用此函数（第一个）
+                console.log(value); //6. 数据库中的用户数据
+            },function(reason){
+                //8. resolve失败，使用reject后调用此函数（第二个）
+                console.err(reason); //9. 数据读取失败
+            });
+            ```
+
+   9. ## Set
+
+         1. ES6提供了新的数据解构Set（集合）。它类似于数组，但成员的值都是唯一的，
+
+         2. 集合实现了iterator接口，所以可以使用 '扩展运算符' 和 `for...of...` 进行遍历。
+
+         3. 集合的属性和方法：
+
+               1. size：返回集合的元素个数
+               2. add：增加一个新元素，返回当前集合
+               3. delete：删除元素，返回boolean值
+               4. has：检测集合中是否包含某个元素，返回boolean值。
+               5. clear： 清空，返回当前集合
+
+            ```js
+            //声明一个set
+            let s = new Set();
+            console.log(s, typeof s); //set(0) {}, "object"
+            let s2 = new Set(['大事','小事','坏事','好事','小事']); //参数为可迭代数组，自动去重
+            console.log(s2.size);//返回个数
+            console.log(s2.add('稀释')); //返回更新后的集合
+            console.log(s2.delete('小事')); //返回boolean
+            console.log(s2.has('大事')); //返回Boolean
+            ```
+
+         4. 遍历Set
+
+            ```js
+            for(let v of s2){
+                console.log(s2);
+            }
+            ```
+
+         5. 数组去重
+
+            ```js
+            let arr = [1,2,3,4,5,4,3,2,1];
+            let result = [...new Set(arr)]; //去重后再转为数组
+            ```
+
+         6. 交集
+
+            ```js
+            let arr2 = [4,5,6,7];
+            let result = [...new Set(arr)].filter(item => {
+                let s2 = new Set(arr2);
+                if(s2.has(item)){
+                    return true;
+                }else{
+                    return false;
+                }
+            });
+            ```
+
+         7. 并集
+
+            ```js
+            let result = [...newSet([...arr,...arr2])]; //先合并数组，然后用集合去重后再转为数组
+            ```
+
+         8. 差集
+
+            ```js
+            //差集根据主体不一样的结果
+            let diff = [...new Set(arr)].filter(item => !(new Set(arr2).has(item)));
+            ```
+
+   10. ## Map
+
+          1. ES6提供了Map数据解构。它类似于对象，也是键值对的集合。但是“键”的范围不限于字符串，各种类型的值（包括对象）都可以当作键。
+
+          2. Map也实现了iterator接口，所以可以使用 '扩展运算符' 和 `for...of...` 进行遍历。
+
+          3. Map的属性和方法：
+
+                1. size：返回Map 的元素个数
+                2. set：增加一个新元素，返回当前Map
+                3. get：返回键名对象的键值
+                4. delete：删除
+                5. has：检测Map 中是否包含某个元素，返回boolean值。
+                6. clear： 清空，返回undefined
+
+          4. ```js
+             //创建一个Map
+             let m = new Map();
+             //添加元素
+             m.set('name','尚硅谷'); //"name" => "尚硅谷"
+             m.set('change',function(){ //"change" => f（）{。。}
+                 console.log("改变你我他");
+             })
+             let key = {
+                 school: 'ATGUIGU'
+             };
+             me.set(key, ['北京','上海']); //{Object => Array(2)}
+             //大小
+             console.log(m.size);
+             //删除
+             m.delete('name');
+             //获取
+             console.log(m.get(key));
+             console.log(m.get('change'));
+             ```
+
+          5. 
+
 
 
 
