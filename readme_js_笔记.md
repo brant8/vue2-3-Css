@@ -6375,7 +6375,7 @@
 
    2. ## ES6允许给函数参数赋值**初始值**
 
-   1. 形参初始值：有默认值的参数，一般位置要靠后（潜规则）
+   3. 形参初始值：有默认值的参数，一般位置要靠后（潜规则）
 
       ```js
       function add(a,b,c=10){
@@ -6384,12 +6384,12 @@
       let result = add(1,2);
       ```
 
-   2. 与解构赋值结合
+   4. 与解构赋值结合
 
       ```js
       //普通写法
       function connect(options){
-      	let host = options.host;
+          let host = options.host;
           let username = options.username;
       }
       //解构赋值写法，且有默认值
@@ -6405,7 +6405,7 @@
       })
       ```
 
-   3. ## Rest
+   5. ## Rest
 
       1. ES6引入`rest`参数，用于获取函数的实参，用来代替 `arguments`
       2. rest参数必须要放到参数最后。
@@ -6426,7 +6426,7 @@
       //['白芷', '阿娇', '思慧']
       ```
 
-   4. ## 扩展运算符
+   6. ## 扩展运算符
 
       1. `...`扩展预算夫能将数组转换为逗号分隔的参数序列。
 
@@ -6464,7 +6464,7 @@
          const divArr = [...divs];
          ```
 
-   5. ## Symbol
+   7. ## Symbol
 
       1. ES6引入新的原始数据类型Symbol，表示独一无二的值。
 
@@ -6511,8 +6511,8 @@
          let game = {...};//很多个方法
          //声明一个对象
          let methods = {
-         	up:Symbol(),
-         	down:Symbol()
+             up:Symbol(),
+             down:Symbol()
          }
          //安全的向对象扩展方法一
          game[methods.up] = function(){
@@ -6560,7 +6560,7 @@
          console.log(o instanceof Person);
          ```
 
-   6. ## 迭代器Iterator
+   8. ## 迭代器Iterator
 
       1. 迭代器是一种接口，为各种不同的数据解构提供统一的访问机制。任何数据结构只要部署Iterator接口，就可以完成遍历操作。
 
@@ -6635,7 +6635,7 @@
          //也可以用banji.stus.forEach遍历
          ```
 
-   7. ## 生成器
+   9. ## 生成器
 
          1. 生成器是ES6提供的一种异步编程解决方案，语法行为与传统函数完全不同。
 
@@ -6770,7 +6770,7 @@
             iterator.next();
             ```
 
-   8. ## Promise
+   10. ## Promise
 
          1. Promise是ES6引入的异步编程的新解决方案。语法上Promise是一个构造函数，用来封装异步操作并可以获取其成功或失败的结果。
 
@@ -6804,110 +6804,640 @@
             });
             ```
 
-   9. ## Set
+   11. ## Set
 
-         1. ES6提供了新的数据解构Set（集合）。它类似于数组，但成员的值都是唯一的，
+          1. ES6提供了新的数据解构Set（集合）。它类似于数组，但成员的值都是唯一的，
 
-         2. 集合实现了iterator接口，所以可以使用 '扩展运算符' 和 `for...of...` 进行遍历。
+            2. 集合实现了iterator接口，所以可以使用 '扩展运算符' 和 `for...of...` 进行遍历。
 
-         3. 集合的属性和方法：
+            3. 集合的属性和方法：
 
-               1. size：返回集合的元素个数
-               2. add：增加一个新元素，返回当前集合
-               3. delete：删除元素，返回boolean值
-               4. has：检测集合中是否包含某个元素，返回boolean值。
-               5. clear： 清空，返回当前集合
+                  1. size：返回集合的元素个数
+                  2. add：增加一个新元素，返回当前集合
+                  3. delete：删除元素，返回boolean值
+                  4. has：检测集合中是否包含某个元素，返回boolean值。
+                  5. clear： 清空，返回当前集合
+
+               ```js
+               //声明一个set
+               let s = new Set();
+               console.log(s, typeof s); //set(0) {}, "object"
+               let s2 = new Set(['大事','小事','坏事','好事','小事']); //参数为可迭代数组，自动去重
+               console.log(s2.size);//返回个数
+               console.log(s2.add('稀释')); //返回更新后的集合
+               console.log(s2.delete('小事')); //返回boolean
+               console.log(s2.has('大事')); //返回Boolean
+               ```
+
+            4. 遍历Set
+
+               ```js
+               for(let v of s2){
+                   console.log(s2);
+               }
+               ```
+
+            5. 数组去重
+
+               ```js
+               let arr = [1,2,3,4,5,4,3,2,1];
+               let result = [...new Set(arr)]; //去重后再转为数组
+               ```
+
+            6. 交集
+
+               ```js
+               let arr2 = [4,5,6,7];
+               let result = [...new Set(arr)].filter(item => {
+                   let s2 = new Set(arr2);
+                   if(s2.has(item)){
+                       return true;
+                   }else{
+                       return false;
+                   }
+               });
+               ```
+
+            7. 并集
+
+               ```js
+               let result = [...newSet([...arr,...arr2])]; //先合并数组，然后用集合去重后再转为数组
+               ```
+
+            8. 差集
+
+               ```js
+               //差集根据主体不一样的结果
+               let diff = [...new Set(arr)].filter(item => !(new Set(arr2).has(item)));
+               ```
+
+   12. ## Map
+
+             1. ES6提供了Map数据解构。它类似于对象，也是键值对的集合。但是“键”的范围不限于字符串，各种类型的值（包括对象）都可以当作键。
+
+                    2. Map也实现了iterator接口，所以可以使用 '扩展运算符' 和 `for...of...` 进行遍历。
+
+                    3. Map的属性和方法：
+
+                     1. size：返回Map 的元素个数
+                     2. set：增加一个新元素，返回当前Map
+                     3. get：返回键名对象的键值
+                     4. delete：删除
+                     5. has：检测Map 中是否包含某个元素，返回boolean值。
+                     6. clear： 清空，返回undefined
+
+                    4. ```js
+                  //创建一个Map
+                  let m = new Map();
+                  //添加元素
+                  m.set('name','尚硅谷'); //"name" => "尚硅谷"
+                  m.set('change',function(){ //"change" => f（）{。。}
+                      console.log("改变你我他");
+                  })
+                  let key = {
+                      school: 'ATGUIGU'
+                  };
+                  me.set(key, ['北京','上海']); //{Object => Array(2)}
+                  //大小
+                  console.log(m.size);
+                  //删除
+                  m.delete('name');
+                  //获取
+                  console.log(m.get(key));
+                  console.log(m.get('change'));
+                  ```
+
+   13. ## class
+
+             1. ES6提供了更接近传统语言的写法，引入了Class（类）的概念，作为对象模板。通过class关键字，可以定义类。
+
+                    2. 基本上，ES6的class可以看作只是一个语法糖，它的绝大部分功能，ES5都可以做大，新的class写法只是让对象原型的写法更加清晰、更像面对对象编程的语法。
+
+                    3. 声明类
+
+                  ```js
+                  //==== ES 5 通过构造函数 ====
+                  function Phone(brand, price){
+                      this.brand = brand;
+                      this.price = price;
+                  }
+                  //添加方法
+                  Phone.prototype.call = function(){
+                      console.log("我可以打电话");
+                  }
+                  //实例化对象
+                  let Huawei = new Phone('华为',999);
+                  Huawei.call(); //调用原型对象公共方法
+                  console.log(Huawei);
+                  //===== ES 6 =====
+                  class Phone{
+                      //构造方法，名字不能修改
+                      constructor(brand, price){
+                          this.brand = brand;
+                          this.price = price;
+                      }
+                      //方法必须使用该语法，不能使用ES5 的对象完整形式， 如 call:function(){} 不能在ES6
+                      call(){
+                          console.log("我可以打电话");
+                      }
+                  }
+                  let onePlus = new Phone("1+",1999);
+                  console.log(onePlus);
+                  ```
+
+                4. constructor 定义构造器函数初始化
+
+                5. extends  继承父类
+
+                  ```js
+                  //====ES5 继承=====
+                  function SmartPhone(brand, price, color, size){
+                     Phone.call(this, brand, price);//继承Phone，改变其this指向即可
+                      this.color = color;
+                      this.size = size;
+                  }
+                  //设置自己构造函数的原型 (校正)
+                  SmartPhone.prototype = new Phone;
+                  SmartPhone.prototype.constructor = SmartPhone;
+                  //声明子类的方法
+                  SmartPhone.prototype.photo = function(){
+                      console.log("我可以拍照");
+                  }
+                  const chuizi = new SmartPhone('锤子',2499,'黑色','5.5');
+                  //====ES6 继承=====
+                  class Phone{
+                      constructor(brand, price){
+                          this.brand = brand;
+                          this.price = price;
+                      }
+                      call(){
+                          console.log("我能打电话");
+                      }
+                  }
+                  class SmartPhone extends Phone{
+                      constructor(brand,price,color,size){
+                          super(brand, price); //相当于 Phone.call(this, brand, price)
+                          this.color = color;
+                          this.size = size;
+                      }
+                      call()}{ //覆盖重写
+                          console.log("我可以视频通话");
+                          //此处不能调用super()，普通成员方法不能调用super
+                      }
+                  }
+                  ```
+
+                6. super 调用父级构造器方法
+
+                7. static 定义静态方法和属性
+
+                  ```js
+                  function Phone(){
+                      
+                  }
+                  Phone.name = '手机';
+                  Phone.change = function(){
+                      console.log("我可以改变世界");
+                  }
+                  ```
+
+               8. set和get，对属性的设置和获取
+
+                  ```js
+                  class Phone{
+                      get price(){
+                          console.log("读取价格");
+                          return 'iloveyou';
+                      }
+                      set price(newVal){ //设置必须要有一个参数
+                          console.log('价格属性修改了');
+                      }
+                  }
+                  let s = new Phone();
+                  console.log(s.price);
+                  s.price = 'free';
+                  ```
+
+   14. ## ES6数值的扩展
+
+             1. `Number.EPSILON`： 是Javascript表示的最小精度。
+
+                   1. 值：接近于`2.22* 10E-16`(2.22乘以10的负16次方)
+
+                      ```js
+                      console.log（0.1 + 0.2 ===0.3）; //false. 浮点精度相加不一样
+                      //用法
+                      if( Math.abs(a-b) < Number.EPSILON){
+                          return true;
+                      }else{
+                          return false;
+                      }
+                      ```
+
+                    2. `Number.isFinite`：检测一个数值是否为有限数。
+
+                  ```js
+                  console.log(Number.isFinite(100)); //true
+                  console.log(Number.isFinite(100/0));//false
+                  console.log(Number.isFinite(Infinity)); //false
+                  ```
+
+                3. `Number.parseInt`、`Number.parseFloat`：字符串转整数
+
+                4. `Number.isInteger`：判断一个数是否为整数
+
+                5. `Number.isNaN`：检测一个属是否为NaN
+
+                6. `Math.trunc`：将数字的小数部分抹掉
+
+                  ```js
+                  console.log(Math.trunc(3.5));
+                  ```
+
+               7. `Math.sign`：判断一个数到底是正数、负数、还是零。
+
+                  ```js
+                  console.log(Math.sign(100)); //1
+                  console.log(Math.sign(0)); //0
+                  console.log(Math.sign(-20000)); //-1
+                  ```
+
+   15. ## ES6对象方法扩展
+
+             1. `Object.is：判断两个值是否完全相等`
+
+                   ```js
+                   console.log(Object.is(120,120)); //类似于===全等号，又不完全一样
+                   console.log(Object.is(NaN,NaN)); //true
+                   console.log(NaN === NaN); //false ,NaN与非数值比较之外，其余的都是false
+                   ```
+
+             2. `Object.assign`：对象的合并
+
+                   ```js
+                   const config1 = {
+                       host:'localhost',
+                       port:3306
+                   }
+                   const config2 = {
+                       host:'http://google.ca',
+                       port:33060
+                   }
+                   console.log(Object.assign(config1, config2)); //相同属性，后面覆盖前面，非重复属性名合并
+                   ```
+
+             3. `Object.setPrototypeOf`、`Object.getPrototypeof` ：原型对象操作
+
+                   ```js
+                   const school = {
+                       name: '尚硅谷'
+                   }
+                   const city = {
+                       xiaoqu: ['beijing','shanghai']
+                   }
+                   Object.setPrototypeOf(school, city);
+                   console.log(Object.getPrototypeOf(school));
+                   console.log(school);
+                   ```
+
+   16. ## 模块化
+
+             1. 模块化指将一个大的程序文件，拆分成许多小的文件，然后将小文件组合起来。
+
+                    2. 模块化优点：
+
+                     1. 防止命名冲突
+                     2. 代码复用
+                     3. 高维护性
+
+                    3. 模块化规范产品，ES6之前的模块化规范及产品有：
+
+                     1. CommonJS => NodeJS、Browserify
+                     2. AMD => requireJS
+                     3. CMD => seaJS
+
+                    4. ES6模块化语法
+
+                     1. **export**命令用于规定模块的对外接口
+
+                        ```js
+                        //m1.js
+                        //1.分别暴露
+                        export let school = '尚硅谷';
+                        export function teach(){
+                            console.log("教你东西");
+                        }
+                        //2.统一暴露 m2.js
+                        export {school, teach}; 
+                        //3.默认暴露
+                        export default{ //任意类型，对象居多
+                            school:'AIGUIGU',
+                            change:function(){
+                                console.log("尚硅谷");
+                            },
+                        }
+                        ```
+
+                     2. **import**命令用于输入其他模块提供的功能
+
+                        ```html
+                        <script type="module">
+                            //1.通用导入方式
+                            import * as m1 from './m1.js'; //m1的所有标记export 暴露的导入
+                            console.log(m1); //Module {Symbol(Symbol.toStringTag):"Module"}..
+                            import * as m3 from 'm3.js';
+                            m3.default.change();
+                            //2.解构赋值形式(统一暴露)
+                            import {school,teach} from 'm2.js'; //相当于分别暴露
+                            console.log(school);
+                            console.log(teach);
+                            import {school as guigu, findJob} from 'm2.js'; //重名用as重命名
+                            console.log(guigu);
+                            import {default as m3} from "m3.js";//对应默认暴露（观看行对象形式友好）
+                            //3.简便形式，针对默认暴露
+                            import m3 from "m3.js";
+                        </script>
+                        ```
+
+                    5. 在HTML中的引入
+
+                  ```html
+                  <!--HTML页面 引入一个js入口文件-->
+                  <script src="app.js" type="Module">
+                  </script>
+                  <!--JS文件-->
+                  <script>
+                      import * as m1 from "m1.js";
+                  </script>
+                  ```
+
+                    6. **实际项目使用方式**
+
+                     1. 因兼容性考虑，使用Babel编译方式（JavaScript编译器），将ES6编译成ES5语法。
+                     2. HTML引入编译后的文件。
+                     3. **Babel使用方式**
+                           1. 安装工具：babel-cli（命令行工具）、babel-preset-env（预设包，转换）、browserify（打包工具，也可用webpack打包但是需要配置环境）
+                           2. 安装命令：`npm i babel cli babel-preset-env browserify -D`； 
+                                 1. -D开发以来
+
+                           3. 非全局安装**编译**使用命令：`npx babel src/js -d dist/js --preset=babel-preset-env`
+                                 1. -d：目标目录
+                                 2. --preset：预设环境
+
+                           4. **打包**入口文件：`npx browserify dist/js/app.js -o dist/bundle.js`
+
+                     4. 额外包实例 - jQuery
+                           1. 安装jQuery：`npm i jquery`
+                           2. 入口函数`app.js`导入：`import $ from 'jquery'`; 
+                                 1. 通过npm安装的不需要路径
+                                 2. 等同于`const $ = require("jquery");`
+
+                           3. 修改内容后，重新打包
+                                 1. `$('body').css('background','pink')`
+
+   17. ## ES7新特性
+
+             1. `Array.prototype.includes`：includes方法用来检测数组中是否包含某个元素，返回布尔类型值
+
+          ```js
+           const mingzhu = ['西游记','红楼梦','三国演义','水浒传'];
+           console.log(mingzhu.includes('金瓶梅'));
+           //.indexOf('西游记') ,若没有返回 -1
+          ```
+
+          1. `[**]`：指数操作符，用来实现幂运算，功能与`Math.pow`结果相同。
+
+          ```js
+            console.log(2 ** 10); // 1024  (2的10侧方)
+            console.log(Math.pow(2, 10)); //1024
+          ```
+
+
+   18. ## ES8新特性
+
+       1. `async`和`await`两种语法结合可以让异步代码像同步代码一样。
+
+          1. 异步编程解决方案
+
+         2. `async`函数
+
+         3. `async`函数的返回值为`promise`对象
+
+         4. `promise`对象的结果由`async`函数执行的返回值决定
 
             ```js
-            //声明一个set
-            let s = new Set();
-            console.log(s, typeof s); //set(0) {}, "object"
-            let s2 = new Set(['大事','小事','坏事','好事','小事']); //参数为可迭代数组，自动去重
-            console.log(s2.size);//返回个数
-            console.log(s2.add('稀释')); //返回更新后的集合
-            console.log(s2.delete('小事')); //返回boolean
-            console.log(s2.has('大事')); //返回Boolean
-            ```
-
-         4. 遍历Set
-
-            ```js
-            for(let v of s2){
-                console.log(s2);
+            async function fn(){
+                return '尚硅谷'; //即便是字符串，返回结果也是promise对象； Promise {<fulfilled>: '尚硅谷'}
+                /*只要不是自定义返回Promise对象( return new Promise())的其他任何值，则返回结果就是 成功的promise对象 否则如下：
+                return new Promise(function(resolve, reject){
+                        // resolve("成功的");
+                        reject("失败的");
+                    }); //Promise {<pending>} */
+                /*throw new Error('出错啦！'); //Promise:"rejected"
+                */
             }
+            const result = fn();
+            console.log(result); //Promise {<fulfilled>: '尚硅谷'}
             ```
 
-         5. 数组去重
+         5. `await`表达式
 
-            ```js
-            let arr = [1,2,3,4,5,4,3,2,1];
-            let result = [...new Set(arr)]; //去重后再转为数组
-            ```
+               1. `await`**必须**写在`async`**函数中**
 
-         6. 交集
+               2. `await`右侧的表达式一般为`promise`对象
 
-            ```js
-            let arr2 = [4,5,6,7];
-            let result = [...new Set(arr)].filter(item => {
-                let s2 = new Set(arr2);
-                if(s2.has(item)){
-                    return true;
-                }else{
-                    return false;
-                }
-            });
-            ```
+               3. `await`返回的是`promise`成功的值
 
-         7. 并集
+               4. `await`的`promise`失败了，就会抛出异常，需要通过`try...catch`捕获处理
 
-            ```js
-            let result = [...newSet([...arr,...arr2])]; //先合并数组，然后用集合去重后再转为数组
-            ```
+                  ```js
+                  //创建promise对象 - 成功resolved
+                  const p =new Promise(((resolve, reject) => {
+                      resolve("用户数据"); //返回的有 状态和值
+                      /*
+                          [[Prototype]]: Promise
+                          [[PromiseState]]: "resolved" 或者 "fullfiled"
+                          [[PromiseResult]]: "用户数据"
+                          * */
+                  }))
+                  //await放在async函数中
+                  async function main(){
+                      let result = await p; //得到promise成功的对象的值 即：用户数据
+                      console.log(result);
+                  }
+                  // - 失败 rejected
+                  const p = new Promise(((resolve, reject) => {
+                      reject("失败啦");
+                  }));
+                  async function main(){
+                      try {
+                          let result = await p;
+                          console.log(result);
+                      }catch (e){
+                          console.log(e);//失败啦
+                      }
+                  }
+                  //调用函数
+                  main();
+                  ```
 
-         8. 差集
+         6. 案例：await和async结合使用 - 读取本地文件内容
 
-            ```js
-            //差集根据主体不一样的结果
-            let diff = [...new Set(arr)].filter(item => !(new Set(arr2).has(item)));
-            ```
+               ```js
+               const fs = require("fs");
+               //读取文件，返回的是一个promise对象
+               function readWeiXue(){
+                   return new Promise((resolve, reject) => {
+                       fs.readFile("./weixue.md",(err,data)=>{
+                           //如果失败
+                           if(err) reject(err);
+                           //如果成功
+                           resolve(data);
+                       })
+                   })
+               }
+               //声明一个async函数
+               async function main(){
+                   //获取为学的内容
+                   let weixue = await readWeiXue(); //await获取的promise的对象的返回值
+                   console.log(weixue.toString());
+                   //以上用法与同步用法很类似
+                   
+                   //多个await时，最好用try catch捕获，若某个await的promise失败，整个async函数会终止，后面的语句不再执行。
+                   
+                   //若不用async和await，返回值为Promise对象，需要用.then链式调用获取值。
+               }
+               ```
 
-   10. ## Map
+         7. 案例：
 
-          1. ES6提供了Map数据解构。它类似于对象，也是键值对的集合。但是“键”的范围不限于字符串，各种类型的值（包括对象）都可以当作键。
+               ```js
+               //发送AJAX请求，返回结果时Promise对象
+               function sendAjax(){
+                   return new Promise(((resolve, reject) => {
+                       //1.创建对象
+                       const x = new XMLHttpRequest();
+                       //2.初始化
+                       x.open('GET', url);
+                       //3.发送
+                       x.send();
+                       //4.事件绑定
+                       x.onreadystatechange = function () {
+                           if(x.readyState ===4 ){
+                               if(x.status>=200 && x.status<300){
+                                   //return xxx;
+                                   /*
+                                       此处使用Promise的目的时因为，要返回结果return xx给函数SendAjax，
+                                       在函数内部的返回结果返回给事件绑定，获取的结果无法'快速'传递到主函数作为返回值
+                                       */
+                                   //如果成功
+                                   resolve(x.response);
+                               }else{
+                                   //如果失败
+                                   reject(x.response);
+                               }
+                           }
+                       }
+                   }));
+               }
+               //=====promise then方法测试=====
+               sendAjax("https://api.apiopen.top/getJoke").then(value => {
+                   console.log(value);//获取到的数据
+               },reason => {});
+               //=====async与await测试=====
+               async function main(){
+                   let result = await sendAjax("https://api.apiopen.top/getJoke");
+                   console.log(result);
+               }
+               //axios的npm包，返回值就是promise对象。
+               ```
 
-          2. Map也实现了iterator接口，所以可以使用 '扩展运算符' 和 `for...of...` 进行遍历。
+         8. **ES8对象方法扩展**
 
-          3. Map的属性和方法：
+               ```js
+               const school = {
+                   name:"尚硅谷",
+                   city:['北京','上海'],
+                   course:['前端','java','大数据']
+               };
+               //获取对象的所有键
+               console.log(Object.keys(school));
+               //获取对象所有的值
+               console.log(Object.values(school));
+               //entries，获取键值形式数组
+               console.log(Object.entries(school))
+               //创建Map
+               const m = new Map(Object.entries(school));
+               console.log(m);//m集合{’name'=>'..'}
+               console.log(m.get('name')); //获取键的值
+               //获得对象属性的描述
+               console.log(Object.getOwnPropertyDescriptors(school));
+               ```
 
-                1. size：返回Map 的元素个数
-                2. set：增加一个新元素，返回当前Map
-                3. get：返回键名对象的键值
-                4. delete：删除
-                5. has：检测Map 中是否包含某个元素，返回boolean值。
-                6. clear： 清空，返回undefined
+               ```js
+               //对象属性
+               const obj = Object.create(null,{
+                   name:{ //getOwnPropertyDescriptors（）获得以下属性
+                       //设置值
+                       value：'尚硅谷',
+                       //属性特性
+                       writable: true,
+                       configurable:true,
+                       enumerable:true
+                   }
+               })
+               ```
 
-          4. ```js
-             //创建一个Map
-             let m = new Map();
-             //添加元素
-             m.set('name','尚硅谷'); //"name" => "尚硅谷"
-             m.set('change',function(){ //"change" => f（）{。。}
-                 console.log("改变你我他");
-             })
-             let key = {
-                 school: 'ATGUIGU'
-             };
-             me.set(key, ['北京','上海']); //{Object => Array(2)}
-             //大小
-             console.log(m.size);
-             //删除
-             m.delete('name');
-             //获取
-             console.log(m.get(key));
-             console.log(m.get('change'));
-             ```
+   19. ## ES9扩展运算符与rest参数
 
-          5. 
+       1. `rest`参数与`spread`扩展运算符在ES6中i经引入，不过ES6中只针对数组，在ES6中为对象提供了像数组一样的rest参数和扩展运算符。
+
+          ```js
+          //function connect({host, port, username, password}){
+          function connect({host, port, ...user}){
+              console.log(host);
+              console.log(port);
+              //console.log(username);
+              //consoel.log(password);
+              console.log(user); //多余参数自动归入...user : rest支持
+          }
+          connect({
+              host:'127.0.0.1',
+              port:3306,
+              username:'root',
+              password:'root'
+          });
+          const skillOne = {
+              q:'天音波',
+              w:'金钟罩'
+          }
+          // ...skillOne => q:'天音波'， w:'金钟罩'
+          const skillTwo = {
+              e:'天龙破'
+          }
+          const mangseng = {...skillOne, ...skillTwo}; //对象合并
+          ```
+
+         2. **命名捕获分组**
+
+               ```js
+               //声明一个字符串
+               let str = '<a href="http://www.atguigu.com">尚硅谷</a>';
+               //提取url与 标签文本
+               const reg = /<a href="(.*)">(.*)<\/a>/; //当中的正则通过小括号分别捕获
+               //执行
+               const result = reg.exec(str); 
+               console.log(result); //得到三个数组（有索引号），第一个原数组，第二个捕获的第一括号，第二个捕获的第二个括号
+               //使用 ?<参数名> 设置正则提取别名，以适应代码变化（更改正则，其他代码不变）
+               const reg2 = /<a href="(?<url>.*)">(?<text>.*)<\/a>/;
+               const result2 = reg2.exec(str); 
+               console.log(result2); //多了名为groups的对象，并且捕获的数据分别对应其变量
+               console.log(result2.groups.url);
+               ```
+
+         3. **正则扩展 - 反向断言**
+
+               1. 
 
 
 

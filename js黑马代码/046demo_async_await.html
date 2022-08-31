@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<script>
+    /*
+    const fs = require("fs");
+    //读取文件，返回的是一个promise对象
+    function readWeiXue(){
+        return new Promise((resolve, reject) => {
+            fs.readFile("./weixue.md",(err,data)=>{
+                //如果失败
+                if(err) reject(err);
+                //如果成功
+                resolve(data);
+            })
+        })
+    }
+    //声明一个async函数
+    async function main(){
+        //获取为学的内容
+        let weixue = await readWeiXue(); //await获取的promise的对象的返回值
+        console.log(weixue.toString());
+        //以上用法与同步用法很类似
+        //多个await时，最好用try catch捕获，若某个await的promise失败，整个async函数会终止，后面的语句不再执行。
+    }
+
+     */
+
+
+    //发送AJAX请求，返回结果时Promise对象
+    function sendAjax(){
+        return new Promise(((resolve, reject) => {
+            //1.创建对象
+            const x = new XMLHttpRequest();
+            //2.初始化
+            x.open('GET', url);
+            //3.发送
+            x.send();
+            //4.事件绑定
+            x.onreadystatechange = function () {
+                if(x.readyState ===4 ){
+                    if(x.status>=200 && x.status<300){
+                        //return xxx;
+                        /*
+                        此处使用Promise的目的时因为，要返回结果return xx给函数SendAjax，
+                        在函数内部的返回结果返回给事件绑定，获取的结果无法'快速'传递到主函数作为返回值
+                        */
+                        //如果成功
+                        resolve(x.response);
+                    }else{
+                        //如果失败
+                        reject(x.response);
+                    }
+                }
+            }
+        }));
+    }
+    //promise then方法测试
+    sendAjax("https://api.apiopen.top/getJoke").then(value => {
+        console.log(value);//获取到的数据
+    },reason => {});
+    //async与await测试
+    async function main(){
+        let result = await sendAjax("https://api.apiopen.top/getJoke");
+        console.log(result);
+    }
+    //axios的npm包，返回值就是promise对象。
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

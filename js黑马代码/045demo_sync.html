@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<script>
+    async function fn(){
+        // return '尚硅谷';
+        return new Promise(function(resolve, reject){
+            // resolve("成功的");
+            reject("失败的");
+        }); //Promise {<pending>}
+    }
+    const result = fn();
+    console.log(result);
+    result.then(value =>{
+        console.log(value);
+    },reason => {
+        console.log(reason);
+    });
+
+    //创建promise对象
+    const p =new Promise(((resolve, reject) => {
+        resolve("用户数据"); //返回的有 状态和值
+        /*
+        [[Prototype]]: Promise
+        [[PromiseState]]: "resolved" 或者 "fullfiled"
+        [[PromiseResult]]: "用户数据"
+        * */
+    }))
+    //await放在async函数中
+    async function main(){
+        let result = await p; //得到promise成功的对象的值 即：用户数据
+        console.log(result);
+    }
+    /*
+    const p = new Promise(((resolve, reject) => {
+        reject("失败啦");
+    }));
+    async function main(){
+        try {
+            let result = await p;
+            console.log(result);
+        }catch (e){
+            console.log(e);//失败啦
+        }
+    }
+
+     */
+    //调用函数
+    main();
+</script>
+
+
+
+
+
+</body>
+</html>
