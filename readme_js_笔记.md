@@ -7390,35 +7390,35 @@
 
    19. ## ES9扩展运算符与rest参数
 
-       1. `rest`参数与`spread`扩展运算符在ES6中i经引入，不过ES6中只针对数组，在ES6中为对象提供了像数组一样的rest参数和扩展运算符。
+          1. `rest`参数与`spread`扩展运算符在ES6中i经引入，不过ES6中只针对数组，在ES6中为对象提供了像数组一样的rest参数和扩展运算符。
 
-          ```js
-          //function connect({host, port, username, password}){
-          function connect({host, port, ...user}){
-              console.log(host);
-              console.log(port);
-              //console.log(username);
-              //consoel.log(password);
-              console.log(user); //多余参数自动归入...user : rest支持
-          }
-          connect({
-              host:'127.0.0.1',
-              port:3306,
-              username:'root',
-              password:'root'
-          });
-          const skillOne = {
-              q:'天音波',
-              w:'金钟罩'
-          }
-          // ...skillOne => q:'天音波'， w:'金钟罩'
-          const skillTwo = {
-              e:'天龙破'
-          }
-          const mangseng = {...skillOne, ...skillTwo}; //对象合并
-          ```
+             ```js
+             //function connect({host, port, username, password}){
+             function connect({host, port, ...user}){
+                 console.log(host);
+                 console.log(port);
+                 //console.log(username);
+                 //consoel.log(password);
+                 console.log(user); //多余参数自动归入...user : rest支持
+             }
+             connect({
+                 host:'127.0.0.1',
+                 port:3306,
+                 username:'root',
+                 password:'root'
+             });
+             const skillOne = {
+                 q:'天音波',
+                 w:'金钟罩'
+             }
+             // ...skillOne => q:'天音波'， w:'金钟罩'
+             const skillTwo = {
+                 e:'天龙破'
+             }
+             const mangseng = {...skillOne, ...skillTwo}; //对象合并
+             ```
 
-         2. **命名捕获分组**
+          2. **命名捕获分组**
 
                ```js
                //声明一个字符串
@@ -7435,9 +7435,47 @@
                console.log(result2.groups.url);
                ```
 
-         3. **正则扩展 - 反向断言**
+          3. **正则扩展 - 反向断言**
 
-               1. 
+             1. ```js
+                //声明字符串
+                let str = 'JS123121你知道么555啦啦啦';
+                // 正向断言
+                //'?='表示判断
+                const reg = /\d+(?=啦)/; //只想匹配数字 本例语法：、d+表示数字；(?=啦)匹配的数字后面必须要有'啦'才符合要求
+                const result = reg.exec(str);
+                console.log(result);
+                // 反向断言
+                let str = 'JS123121你知道么555啦啦啦';
+                const reg = /\d+/; //普通匹配：匹配"123121"  
+                const reg = /(?<=么)\d+/; //反向断言 匹配"555"  
+                const result2 = reg.exec(str);
+                console.log(result2);
+                ```
+
+          4. **正则扩展 - dotAll模式**
+
+                1. dot `.` 元字符：除换行符以外的任意单个字符。
+
+                2. ```js
+                   //目标：提取<a>和<p>标签内容分别赋予变量
+                   let str = `
+                   	<ul>
+                   		<li>
+                   			<a>肖申克的救赎</a>
+                   			<p>上映日期：1994-09-10</p>
+                           </li>
+                           <li>
+                   			<a>阿甘正传</a>
+                   			<p>上映日期：1994-07-6</p>
+                           </li>
+                   	</ul>`;
+                   const reg = /<li>\s+<a>(.*?)<\/a>\s+<p>/;
+                   const result = reg.exec(str);
+                   console.log(result);
+                   ```
+
+                3. 
 
 
 
