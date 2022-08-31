@@ -6808,9 +6808,9 @@
 
           1. ES6提供了新的数据解构Set（集合）。它类似于数组，但成员的值都是唯一的，
 
-            2. 集合实现了iterator接口，所以可以使用 '扩展运算符' 和 `for...of...` 进行遍历。
+                 2. 集合实现了iterator接口，所以可以使用 '扩展运算符' 和 `for...of...` 进行遍历。
 
-            3. 集合的属性和方法：
+                 3. 集合的属性和方法：
 
                   1. size：返回集合的元素个数
                   2. add：增加一个新元素，返回当前集合
@@ -6873,327 +6873,328 @@
 
    12. ## Map
 
-             1. ES6提供了Map数据解构。它类似于对象，也是键值对的集合。但是“键”的范围不限于字符串，各种类型的值（包括对象）都可以当作键。
+            1. ES6提供了Map数据解构。它类似于对象，也是键值对的集合。但是“键”的范围不限于字符串，各种类型的值（包括对象）都可以当作键。
 
-                    2. Map也实现了iterator接口，所以可以使用 '扩展运算符' 和 `for...of...` 进行遍历。
+                   2. Map也实现了iterator接口，所以可以使用 '扩展运算符' 和 `for...of...` 进行遍历。
 
-                    3. Map的属性和方法：
+                   3. Map的属性和方法：
 
-                     1. size：返回Map 的元素个数
-                     2. set：增加一个新元素，返回当前Map
-                     3. get：返回键名对象的键值
-                     4. delete：删除
-                     5. has：检测Map 中是否包含某个元素，返回boolean值。
-                     6. clear： 清空，返回undefined
+                    1. size：返回Map 的元素个数
+                    2. set：增加一个新元素，返回当前Map
+                    3. get：返回键名对象的键值
+                    4. delete：删除
+                    5. has：检测Map 中是否包含某个元素，返回boolean值。
+                    6. clear： 清空，返回undefined
 
-                    4. ```js
-                  //创建一个Map
-                  let m = new Map();
-                  //添加元素
-                  m.set('name','尚硅谷'); //"name" => "尚硅谷"
-                  m.set('change',function(){ //"change" => f（）{。。}
-                      console.log("改变你我他");
-                  })
-                  let key = {
-                      school: 'ATGUIGU'
-                  };
-                  me.set(key, ['北京','上海']); //{Object => Array(2)}
-                  //大小
-                  console.log(m.size);
-                  //删除
-                  m.delete('name');
-                  //获取
-                  console.log(m.get(key));
-                  console.log(m.get('change'));
-                  ```
+                 
+                 ```js
+                 //创建一个Map
+                 let m = new Map();
+                 //添加元素
+                 m.set('name','尚硅谷'); //"name" => "尚硅谷"
+                 m.set('change',function(){ //"change" => f（）{。。}
+                     console.log("改变你我他");
+                 })
+                 let key = {
+                     school: 'ATGUIGU'
+                 };
+                 me.set(key, ['北京','上海']); //{Object => Array(2)}
+                 //大小
+                 console.log(m.size);
+                 //删除
+                 m.delete('name');
+                 //获取
+                 console.log(m.get(key));
+                 console.log(m.get('change'));
+                 ```
 
    13. ## class
 
-             1. ES6提供了更接近传统语言的写法，引入了Class（类）的概念，作为对象模板。通过class关键字，可以定义类。
+         1. ES6提供了更接近传统语言的写法，引入了Class（类）的概念，作为对象模板。通过class关键字，可以定义类。
 
-                    2. 基本上，ES6的class可以看作只是一个语法糖，它的绝大部分功能，ES5都可以做大，新的class写法只是让对象原型的写法更加清晰、更像面对对象编程的语法。
+                2. 基本上，ES6的class可以看作只是一个语法糖，它的绝大部分功能，ES5都可以做大，新的class写法只是让对象原型的写法更加清晰、更像面对对象编程的语法。
 
-                    3. 声明类
+                3. 声明类
 
-                  ```js
-                  //==== ES 5 通过构造函数 ====
-                  function Phone(brand, price){
+              ```js
+              //==== ES 5 通过构造函数 ====
+              function Phone(brand, price){
+                  this.brand = brand;
+                  this.price = price;
+              }
+              //添加方法
+              Phone.prototype.call = function(){
+                  console.log("我可以打电话");
+              }
+              //实例化对象
+              let Huawei = new Phone('华为',999);
+              Huawei.call(); //调用原型对象公共方法
+              console.log(Huawei);
+              //===== ES 6 =====
+              class Phone{
+                  //构造方法，名字不能修改
+                  constructor(brand, price){
                       this.brand = brand;
                       this.price = price;
                   }
-                  //添加方法
-                  Phone.prototype.call = function(){
+                  //方法必须使用该语法，不能使用ES5 的对象完整形式， 如 call:function(){} 不能在ES6
+                  call(){
                       console.log("我可以打电话");
                   }
-                  //实例化对象
-                  let Huawei = new Phone('华为',999);
-                  Huawei.call(); //调用原型对象公共方法
-                  console.log(Huawei);
-                  //===== ES 6 =====
-                  class Phone{
-                      //构造方法，名字不能修改
-                      constructor(brand, price){
-                          this.brand = brand;
-                          this.price = price;
-                      }
-                      //方法必须使用该语法，不能使用ES5 的对象完整形式， 如 call:function(){} 不能在ES6
-                      call(){
-                          console.log("我可以打电话");
-                      }
+              }
+              let onePlus = new Phone("1+",1999);
+              console.log(onePlus);
+              ```
+
+            4. constructor 定义构造器函数初始化
+
+            5. extends  继承父类
+
+              ```js
+              //====ES5 继承=====
+              function SmartPhone(brand, price, color, size){
+                 Phone.call(this, brand, price);//继承Phone，改变其this指向即可
+                  this.color = color;
+                  this.size = size;
+              }
+              //设置自己构造函数的原型 (校正)
+              SmartPhone.prototype = new Phone;
+              SmartPhone.prototype.constructor = SmartPhone;
+              //声明子类的方法
+              SmartPhone.prototype.photo = function(){
+                  console.log("我可以拍照");
+              }
+              const chuizi = new SmartPhone('锤子',2499,'黑色','5.5');
+              //====ES6 继承=====
+              class Phone{
+                  constructor(brand, price){
+                      this.brand = brand;
+                      this.price = price;
                   }
-                  let onePlus = new Phone("1+",1999);
-                  console.log(onePlus);
-                  ```
-
-                4. constructor 定义构造器函数初始化
-
-                5. extends  继承父类
-
-                  ```js
-                  //====ES5 继承=====
-                  function SmartPhone(brand, price, color, size){
-                     Phone.call(this, brand, price);//继承Phone，改变其this指向即可
+                  call(){
+                      console.log("我能打电话");
+                  }
+              }
+              class SmartPhone extends Phone{
+                  constructor(brand,price,color,size){
+                      super(brand, price); //相当于 Phone.call(this, brand, price)
                       this.color = color;
                       this.size = size;
                   }
-                  //设置自己构造函数的原型 (校正)
-                  SmartPhone.prototype = new Phone;
-                  SmartPhone.prototype.constructor = SmartPhone;
-                  //声明子类的方法
-                  SmartPhone.prototype.photo = function(){
-                      console.log("我可以拍照");
+                  call()}{ //覆盖重写
+                      console.log("我可以视频通话");
+                      //此处不能调用super()，普通成员方法不能调用super
                   }
-                  const chuizi = new SmartPhone('锤子',2499,'黑色','5.5');
-                  //====ES6 继承=====
-                  class Phone{
-                      constructor(brand, price){
-                          this.brand = brand;
-                          this.price = price;
-                      }
-                      call(){
-                          console.log("我能打电话");
-                      }
-                  }
-                  class SmartPhone extends Phone{
-                      constructor(brand,price,color,size){
-                          super(brand, price); //相当于 Phone.call(this, brand, price)
-                          this.color = color;
-                          this.size = size;
-                      }
-                      call()}{ //覆盖重写
-                          console.log("我可以视频通话");
-                          //此处不能调用super()，普通成员方法不能调用super
-                      }
-                  }
-                  ```
+              }
+              ```
 
-                6. super 调用父级构造器方法
+            6. super 调用父级构造器方法
 
-                7. static 定义静态方法和属性
+            7. static 定义静态方法和属性
 
-                  ```js
-                  function Phone(){
-                      
-                  }
-                  Phone.name = '手机';
-                  Phone.change = function(){
-                      console.log("我可以改变世界");
-                  }
-                  ```
+              ```js
+              function Phone(){
+                  
+              }
+              Phone.name = '手机';
+              Phone.change = function(){
+                  console.log("我可以改变世界");
+              }
+              ```
 
                8. set和get，对属性的设置和获取
 
-                  ```js
-                  class Phone{
-                      get price(){
-                          console.log("读取价格");
-                          return 'iloveyou';
-                      }
-                      set price(newVal){ //设置必须要有一个参数
-                          console.log('价格属性修改了');
-                      }
+              ```js
+              class Phone{
+                  get price(){
+                      console.log("读取价格");
+                      return 'iloveyou';
                   }
-                  let s = new Phone();
-                  console.log(s.price);
-                  s.price = 'free';
-                  ```
+                  set price(newVal){ //设置必须要有一个参数
+                      console.log('价格属性修改了');
+                  }
+              }
+              let s = new Phone();
+              console.log(s.price);
+              s.price = 'free';
+              ```
 
    14. ## ES6数值的扩展
 
-             1. `Number.EPSILON`： 是Javascript表示的最小精度。
+         1. `Number.EPSILON`： 是Javascript表示的最小精度。
 
-                   1. 值：接近于`2.22* 10E-16`(2.22乘以10的负16次方)
-
-                      ```js
-                      console.log（0.1 + 0.2 ===0.3）; //false. 浮点精度相加不一样
-                      //用法
-                      if( Math.abs(a-b) < Number.EPSILON){
-                          return true;
-                      }else{
-                          return false;
-                      }
-                      ```
-
-                    2. `Number.isFinite`：检测一个数值是否为有限数。
+               1. 值：接近于`2.22* 10E-16`(2.22乘以10的负16次方)
 
                   ```js
-                  console.log(Number.isFinite(100)); //true
-                  console.log(Number.isFinite(100/0));//false
-                  console.log(Number.isFinite(Infinity)); //false
+                  console.log（0.1 + 0.2 ===0.3）; //false. 浮点精度相加不一样
+                  //用法
+                  if( Math.abs(a-b) < Number.EPSILON){
+                      return true;
+                  }else{
+                      return false;
+                  }
                   ```
 
-                3. `Number.parseInt`、`Number.parseFloat`：字符串转整数
+                2. `Number.isFinite`：检测一个数值是否为有限数。
 
-                4. `Number.isInteger`：判断一个数是否为整数
+              ```js
+              console.log(Number.isFinite(100)); //true
+              console.log(Number.isFinite(100/0));//false
+              console.log(Number.isFinite(Infinity)); //false
+              ```
 
-                5. `Number.isNaN`：检测一个属是否为NaN
+            3. `Number.parseInt`、`Number.parseFloat`：字符串转整数
 
-                6. `Math.trunc`：将数字的小数部分抹掉
+            4. `Number.isInteger`：判断一个数是否为整数
 
-                  ```js
-                  console.log(Math.trunc(3.5));
-                  ```
+            5. `Number.isNaN`：检测一个属是否为NaN
+
+            6. `Math.trunc`：将数字的小数部分抹掉
+
+              ```js
+              console.log(Math.trunc(3.5));
+              ```
 
                7. `Math.sign`：判断一个数到底是正数、负数、还是零。
 
-                  ```js
-                  console.log(Math.sign(100)); //1
-                  console.log(Math.sign(0)); //0
-                  console.log(Math.sign(-20000)); //-1
-                  ```
+              ```js
+              console.log(Math.sign(100)); //1
+              console.log(Math.sign(0)); //0
+              console.log(Math.sign(-20000)); //-1
+              ```
 
    15. ## ES6对象方法扩展
 
-             1. `Object.is：判断两个值是否完全相等`
+         1. `Object.is：判断两个值是否完全相等`
 
-                   ```js
-                   console.log(Object.is(120,120)); //类似于===全等号，又不完全一样
-                   console.log(Object.is(NaN,NaN)); //true
-                   console.log(NaN === NaN); //false ,NaN与非数值比较之外，其余的都是false
-                   ```
+               ```js
+               console.log(Object.is(120,120)); //类似于===全等号，又不完全一样
+               console.log(Object.is(NaN,NaN)); //true
+               console.log(NaN === NaN); //false ,NaN与非数值比较之外，其余的都是false
+               ```
 
-             2. `Object.assign`：对象的合并
+         2. `Object.assign`：对象的合并
 
-                   ```js
-                   const config1 = {
-                       host:'localhost',
-                       port:3306
-                   }
-                   const config2 = {
-                       host:'http://google.ca',
-                       port:33060
-                   }
-                   console.log(Object.assign(config1, config2)); //相同属性，后面覆盖前面，非重复属性名合并
-                   ```
+               ```js
+               const config1 = {
+                   host:'localhost',
+                   port:3306
+               }
+               const config2 = {
+                   host:'http://google.ca',
+                   port:33060
+               }
+               console.log(Object.assign(config1, config2)); //相同属性，后面覆盖前面，非重复属性名合并
+               ```
 
-             3. `Object.setPrototypeOf`、`Object.getPrototypeof` ：原型对象操作
+         3. `Object.setPrototypeOf`、`Object.getPrototypeof` ：原型对象操作
 
-                   ```js
-                   const school = {
-                       name: '尚硅谷'
-                   }
-                   const city = {
-                       xiaoqu: ['beijing','shanghai']
-                   }
-                   Object.setPrototypeOf(school, city);
-                   console.log(Object.getPrototypeOf(school));
-                   console.log(school);
-                   ```
+               ```js
+               const school = {
+                   name: '尚硅谷'
+               }
+               const city = {
+                   xiaoqu: ['beijing','shanghai']
+               }
+               Object.setPrototypeOf(school, city);
+               console.log(Object.getPrototypeOf(school));
+               console.log(school);
+               ```
 
    16. ## 模块化
 
-             1. 模块化指将一个大的程序文件，拆分成许多小的文件，然后将小文件组合起来。
+         1. 模块化指将一个大的程序文件，拆分成许多小的文件，然后将小文件组合起来。
 
-                    2. 模块化优点：
+                2. 模块化优点：
 
-                     1. 防止命名冲突
-                     2. 代码复用
-                     3. 高维护性
+                 1. 防止命名冲突
+                 2. 代码复用
+                 3. 高维护性
 
-                    3. 模块化规范产品，ES6之前的模块化规范及产品有：
+                3. 模块化规范产品，ES6之前的模块化规范及产品有：
 
-                     1. CommonJS => NodeJS、Browserify
-                     2. AMD => requireJS
-                     3. CMD => seaJS
+                 1. CommonJS => NodeJS、Browserify
+                 2. AMD => requireJS
+                 3. CMD => seaJS
 
-                    4. ES6模块化语法
+                4. ES6模块化语法
 
-                     1. **export**命令用于规定模块的对外接口
+                 1. **export**命令用于规定模块的对外接口
 
-                        ```js
-                        //m1.js
-                        //1.分别暴露
-                        export let school = '尚硅谷';
-                        export function teach(){
-                            console.log("教你东西");
-                        }
-                        //2.统一暴露 m2.js
-                        export {school, teach}; 
-                        //3.默认暴露
-                        export default{ //任意类型，对象居多
-                            school:'AIGUIGU',
-                            change:function(){
-                                console.log("尚硅谷");
-                            },
-                        }
-                        ```
+                    ```js
+                    //m1.js
+                    //1.分别暴露
+                    export let school = '尚硅谷';
+                    export function teach(){
+                        console.log("教你东西");
+                    }
+                    //2.统一暴露 m2.js
+                    export {school, teach}; 
+                    //3.默认暴露
+                    export default{ //任意类型，对象居多
+                        school:'AIGUIGU',
+                        change:function(){
+                            console.log("尚硅谷");
+                        },
+                    }
+                    ```
 
-                     2. **import**命令用于输入其他模块提供的功能
+                 2. **import**命令用于输入其他模块提供的功能
 
-                        ```html
-                        <script type="module">
-                            //1.通用导入方式
-                            import * as m1 from './m1.js'; //m1的所有标记export 暴露的导入
-                            console.log(m1); //Module {Symbol(Symbol.toStringTag):"Module"}..
-                            import * as m3 from 'm3.js';
-                            m3.default.change();
-                            //2.解构赋值形式(统一暴露)
-                            import {school,teach} from 'm2.js'; //相当于分别暴露
-                            console.log(school);
-                            console.log(teach);
-                            import {school as guigu, findJob} from 'm2.js'; //重名用as重命名
-                            console.log(guigu);
-                            import {default as m3} from "m3.js";//对应默认暴露（观看行对象形式友好）
-                            //3.简便形式，针对默认暴露
-                            import m3 from "m3.js";
-                        </script>
-                        ```
+                    ```html
+                    <script type="module">
+                        //1.通用导入方式
+                        import * as m1 from './m1.js'; //m1的所有标记export 暴露的导入
+                        console.log(m1); //Module {Symbol(Symbol.toStringTag):"Module"}..
+                        import * as m3 from 'm3.js';
+                        m3.default.change();
+                        //2.解构赋值形式(统一暴露)
+                        import {school,teach} from 'm2.js'; //相当于分别暴露
+                        console.log(school);
+                        console.log(teach);
+                        import {school as guigu, findJob} from 'm2.js'; //重名用as重命名
+                        console.log(guigu);
+                        import {default as m3} from "m3.js";//对应默认暴露（观看行对象形式友好）
+                        //3.简便形式，针对默认暴露
+                        import m3 from "m3.js";
+                    </script>
+                    ```
 
-                    5. 在HTML中的引入
+                5. 在HTML中的引入
 
-                  ```html
-                  <!--HTML页面 引入一个js入口文件-->
-                  <script src="app.js" type="Module">
-                  </script>
-                  <!--JS文件-->
-                  <script>
-                      import * as m1 from "m1.js";
-                  </script>
-                  ```
+              ```html
+              <!--HTML页面 引入一个js入口文件-->
+              <script src="app.js" type="Module">
+              </script>
+              <!--JS文件-->
+              <script>
+                  import * as m1 from "m1.js";
+              </script>
+              ```
 
-                    6. **实际项目使用方式**
+                6. **实际项目使用方式**
 
-                     1. 因兼容性考虑，使用Babel编译方式（JavaScript编译器），将ES6编译成ES5语法。
-                     2. HTML引入编译后的文件。
-                     3. **Babel使用方式**
-                           1. 安装工具：babel-cli（命令行工具）、babel-preset-env（预设包，转换）、browserify（打包工具，也可用webpack打包但是需要配置环境）
-                           2. 安装命令：`npm i babel cli babel-preset-env browserify -D`； 
-                                 1. -D开发以来
+                 1. 因兼容性考虑，使用Babel编译方式（JavaScript编译器），将ES6编译成ES5语法。
+                 2. HTML引入编译后的文件。
+                 3. **Babel使用方式**
+                       1. 安装工具：babel-cli（命令行工具）、babel-preset-env（预设包，转换）、browserify（打包工具，也可用webpack打包但是需要配置环境）
+                       2. 安装命令：`npm i babel cli babel-preset-env browserify -D`； 
+                             1. -D开发以来
 
-                           3. 非全局安装**编译**使用命令：`npx babel src/js -d dist/js --preset=babel-preset-env`
-                                 1. -d：目标目录
-                                 2. --preset：预设环境
+                       3. 非全局安装**编译**使用命令：`npx babel src/js -d dist/js --preset=babel-preset-env`
+                             1. -d：目标目录
+                             2. --preset：预设环境
 
-                           4. **打包**入口文件：`npx browserify dist/js/app.js -o dist/bundle.js`
+                       4. **打包**入口文件：`npx browserify dist/js/app.js -o dist/bundle.js`
 
-                     4. 额外包实例 - jQuery
-                           1. 安装jQuery：`npm i jquery`
-                           2. 入口函数`app.js`导入：`import $ from 'jquery'`; 
-                                 1. 通过npm安装的不需要路径
-                                 2. 等同于`const $ = require("jquery");`
+                 4. 额外包实例 - jQuery
+                       1. 安装jQuery：`npm i jquery`
+                       2. 入口函数`app.js`导入：`import $ from 'jquery'`; 
+                             1. 通过npm安装的不需要路径
+                             2. 等同于`const $ = require("jquery");`
 
-                           3. 修改内容后，重新打包
-                                 1. `$('body').css('background','pink')`
+                       3. 修改内容后，重新打包
+                             1. `$('body').css('background','pink')`
 
    17. ## ES7新特性
 
@@ -7457,7 +7458,7 @@
 
                 1. dot `.` 元字符：除换行符以外的任意单个字符。
 
-                2. ```js
+                   ```js
                    //目标：提取<a>和<p>标签内容分别赋予变量
                    let str = `
                    	<ul>
@@ -7470,13 +7471,22 @@
                    			<p>上映日期：1994-07-6</p>
                            </li>
                    	</ul>`;
-                   const reg = /<li>\s+<a>(.*?)<\/a>\s+<p>/;
+                   const reg = /<li>\s+<a>(.*?)<\/a>\s+<p>/; //测试匹配
+                   const reg2 = /<li>\s+<a>(.*?)<\/a>\s+<p>(.*?)<\/p>/; //普通模式匹配
+                   const reg3 = /<li>.*?<a>(.*?)<\/a>.*?<p>(.*?)<\/p>/gs; //修正符 '/s'，让'.'匹配任意字符（用于换行）
                    const result = reg.exec(str);
-                   console.log(result);
+                   console.log(result); //[[Prototype]]: Array(0)
+                   let data = [];
+                   let result2;
+                   while(result2 = reg3.exec(str)){ //此处时=号不是==号
+                       console.log(result2);
+                       data.push({title:result2[1], time:result2[2]});
+                   }
+                   //输出结果
+                   console.log(data);
                    ```
-
+                
                 3. 
-
 
 
 
