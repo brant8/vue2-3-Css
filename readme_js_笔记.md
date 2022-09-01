@@ -7473,7 +7473,7 @@
                    	</ul>`;
                    const reg = /<li>\s+<a>(.*?)<\/a>\s+<p>/; //测试匹配
                    const reg2 = /<li>\s+<a>(.*?)<\/a>\s+<p>(.*?)<\/p>/; //普通模式匹配
-                   const reg3 = /<li>.*?<a>(.*?)<\/a>.*?<p>(.*?)<\/p>/gs; //修正符 '/s'，让'.'匹配任意字符（用于换行）
+                   const reg3 = /<li>.*?<a>(.*?)<\/a>.*?<p>(.*?)<\/p>/gs; //修正符 '/s'，让'.'匹配任意字符（用于换行/多个换行）
                    const result = reg.exec(str);
                    console.log(result); //[[Prototype]]: Array(0)
                    let data = [];
@@ -7485,8 +7485,228 @@
                    //输出结果
                    console.log(data);
                    ```
-                
-                3. 
+
+   20. ## ES10
+
+
+          1. `Object.fromEntries()` 转为对象
+
+             ```js
+             //二维数组
+             const result = Object.fromEntries([
+                 ['name','尚硅谷'],
+                 ['学科','大数据']
+             ]);
+             console.log(result); //[[Prototype]]: Object
+             //Map
+             const m = new Map();
+             m.set('name','ATGUIGU');
+             const result2 = Object.fromEntries(m);
+             console.log(result2); //[[Prototype]]: Object
+             ```
+
+          2. `Object.entries`ES8，把对象转为二维数组。
+
+             ```js
+             const arr = Object.entries({
+                 name:"尚硅谷"
+             });
+             console.log(arr); //[Array(2)]
+             ```
+
+          3. `trimStart()`与`trimEnd()`：清除左侧或者右侧空格
+
+             ```js
+             let str = "    ilove you   ";
+             console.log(str.trimStart());
+             console.log(str.trimEnd());
+             ```
+
+          4. `flap`和`flapMap`：将多维数组转为低位数组、降低Map维度
+
+             ```js
+             const arr = [1,2,3,4,[5,6,7]];
+             const arr2 = [1,2,3,4,[5,[6,7]]];
+             console.log(arr.flat()); //[1, 2, 3, 4, 5, 6, 7]
+             console.log(arr2.flat(2)); //[1, 2, 3, 4, 5, 6, 7] ,参数2表示深度
+             //Map
+             const arr = [1,2,3,4];
+             const result = arr.map(item => item * 10); //(4) [10, 20, 30, 40]
+             const result2 = arr.map(item => [item * 10]); //二维数组， (4) [Array(1), Array(1), Array(1), Array(1)]
+             const result2 = arr.flatMap(item => [item * 10]); //(4) [10, 20, 30, 40]
+             ```
+
+          5. `Symbol.prototype.description`：用来获取Symbol的字符串描述
+
+             ```js
+             let s = Symbol('尚硅谷');
+             console.log(s.description);
+             ```
+
+   21. ## ES11
+
+
+          1. 私有属性
+
+             ```js
+             class Person{
+                 //共有属性
+                 name;
+                 //私有属性
+                 #age;
+                 #weight;
+                 //构造方法
+                 constructor(name, age, weight){
+                     this.name = name;
+                     this.#age = age;
+                     this.#weight = weight;
+                 }
+                 intro(){
+                     console.log(this.#age);
+                 }
+             }
+             const girl = new Person('小红',18,'45kg');
+             console.log(girl.name);
+             console.log(girl.#age); //出错，外部无法访问私有属性
+             console.log(girl.intro());
+             ```
+
+          2. `Promise.allSettled([数组参数])`：返回一个始终成功的Promise对象
+
+             ```js
+             const p1 = new Promise((resolve, reject)=>{
+                 setTimeout(()=>{
+                     resolve('商品数据 - 1');
+                 },1000);
+             });
+             const p2 = new Promise((resolve, reject)=>{
+                 setTimeout(()=>{
+                     //resolve('商品数据 - 2');
+                     reject('出错啦！');
+                 },1000);
+             });
+             //调用 allsettled方法 ; 数组参数
+             const result = Promise.allSettled([p1, p2]);
+             /*
+             [[Prototype]]: Promise
+             [[PromiseState]]: "fulfilled"  --状态始终都是成功--
+             [[PromiseResult]]: Array(2)
+              ----当两个都是resolve--
+                 0: {status: 'fulfilled', value: '商品数据 - 1'}
+                 1: {status: 'fulfilled', value: '商品数据 - 2'}
+                 length: 2
+                 [[Prototype]]: Array(0)
+             ---当其中一个是reject时候---    
+             0: {status: 'fulfilled', value: '商品数据 - 1'}
+             1: {status: 'rejected', reason: '出错啦！'}
+             */
+             ```
+
+          3. `Promise.all([数组参数])`：返回结果根据参数的返回值决定。若参数有一个是reject，则返回结果是reject。必须都resolve其返回结果才是resolve。
+
+          4. `String.prototype.matchAll`：正则批量匹配结果。
+
+             ```js
+             //爬虫类使用率高的方法
+             let str = `
+             	<ul>
+             		<li>
+             			<a>肖申克的救赎</a>
+             			<p>上映日期：1994-09-10</p>
+                     </li>
+                     <li>
+             			<a>阿甘正传</a>
+             			<p>上映日期：1994-07-6</p>
+                     </li>
+             	</ul>`;
+             const reg = /<li>.*?<a>(.*?)<\/a>.*?<p>(.*?)<\/p>/gs; //s修正模式，批量匹配，需要用g（全文/字符串）
+             //调用方法
+             const result = str.matchAll(reg);
+             console.log(result);
+             //for...of （个人测试 不能与 扩展运算符 共存）
+             for(let v of result){
+                 console.log(v); 
+             }
+             //扩展运算符
+             const arr = [...result];
+             console.log(arr);
+             ```
+
+          5. console返回内容里面：
+
+             ```js
+             /*
+             RegExpStringIterator {}
+             	[[Prototype]]: RegExp String Iterator
+             		next: ƒ next()	 //此处ƒ next()表示可迭代对象
+             */
+             //可迭代对象可以使用 for...of迭代或者 扩展运算符展开
+             ```
+
+          6. 可选链操作符`?.`
+
+             ```js
+             function main(config){
+                 const dbHost = config && config.db && config.db.host; //使用逻辑与，判断是否为空值，若为空console会报错
+                 const dbHost = config?.db?.host; //查看config?.是否有传入，有传入则db?.查看db有无输入；若都没有不会报错，返回undefined
+                 console.log(dbHost);
+             }
+             main({
+                 db:{
+                     host:'192.168.1.100',
+                     username:'root'
+                 },
+                 cache:{
+                     host:'192.168.1.200',
+                     username:'admin'
+                 }
+             });
+             ```
+
+          7. 动态import：按需加载
+
+             ```js
+             //app.js入口函数
+             //import * as m1 from "./hello.js"; //静态导入
+             //获取元素
+             const btn = document.getElementById('btn');
+             btn.onclick = function(){
+                 import('./hello.js').then(module => {//动态导入
+                     console.log(module);
+                     module.hello();
+                 }); 
+             }
+             //hello.js
+             export function hello(){
+                 alert('hello');
+             }
+             
+             ```
+
+          8. `BigInt` 数据类型：大数值运算
+
+             ```js
+             //大整形
+             let n = 521n;
+             console.log(n, typeof(n));
+             let n = 123;
+             console.log(BigInt(n));
+             console.log(BigInt(1.2));//报错，非整形
+             //大数值运算
+             let max = Number.MAX_SAFE_INTEGER;
+             console.log(max);
+             console.log(max+1);
+             console.log(BigInt(max)+1); //报错，不能跟普通整型运算
+             ```
+
+          9. `globalThis` 全局对象 ：对全局参数的操作
+
+             ```js
+             console.log(globalThis);
+             ```
+
+          10. 
+
 
 
 
