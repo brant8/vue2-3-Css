@@ -7705,7 +7705,11 @@
              console.log(globalThis);
              ```
 
-          10. 
+
+
+
+
+
 
 
 
