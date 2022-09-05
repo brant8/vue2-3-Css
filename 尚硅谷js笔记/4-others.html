@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<button>点击发送</button>
+<button>点击发送</button>
+<script>
+    const btns = document.querySelectorAll('button');
+    let x=null;
+    //标识变量
+    let isSending = false; //表示是否正在发送AJAX请求。
+
+    btns[0].onclick = function(){
+        if(isSending) x.abort(); //如果正在发送，则取消该请求，创建一个新请求
+        x = new XMLHttpRequest();
+        //修改标识变量的值
+        isSending=true;
+        x.open('GET','http://127.0.0.1:8000/delay');
+        x.send();
+        x.onreadystatechange = function(){
+            if(x.readyState ===4){
+                //修改标识变量
+                isSending =false;//此处不需要再加状态码判断，无论请求成功失败
+            }
+        }
+    }
+    //abort取消请求
+    btns[1].onclick =function(){
+        x.abort();//不能直接使用x，因为x没有在btns[0]函数中，需要在全局声明变量
+    }
+</script>
+
+</body>
+</html>

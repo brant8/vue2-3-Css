@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>同源与跨域</title>
+    <style>
+        #result{
+        width: 200px;
+        height: 200px;
+        border:solid 1px deeppink;
+        }
+    </style>
+</head>
+<body>
+
+<div id="result"></div>
+<script>
+    //处理函数
+    function handle(data){
+        const result = document.getElementById('result');
+        result.innerHTML = data.name;
+    }
+    //在下面使用服务器打开js，app.js里面Network - Response可以返回该js文件的JS代码
+
+</script>
+<script src="http://localhost:63342/otherDoc/expressjs/7-app.js"></script>
+</body>
+</html>

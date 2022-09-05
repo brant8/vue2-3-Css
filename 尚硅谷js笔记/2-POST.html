@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+      #result{
+        width: 200px;
+        height: 200px;
+        border:solid 1px deeppink;
+      }
+    </style>
+</head>
+<body>
+
+<div id="result"></div>
+<script>
+    //获取元素
+    const result = document.getElementById("result");
+    //绑定事件
+    result.addEventListener("mouseover",function(){
+        // console.log("test");
+        //1.创建对象
+        const xhr = new XMLHttpRequest();
+        //初始化 设置类型与URL
+        xhr.open('POST','http://127.0.0.1:8000/server');
+        //设置预定义请求头
+        xhr.setRequestHeader('Content-Type','application/x-www-form-urluncoded');
+        //自定义请求头，浏览器安全机制若后台没有设置允许自定义请求头，前端会报错
+        xhr.setRequestHeader('name','atguigu');
+        //3.发送(带参数有不同格式)
+        xhr.send('a=100&b=200');
+        //xhr.send('a:100&b:200');
+        //4.事件绑定
+        xhr.onreadystatechange = function(){
+            //判断
+            if(xhr.readyState ==4 ){
+                if(xhr.status >=200 && xhr.status<300){
+                    //处理服务端返回的结果
+                    result.innerHTML=xhr.response;
+                }
+            }
+        }
+    })
+</script>
+
+</body>
+</html>

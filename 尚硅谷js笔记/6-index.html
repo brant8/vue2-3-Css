@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>同源与跨域</title>
+</head>
+<body>
+    <h1>同源与跨域</h1>
+    <button>点击获取用户</button>
+    <script>
+        const btn = document.querySelector('button');
+        btn.onclick=function(){
+            const x = new XMLHttpRequest();
+            //这里满足同源策略，即页面资源为6-index.html是来自server-page.js本地服务器的同端口9000,且用户数据也要来自同服务器，同端口号
+            // 所以url可以简写
+            x.open('GET','/data');
+            //发送
+            x.send();
+            x.onreadystatechange=function(){
+                if(x.readyState===4){
+                    if(x.status>=200 && x.status<300) {
+                        console.log(x.response); //或得到的数据
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

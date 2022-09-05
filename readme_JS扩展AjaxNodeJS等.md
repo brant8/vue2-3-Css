@@ -719,6 +719,167 @@
 
 2. `fetch()`较少使用。
 
+## 同源策略
+
+1. 同源策略 Same-Origin Policy，是浏览器的一种安全策略。
+
+2. **同源**：**协议、域名、端口号**，必须完全相同。
+
+3. 违背同源策略的就是**跨域**。
+
+4. **Ajax必须满足同源策略，才能发送请求**。
+
+5. 同源策略案例：
+
+   1. 服务器Express： server-page.js
+
+      ```js
+      const express = require('express');
+      const app = express();
+      
+      app.get('/home',(request,response)=>{
+          //响应一个页面
+          response.sendFile(__dirname + '/6-index.html')
+      });
+      app.get('/data',(request, response)=>{
+          response.send('用户数据');
+      })
+      
+      app.listen(9000, ()=>{
+          console.log("服务器已经启动");
+      })
+      ```
+
+   2. 用户根据地址访问：`127.0.0.1/home`获取到的页面`6-index.html`来自同个服务器
+
+      ```html
+      <h1>同源与跨域</h1>
+      <button>点击获取用户</button>
+      <script>
+          //页面中的Ajax
+          const btn = document.querySelector('button');
+          btn.onclick=function(){
+              const x = new XMLHttpRequest();
+              //这里满足同源策略，即页面资源为6-index.html是来自server-page.js本地服务器的同端口9000,且用户数据也要来自同服务器，同端口号
+              // 所以url可以简写
+              x.open('GET','/data');
+              //发送
+              x.send();
+              x.onreadystatechange=function(){
+                  if(x.readyState===4){
+                      if(x.status>=200 && x.status<300) {
+                          console.log(x.response); //得到的数据 
+                      }
+                  }
+              }
+          }
+      </script>
+      ```
+
+6. **解决跨域**：
+
+   1. JSONP - JSON with Padding，是一个**非官方**的跨域解决问题，只支持`get`请求。
+
+   2. 网页中有些标签天生具有跨域能力，如：`img`，`link`，`iframe`，`script`
+
+   3. JSONP就是利用script标签的跨域能力来发送请求的。
+
+      ```js
+      // JSONP 使用
+      //1. 动态的创建一个script标签
+      var script = document.createElement("script");
+      //2. 设置script的src，设置回调函数
+      //说明：Express服务器返回的是函数调用
+      script.src = "http://localhost:3000/checkusername";
+      //3. 将script插入到文档中
+      document.body.appendChild(script);
+      ```
+
+   4. JSONP理解：动态添加`<script>`标签
+
+      ```js
+      //jsonp服务
+      app.all('/jsonp-server',(request,response)=>{
+           response.send('hello jsonp-server'); //输出字符串 
+          //前端使用<script src='localhost/jsonp-server'>无法识别返回的内容（非JS代码），报错
+          
+          response.send('console.log("hello jsonp")');   //返回js代码可在console输出
+          
+          const data = {
+              name:'尚硅谷'
+          };
+          //将数据转化为字符串
+          let str = JSON.stringify(data);
+          //返回结果
+          response.end(`handle(${str})`);
+              //返回结果为函数调用：`handle(${str})`， 函数参数str为实际返回给客户端的数据（前端必须提前声明该函数）
+              // end()不会增加特殊响应头
+      });
+      ```
+
+   5. CTRL + F5： 强制刷新。
+
+7. jQuery 发送 JSONP请求（跨域请求）
+
+   1. 前端代码
+
+      ```js
+      $('button').eq(0).click(function(){
+          //$.getJSON('[url]?callback=?',Fn)
+          //此处的?会默认生成一个值（随机函数名），只需要后端返回相同值并且传入参数即可,XX(xx)
+          $.getJSON('http://127.0.0.1:8000/jquery-json-server?callback=?',function(data){
+             //console.log(data); 
+              $('#result').html(`
+              	名称：${data.name}<br>
+              	小区：${data.city}
+              `)
+          });
+      })
+      ```
+
+   2. 后端服务器代码
+
+      ```js
+      app.all('/jquery-jsonp-server',(request,response)=>{
+          const data = {
+              name:'尚硅谷',
+              city:['北京','上海']
+          };
+          //将数据转化为字符串
+          let str = JSON.stringify(data);
+          //接收callback参数 , cb即jquery的问好？的值
+          let cb = requuest.query.callback;
+          //返回结果（方法调用并传参）
+          response.end(`${cb}(${str})`)
+      });
+      ```
+
+8. **跨域请求另一种解决方案 CORS**
+
+   1. CORS - Cross-Origin Resource Sharing， 跨域资源共享。
+
+   2. CORS 是**官方**的跨域解决方案，其特点是不需要在客户端做任何特殊的操作，完全在服务器中进行处理，支持`get`和`post`请求。
+
+   3. 跨域资源共享标准新增了一组HTTP首部字段，允许服务器声明哪些源站通过浏览器有权限访问哪些资源。
+
+   4. CORS 如何工作的：通过设置一个响应头`Access-Control-Allow-Origin`来告诉浏览器，该请求允许跨域，浏览器接收到该响应以后就会对响应放行。
+
+   5. CORS 的使用：（参考火狐说明，关键字Access-Control-CORS）
+
+      1. 主要是服务器端的设置（常默认允许三个，Origin、Methods、Headers）
+
+         ```js
+         router.get("/testAJAX",function(req,res){
+             response.setHeader("Access-Control-Allow-Origin","http://127.0.0.1:5000");//限制网页和端口
+             response.setHeader("Access-Control-Allow-Origin","*");//允许所有URL进行跨域
+             response.setHeader("Access-Control-Allow-Methods","*");//默认允许HTTP的get和post，若需要put等其他，需要允许
+             response.setHeader("Access-Control-Allow-Headers","*");//自定义头信息参数
+             response.send('hello CORS');
+         })
+         ```
+
+      2. 前端AJAX正常写法
+
 
 
 
