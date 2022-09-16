@@ -467,7 +467,7 @@
     2. module变量时一个对象，它的`export`属性（即`module.exports`）时对外的接口。
     3. 加载某个模块，其实是加载该模块的module.exports属性。`require()`方法用于加载模块。
 
-## NPM与包
+## NPM
 
 1. Node.js 中的第三方模块又叫做 包。
 
@@ -564,11 +564,548 @@
 12. **快速创建`package.json`**
 
     1. npm包管理工具提供一个快捷命令，可以在执行命令时所处的目录中，快速创建配置文件
-    2. 快速创建命令：`npm init -y`
-    3. 注意：快速创建命令只能在英文目录下成功运行。不能出现空格。
+    2. **快速创建命令：`npm init -y`**
+    3. *注意*：快速创建命令只能在英文目录下成功运行。不能出现空格。
     4. 运行 npm install 命令安装包时，npm 包管理工具会自动把包的名称和版本号，记录到package.json中。
 
-13. 
+13. **`dependencies`节点**
+
+    1. 专门用来记录使用`npm install`命令装过哪些包及版本号。
+    2. 装多个包：`npm i jquery art-template` 使用空格
+
+14. 一次性安装所有的包
+
+    1. 当剔除了node_module文件夹以后，需要下载所有的包才能运行起来。
+    2. **安装所有包命令：`npm install`**
+    3. 该命令执行时，npm包管理工具会先读取package.json中的dependencies节点，读取依赖包和版本后，npm会一次性下载到项目中。
+
+15. 卸载包
+
+    1. 运行命令：`npm uninstall moment`
+    2. 卸载成功后，会自动从package.json中的dependencies删掉。
+
+16. **`devDependencies`节点**
+
+    1. 如果某些包旨在项目开发阶段会用到，在项目上线之后不会用到，则建议把这些包记录到devDependencies节点中。
+    2. 某些包在开发和项目上线之后都需要用到的，把其记录到dependencies节点中。
+    3. **安装命令：`npm i 包名 -D`** ；安装包到devDependencies节点中
+    4. 完整形式：`npm install 包名 --save-dev`
+    5. 如何判断是否安装在开发阶段：查看 npmjs.com 该包的安装命令，通常安装命令直接给出是否`-D`
+
+17. 切换npm的下包**镜像源**
+
+    1. 查看当前的下包镜像源：`npm config get registry`
+    2. 将下包的尽享元切换为淘宝镜像源：`npm config set registry=https://registry.npm.taobao.org/`
+    3. 检查镜像源是否下载成功：`npm config get registry`
+
+18. nrm工具
+
+    1. 为了方便切换下包镜像源，可以安装`nrm`小工具，利用nrm提供的终端命令，可以快速查看和切换下包镜像源。
+    2. 安装命令：`npm i nrm -g` ；
+    3. 查看所有可用的镜像源：`nrm ls`
+    4. 将下载包的镜像源切换为淘宝镜像：`nrm use taobao`
+
+## 包
+
+1. 包的分类：项目包、全局包。
+
+2. 项目包：被安装到项目`node_modules`目录中的包。
+
+3. 项目包分两类
+   1. 开发依赖包：记录到devDependencies节点中的包。关键字 `-D`
+   2. 核心依赖包：记录到dependencies节点的包。一直会用到。
+
+4. 全局包：`npm install 包 -g` ；参数 `-g`
+   1. 全局包安装到`C:\Users\用户目录\AppData\Roaming\npm\node_modules`目录下
+   2. 安装全局包：`npm i 包名 -g`
+   3. 卸载全局包：`npm uninstall 包名 -g`
+
+5. 只有**工具性质的包**，才有全局安装的必要性，因为其提供了好用的终端命令。
+   1. 判断某个包是否需要全局安装后才能使用，可以参考官方提供的说明即可。
+   2. 官方安装命令提示是否有 `-g`
+
+6. 工具包之 `i5ting_toc`：
+   1. `i5ting_toc`可以把md文档转为html页面的小工具
+   2. 安装为全局包命令：`npm install -g i5ting_toc`
+   3. 调用实现转换功能：`i5ting_toc -f 要转换的md文件路径 -o`
+
+7. 规范的包结构
+   1. 包必须以单独的目录而存在。
+   2. 包的顶级目录下必须包含package.json这个包管理配置文件。
+   3. package.json中必须包含name、version、main这三个属性，分别代表包的名字、版本号、包的入口。
+   4. main属性：require指向加载的文件，比如`'main':'./moment.js'`
+
+8. **案例：开发自己的包** 用于转义HTML标签
+
+   1. 创建一个文件夹（文件夹名字无所谓）包含index.js、package.json、README.md三个文件。
+
+   2. 初始化package.json（注意包名称需要唯一，可查看npmjs库搜一下创建对应的名字），[开源协议参考](https://www.jianshu.com/p/86251523e898)
+
+      ```json
+      {
+        "name": "itheima-tools",
+        "version": "1.0.0",
+        "main": "index.js",
+        "description": "提供了格式化时间，HTML Escape的功能 -- bbyo",
+        "keywords": ["itheima","dataFormat","escape"],
+        "license": "ISC"
+      }
+      ```
+
+   3. 在index.js中定义格式化时间的方法
+
+      ```js
+      function dateFormat(dataStr){
+          /**代码*/
+      }
+      //补零方法
+      function padZero(n){ /**代码*/ } 
+      //定义转义HTML字符函数
+      function htmlEscape(htmlStr){
+          return htmlStr.replace(/<|>|"|&/g,(match)=>{ //g表示全局匹配，即匹配多次/全部
+              switch(match){
+                  case '<':
+                      return '&lt;';
+                  case '>':
+                      return '&gt;';
+                  case '"':
+                      return '&quot;';
+                  case '&':
+                      return '&amp;';
+              }
+           });
+      }
+      //定义还原HTML字符串
+      function htmlUnEscape(str){
+          return str.replace(/&lt;|&gt;|&quot;|&amp;/g,(match)=>{
+              switch (match){
+                  case '&lt;':
+                      return '<';
+                  case '&gt;':
+                      return '>';
+                  case '&quot;':
+                      return '"';
+                  case '&amp;':
+                      return '&';
+              }
+          });
+      }
+      module.exports = {
+          dateFormat,
+          htmlEscape
+      }
+      ```
+
+   4. 对代码进行测试，文件夹外创建 test.js，使用`node ./test.js`测试代码运行清空
+
+      ```js
+      const itheima = require('./itheima-tools/index');
+      //const itheima = require('./itheima-tools'); //使用目录形式，默认指向index.js
+      const dtStr = itheima.dateFormat(new Date());
+      console.log(dtStr);
+      
+      const htmlStr = '<h1 title="abc">这是h1标签<span>123&nbsp;</span></h1>';
+      const str = itheima.htmlEscape(htmlStr);
+      console.log(str);
+      
+      let str2 = itheima.htmlUnEscape(str);
+      console.log(str2);
+      ```
+
+   5. 模块拆分：
+
+      1. 将时间格式化功能拆分到 src->dataFormat.js 中
+
+      2. 将处理HTML字符串的功能，拆分到 src->htmlEscape.js 中
+
+      3. 在index.js中，导入两个模块，得到需要向外共享的方法
+
+      4. 在index.js中，使用module.exports把对应的方法共享出去
+
+         ```js
+         //index.js
+         const date = require('./src/ddateFormat');
+         const escape = requrie('./src/htmlEscape');
+         //向外暴露需要的成员
+         module.exports = {
+             ...date, //es8中的展开对象、数组，date中多个到处的函数
+             ...escape
+         }
+         ```
+
+   6. 发布npm包
+
+      1. 注册npm账号
+      2. 在终端执行账号登陆命令：`npm login` ； 后输入登录信息
+      3. npm登录注意：需要把下包的服务器地址切换为npm官方，否则发布失败。
+      4. 切换目录到包的根目录，运行：`npm publish` ；即可发布到npm上。
+      5. 注意：包名唯一，且包名不能大写。
+
+   7. 删除已发布的包
+
+      1. 运行：`npm unpublish 包名 --force` ； 从npm删除已发布的包
+      2. `npm unpublish`命令只能删除72小时以内发布的包
+      3. `npm unpublish`删除的包，在24小时内不允许重复发布
+
+9. 模块：优先从缓存内加载
+
+   1. 模块在第一次加载后会被缓存。这页意味着多次调用`require()`方法不会导致模块的代码被执行多次。
+   2. 注意：不论是内置模块、用户自定义模块、还是第三方模块，都会优先从缓存中加载，从而提高模块的加载效率。
+
+10. 内置模块加载机制
+
+    1. 内置模块由Node.js 官方提供的模块，内置模块的加载优先级**最高**。
+    2. 例如：`require('fs')`始终返回内置的fs模块，即使在node_modules目录下由名字相同的包也叫做fs。
+
+11. 自定义模块加载机制
+
+    1. 使用`require()`加载自定义模块时，必须指定以`./`或`../`开头的路径标识符。在加载自定义模块时，如果没有指定`./`或`../`这样的路径标识符，则node 会把它当作内置模块或第三方模块进行加载。
+    2. 使用`require()`导入自定义模块时，如果省略了文件的扩展名，Node.js 会 按顺序 分别尝试加载以下文件
+       1. 按照确切的文件名进行加载
+       2. 补全`.js`扩展名进行加载
+       3. 补全`.json`扩展名进行加载
+       4. 补全`.node`扩展名进行加载
+       5. 加载失败，终端报错
+
+12. 第三方模块的加载机制
+
+    1. 如果传递给`require()`的模块标识符不是一个内置模块，也没有以`./`或`../`开头，则Node.js会从当前模块的父目录开始，尝试从`/node_modules`文件夹中加载第三方模块。
+    2. 如果没有找到对应的第三方模块，则移动到再上一层父目录中，进行加载，直到文件系统的根目录。
+    3. 如果 在`C:\Users\itheima\project\foo.js`调用了`require('tools')`，则Node.js会按以下顺序查找
+       1. `C:\Users\itheima\project\node_modules\tools`
+       2. `C:\Users\itheima\node_modules\tools`
+       3. `C:\Users\node_modules\tools`
+       4. `C:\node_modules\tools`
+       5. 找不到，报错
+
+13. 目录作为模块
+
+    1. 把目录作为模块标识符，传递给`require()`进行加载的时候，有三种加载方式
+       1. 在被加载的目录下查找一个叫做package.json的文件，并寻找`main 属性`，作为`require()`加载入口
+       2. 如果目录中没有`package.json`文件，或者`main`入口不存在或无法解析，则Node.js 将会视图加载目录下的index.js文件。
+       3. 如果上述都失败，则Node.js会在终端打印错误消息，报告模块的缺失。`Error:Cannot Find module 'xxx'`
+
+
+## Express
+
+1. Express是基于Node.js平台，快速、开放、极简的Web开发框架。
+
+2. Express的作用和Node.js内置的http模块类似，是专门用来创建Web服务器的。
+
+3. http 内置模块用起来复杂，开发效率低；Express是基于内置的http模块进一步封装出来的，能够极大的提高开发效率。
+
+4. 使用Express，前端服务器常见的：
+
+   1. Web网站服务器：专门对外提供Web网页资源的服务器。
+   2. API接口服务器：专门对外提供API接口的服务器。
+
+5. 安装Express：`npm i express@4.17.1`
+
+6. 创建基本Web服务器
+
+   ```js
+   //1.导入express
+   const express = require('express');
+   //2.创建web服务器
+   const app = express();
+   //3.其他操作，比如挂载路由
+   //4.调用app.listen（端口号，启动成功后的回调函数），启动服务器
+   app.listen(80, ()=>{
+       console.log('express server running at http://127.0.0.1');
+   })
+   ```
+
+7. 监听**GET请求**
+
+   1. 通过`app.get()`方法，可以监听客户端的GET请求，具体如下
+
+      ```js
+      //参数1：客户端请求的URL地址
+      //参数2：请求对应的处理函数
+      //	req：请求对象（包含了与请求相关的属性和方法）
+      //	res：响应对象（包含了与响应相关的属性与方法）
+      app.get('请求URL',function(req,res){ /*处理函数*/ })
+      ```
+
+8. 监听**POST请求**
+
+   1. 通过`app.post()`方法，可以监听客户端的GET请求，具体如下
+
+      ```js
+      //参数1：客户端请求的URL地址
+      //参数2：请求对应的处理函数
+      //	req：请求对象（包含了与请求相关的属性和方法）
+      //	res：响应对象（包含了与响应相关的属性与方法）
+      app.post('请求URL',function(req,res){ /*处理函数*/ })
+      ```
+
+9. 把内容**响应**给客户端
+
+   1. 通过`res.send()`方法，可以把处理好的内容，发送给客户端。
+
+      ```js
+      app.get('/user',(req, res)=>{
+          //向客户端发送JSON对象
+          res.send({
+              name:'zs',
+              age:20
+          });
+      })
+      app.post('/user',(res,req)=>{
+          //向客户端发送文本内容
+          res.send('请求成功');
+      })
+      ```
+
+10. 获取URL中携带的查询参数
+
+    1. 通过`req.query`对象，可以访问到客户端通过查询字符串的形式，发送到服务器的参数。
+
+       ```js
+       app.get('/',(req,res)=>{
+           //通过req.query可以获取到客户端发送过来的 查询参数
+           console.log(req.query);
+           res.send(req.query);
+       })
+       //前端访问传递参数方式：http://127.0.0.1/?name=zs&age=20
+       ```
+
+11. 获取URL中的动态参数
+
+    1. 通过req.params对象，可以访问到URL中，通过`:`匹配到的动态参数。
+
+       ```js
+       //URL地址中，可以通过:参数名的形式，匹配动态参数值
+       app.get('/user/:id',(req,res)=>{ //此处的:id 是一个动态参数
+          //req.params默认是一个空对象
+          //里面存放着通过 ： 动态匹配到的参数值
+          console.log(req.params);
+       })
+       //比如： http://127.0.0.1/user/1 
+       //结果: { "id":"1" }
+       ```
+
+12. 托管静态资源 - `expess.static()`
+
+    1. 通过`express.static()`，可以非常方便的创建一个*静态资源服务器*。
+
+    2. 例如：通过下面代码可以将public目录下的图片、CSS文件、JavaScript文件对外开放
+
+       ```js
+       app.use(express.static('public')); 
+       //即可以访问public目录中所有文件
+       //访问： http://localhost:3000/images/bg.jpg
+       ```
+
+    3. 注意：Express在指定的静态目录中查找文件，并对外提供资源的访问路径，因此，存放静态文件的目录名不会出现在URL中。
+
+    4. 若要托管多个静态资源目录，多次调用`express.static()`函数即可。
+
+    5. 注意：多个静态托管时，同个名称文件，先托管的优先级高。
+
+13. 挂载路径前缀 
+
+    1. 若在托管的资源访问路径之前，挂载路径前缀，可以使用如下
+
+       ```js
+       app.use('/public',express.static('public'));
+       //访问： http://localhost:3000/public/images/bg.jpg
+       ```
+
+14. 工具 - nodemon：能够监听项目的改动自动重启
+
+    1. 安装命令：`npm install -g nodemon`
+    2. 运行命令：`nodemon server.js`
+
+15. Express - 路由
+
+    1. Express中，路由指的是客户端的请求与服务器处理函数之间的映射关系。
+
+    2. Express中的路由分3部分组成，分别是请求的类型、请求的URL地址、处理函数。
+
+       ```js
+       //格式
+       app.METHOD(PATH, HANDLER)
+       //比如
+       app.get('/',function(req,res){
+           res.send('hello World');
+       })
+       ```
+
+    3. 每个请求到大服务器之后，需要先经过路由的匹配，只有匹配成功之后，才会调用对应的函数处理。
+
+       1. 匹配时，会按照*路由的顺序*进行匹配，如果请求类型和请求的URL同时匹配成功，则Express会将这次请求，转交给对应的function函数进行处理。
+       2. 注意路由顺序：即为代码`app.get('/',fn)`的先后顺序，先声明的代码先匹配。
+
+16. 模块化路由
+
+    1. 为了方便对路由进行模块化的管理，Express不建议将路由直接挂载到app上，而推荐将路由抽离为单独的模块。
+
+    2. 步骤
+
+       1. 创建路由模块对应的 .js文件
+       2. 调用`express.Router()`函数创建路由对象
+       3. 向路由对象上挂载具体的路由
+       4. 使用`module.exports`向外共享路由对象
+       5. 使用`app.use()`函数注册路由模块
+
+       ```js
+       //创建路由模块user.js
+       var express = require('express'); //1.导入express
+       var router = express.Router(); //2.路由对象
+       
+       router.get('/user/list',function(req,res){ //3.挂载具体的路由
+           res.send('Get user list.');
+       })
+       router.post('/user/add',function(req,res){
+           res.send('Add new user..');
+       })
+       
+       module.exports = router //4.导出路由对象
+       ```
+
+    3. 注册路由模块
+
+       ```js
+       //app.js
+       //..
+       //1.导入路由模块
+       const userRouter = require('./router/user.js');
+       //2.使用app.user()注册路由模块
+       app.use(userRouter);
+       //..
+       ```
+
+    4. 注意：`app.use()`的作用，就是用来注册全局中间件的。
+
+    5. 为路由模块添加前缀
+
+       1. 类似于托管静态资源，为挂载访问前缀一样。
+
+          ```js
+          //导入路由模块
+          const userRouter = require('./router/user.js');
+          //挂载路由前缀
+          app.use('/api',userRouter);
+          //访问 http://127.0.0.1/api/user/add
+          ```
+
+17. Express中间件：Middleware，特指业务流程的中间处理环节。
+
+    1. Express中间件调用流程
+
+       1. 当一个请求到大Express服务器之后，可以连续调用多个中间件，从而对这次请求进行预处理。
+
+    2. 格式：本质上是一个function处理函数
+
+       ```js
+       app.get('/',function(req,res,next){
+           next(); //表示把流转关系转交给下一个中间件或路由
+       })
+       /*
+       .get: 	 	HTTP method
+       '/': 	 	Path(route) for which middleware function applies
+       function: 	middleware function
+       req:		http request to middleware function
+       res:		http response to middleware function
+       next:		callback argument to middlefunction
+       */
+       ```
+
+    3. 注意：**中间件函数**的形参列表中，**必须包含next 参数**。而路由处理函数中只包含req和res。
+
+18. **全局生效中间件**：客户端发起的任何请求，到达服务器之后，都会触发的中间件，叫做全局生效的中间件。
+
+    1. 通过调用`app.use(中间件函数)`，即可定义一个全局生效的中间件
+
+       ```js
+       const mw = function (req,res,next){
+           console.log('简单的中间件函数');
+           next();
+       }
+       //全局生效的中间件
+       app.use(mw);
+       app.get('/'(req,res)=>{
+           res.send('homepage');
+       })
+       ..
+       ```
+
+    2. 定义全局中间件的简化形式
+
+       ```js
+       app.use(function (req,res,next){
+           console.log('简单的中间件函数');
+           next();
+       })
+       ```
+
+19. 中间件的作用
+
+    1. 多个中间件之间，共享同一份`req`和`res`。基于这样的特性，可以在上游的中间件中，统一为req或res对象添加自定义的属性或方法，供下游的中间件或路由进行使用。
+
+20. 定义多个全局中间件
+
+    1. 可以使用`app.use()`连续定义多个全局中间件。
+
+    2. 客户端请求达到服务器之后，会按照中间件的**先后顺序**依次进行调用。
+
+       ```js
+       app.use(function (req,res,next){
+           console.log('调用第一个简单的中间件函数');
+           next();
+       })
+       app.use(function (req,res,next){
+           console.log('调用第二个简单的中间件函数');
+           next();
+       })
+       ```
+
+21. 局部生效中间件
+
+    1. 不使用`app.use()`定义的中间件，叫做局部生效的中间件。
+
+       ```js
+       const mw1 = function(req,res,next){
+           next();
+       }
+       //此中间件mw1 只在当前路由中生效，属于局部
+       app.get('/',mw1,function(req,res){
+           res.send('Home page');
+       })
+       //mw1不会影响下面的路由
+       app.get('/user',function(req,res){ res.send('User page'); })
+       ```
+
+22. 定义多个局部中间件
+
+    1. 可以在路由中，通过下面两种等价的方式，使用多个局部中间件。
+
+       ```js
+       //以下两种写法是完全等价的，可以根据喜好任意选择 ; 注意调用顺序
+       app.get('/', mw1, mw2, (req,res) => { res.send('Home page'); })
+       app.get('/',[mw1, mw2], (req,res) =>{ res.send('Home page'); })
+       ```
+
+23. 中间件使用注意事项
+
+    1. 一定要在路由之前注册中间件
+    2. 客户端发送过来的请求，，可以连续调用多个中间件进行处理
+    3. 执行完中间件的业务代码之后，不要忘记调用`next()`函数
+    4. 为了防止代码逻辑混乱，调用`next()`函数后不要再写额外的代码
+    5. 连续调用多个中间件时，多个中间件之间，共享req和res对象。
+
+24. 中间件的分类 - 5大类
+
+    1. 应用级别的中间件
+       1. 通过`app.use()`或`app.get()`或`app.post()`，绑定到app实例上的中间件。
+    2. 路由级别的中间件
+       1. 绑定到`express.Router()`实力实例上的中间件。用于与应用级别中间件没有区别，只不过，应用级别中间件时绑定到app实例上，路由级别中间件绑定到router实例上。
+    3. 错误级别的中间件
+    4. Express内置的中间件
+    5. 第三方中间件
+
+​	
 
 
 
