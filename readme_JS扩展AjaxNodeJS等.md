@@ -1098,12 +1098,808 @@
 24. 中间件的分类 - 5大类
 
     1. 应用级别的中间件
+
        1. 通过`app.use()`或`app.get()`或`app.post()`，绑定到app实例上的中间件。
+
     2. 路由级别的中间件
+
        1. 绑定到`express.Router()`实力实例上的中间件。用于与应用级别中间件没有区别，只不过，应用级别中间件时绑定到app实例上，路由级别中间件绑定到router实例上。
+
+          ```js
+          var app = express()
+          var router = express.Router()
+          router.use(function(req,res,next){
+              next();
+          })
+          ```
+
     3. 错误级别的中间件
+
+       1. 作用：用来捕获整个项目中发生的异常错误，从而方式项目异常崩溃的问题。
+
+       2. 格式：`(err,req,res,next)`
+
+          ```js
+          app.get('/',function(req,res){
+              throw new Error('服务器内部发生了错误！');//1.抛出一个自定义的错误
+              res.send('Home Page'); //若没有下面捕获，前端页面显示‘错误页面’（类似404）
+          });
+          app.use(function(err,req,res,next){  //错误级别中间件
+              console.log('发生了错误: ' + err.message) //2.在服务器打印‘错误消息’
+              res.send('Error! ' + err.message); //3.向客户端响应‘错误相关的内容’而非错误页面
+          })
+          ```
+
+       3. 注意：错误级别的中间件，必须注册在所有路由之后。
+
     4. Express内置的中间件
+
+       1. 从Express 4.16.0版本开始，Express内置了3个常用的中间件，极大的提高了Express项目的开发效率和体验。
+
+       2. `express.static`：快速托管静态资源的内置中间件，如HTML、图片、CSS等。（无兼容性问题，任何版本均可使用）
+
+       3. `express.json`：解析JSON格式的请求体数据（有兼容性，4.16.0+版本）
+
+       4. `express.urlencoded`解析URL-encoded格式的请求体数据（有兼容性，尽在4.16.0+版本）
+
+          ```js
+          /*
+          Postman向服务器发送指定内容：
+          选择'POST'方式，输入'URL'，选择'Body'的'raw'中的'JSON'格式
+          内容区输入：{ "name":"zs", "age":13}
+          服务器接收：req.body 属性接收客户端发送过来的请求体数据，此处JSON格式
+          默认情况下，如果不配置表单数据的中间件，则 req.body 默认等于'undefined'
+          */
+          //配置解析 appication/json 格式数据的内置中间件
+          app.use(express.json());
+          /*
+          Postman向服务器发送指定内容：
+          选择'POST'方式，输入'URL'，选择'Body'的'x-www-form-urlencoded'中的键值对形式
+          内容区输入：Key【bookname】 - Value【水谷转】 - Description【】
+          服务器接收：req.body 属性接收客户端发送过来的请求体数据，此处url-encoded格式
+          默认情况下，如果不配置表单数据的中间件，则 req.body 默认等于'{}' 空对象
+          */
+          //配置解析 application/x-www-form-urlencoded 格式数据的内置中间件
+          app.use(express.urlencoded( {extended:false} ))
+          ```
+
+       5. 除了*错误级别的中间件*，其他的中间件，必须在路由之前进行配置
+
     5. 第三方中间件
+
+       1. 非Express官方内置，有第三方开发出来的，按需下载。
+       2. 在Express 4.16.0之前，经常使用'body-parser'这个第三方中间件，来解析请求体的数据。
+       3. 安装：`npm install body-parser`； 
+       4. 然后导入、调用`app.user(parser.urlencoded({ extended:false }))`注册中间件。
+
+25. 自定义中间件 - 案例
+
+    1. 手动模拟一个类似于express.urlencoded这样的中间件，来解析POST提交到服务器表单的数据。
+
+       1. 定义中间件
+       2. 监听req的data事件
+       3. 监听req的end事件
+       4. 使用querystring模块解析请求体数据
+       5. 将解析出来的数据对象挂载为req.body
+
+       ```js
+       //导入内置模块
+       const qs = require('querystring')
+       //解析表单数据的中间件
+       app.use(function(req,res,next){
+           //定义中间件具体的业务逻辑
+           //1.定义变量，用来存储客户端发送过来的请求体数据
+           let str = '';
+           //2.监听req对象的data事件（客户端发送过来的新的请求体数据）
+           req.on('data',(chunk)=>{
+           	//拼接请求体数据，隐式转换为字符串
+           	str += chunk;
+       	});
+           //3.监听req对象的end事件（请求体发送完毕后自动触发）
+           req.on('end',()=>{
+               //打印完整的请求体数据
+               console.log(str)
+               //TODO：把字符串格式的请求体数据，解析成对象格式
+               //4.调用qs.parse()方法，把查询字符串解析为对象
+           	const body = qs.parse(str);
+               console.log(body);
+               //5.将解析出来的请求体对象，挂在为 req.body 属性
+               req.body = body;
+               next(); //交给其他或路由使用
+           })
+       })
+       
+       ```
+
+    2. 监听 req 的 data 事件：获取客户端发送到服务端的数据。
+
+       1. 如果数据量比较大，无法一次性发送完毕，则客户端会数据切割后，分批发送到服务器。所以data事件可能会触发多次，每一次触发data事件时，获取到的数据只是完整数据的一部分，需要手动对接收到的数据进行拼接。
+
+    3. 监听 req 的 end 事件：请求体数据接收完毕之后，会自动触发req的end事件。
+
+       1. 可以在req的end事件中，拿到并处理完整的请求体数据。
+
+    4. 使用 querystring 模块解析请求体数据
+
+       1. Node.js内置了一个 querystring 模块，专门用来处理查询字符串。通过这个模块提供的`parse()`函数，可以轻松查询字符串，解析成对象的格式。
+
+    5. 将解析出来的数据对象挂载为 req.body
+
+       1. 上游的中间件和下游的中间件及路由之间，共享同一份req 和 res。因此，可以将解析出来的数据，挂载为req的自定义属性，命名为`req.body`，供下游使用。
+
+    6. 将自定义中间件封装为模块
+
+       1. 为了优化代码的结构，我们可以把自定义的中间件函数，封装为独立的模块
+
+          ```js
+          //custom-body-parse.js 代码
+          const qs = require('querystring');
+          function bodyParser(req, res, next){ /*逻辑代码*/}
+          module.exports = bodyParser //向外导出解析请求体数据的中间件函数
+          //--------分割----
+          //1.导入自定义的中间件模块
+          const myBBodyParser = require('custom-body-parser');
+          //2.注册自定义的中间件模块，注册为全局可用的中间件
+          app.use(myBodyParser);
+          app.post(...)
+          ```
+
+26. 编写接口
+
+    1. 先创建一个基本服务器
+
+       ```js
+       //app.js
+       const express = require('express');
+       const app = express();
+       //代码...
+       app.listen(80,function(){
+           console.log("expressserver running ..")
+       })
+       ```
+
+    2. 创建API路由模块
+
+       ```js
+       //apiRouter.js 路由模块
+       const express = require('express');
+       const apiRouter = express.Router();
+       //代码...GET/POST等
+       module.exports = apiRouter
+       
+       //app.js
+       const apiRouter = require('./apiRouter.js');
+       app.use('/api',apiRouter);//注册全局中间件
+       ```
+
+    3. 编写GET接口
+
+       ```js
+       apiRouter.get('/get',(req,res)=>{
+           //1.获取到客户端通过查询字符串，发送到服务器的数据
+           const query = req.query;
+           //2.调用res.send()方法，把数据响应给客户端
+           res.send({
+               status:0, //状态码，0表示成功，1表示失败
+               msg:'GET请求成功！', //状态描述
+               data:query //响应给客户端的具体数据
+           })
+       })
+       //访问地址：127.0.0.1/api/get
+       ```
+
+    4. 编写POST接口
+
+       ```js
+       apiRouter.post('/post',(req,res)=>{
+           //1.获取到客户端通过请求体，发送到服务器的URL-encoded数据
+           const body = req.body;
+           //2.调用res.send()方法，把数据响应给客户端
+           res.send({
+               status:0, //状态码，0表示成功，1表示失败
+               msg:'GET请求成功！', //状态描述
+               data:body //响应给客户端的具体数据
+           })
+       })
+       //注意：如果要获取URL-encoded格式的请求体数据，必须配置中间件app.use(express.urlencoded({extended:false}))
+       //访问地址：127.0.0.1/api/post?
+       ```
+
+    5. 接口跨域问题
+
+       1. 以上编写的GET和POST接口，存在一个严重的问题：**不支持跨域请求**。
+
+    6. 解决跨域问题：
+
+       1. CORS：主流解决方案，推荐使用。
+       2. JSONP：有缺陷的解决方案，只支持GET请求
+
+27. CORS跨域资源共享
+
+    1. CORS - Cross-Origin Resource Sharing，跨域资源共享， 由一些列HTTP响应头组成，**这些HTTP响应头决定浏览器是否阻止前端JS代码跨域获取资源**。
+
+    2. 浏览器的同源安全策列默认会阻止网页“跨域”获取资源。如果接口服务器配置了CORS相关的HTTP响应头，就可以解除浏览器端的跨域访问限制。
+
+    3. CORS注意事项
+
+       1. CORS主要在服务器端进行配置。客户端浏览器无需做任何额外的配置，即可请求开启了CORS的接口。
+       2. CORS在浏览器中有兼容性。只有支持 *XMLHttpRequest Level2* 的浏览器，才能正常访问开启了CORS的服务端接口。如 IE10+、CHrome4+、FireFox3.5+。
+
+    4. 使用 **cors中间件** 解决跨域问题：
+
+       1. 通过安装和配置 Express的第三方 cors中间件，可以方便的解决跨域问题。
+       2. 步骤一：安装中间件 `npm install cors`
+       3. 步骤二：使用 `const cors = require('cors')`
+       4. 步骤三： 在路由之前调用（全局）`app.use(cors())`
+
+    5. CORS响应头部 - *Access-Control-Allow-**Origin***
+
+       1. 响应头部中可以携带一个 Access-Control-Allow-Origin 字段
+
+          ```js
+          Access-Control-Allow-Origin: <origin> | *
+          ```
+
+       2. 其中，origin 参数的值指定了允许访问该资源的外域URL。
+
+          ```js
+          //只允许来自http://itcase.cn的请求
+          res.setHeader('Access-Control-Allow-Origin','http://itcast.cn');
+          //通配符*， 允许来自任何域的请求
+          res.setHeader('Access-COntrol-Allow-Origin','*');
+          ```
+
+    6. CORS响应头部 -  *Access-Control-Allow-**Headers***
+
+       1. 默认情况下，CORS仅支持客户端向服务器发送**如下9个请求头**。
+
+       2. Accept、Accept-Language、Content-Language、DPR、Downlink、Save-Data、Viewport-Width、Width、Content-Type（值仅限于 text/plain、multipart/form-data、application/x-www-form-urlencoded三者之一）
+
+       3. 如果客户端向服务器发送了额外的请求头信息，则需要在服务器端，通过Access-Control-Allow-Headers对额外的请求头进行声明，否则这次请求会失败。
+
+          ```js
+          //比如：允许客户端额外向服务器发送Content-Type请求头和X-Custom-Header请求头
+          //注意：多个请求头之间使用英文的逗号进行分割
+          res.setHeader('Access-Control-Allow-Headers','Content-Type,X-Custom-Header')
+          ```
+
+    7. CORS响应头部 -  *Access-Control-Allow-**Methods***
+
+       1. 默认情况下，CORS仅支持客户端发起GET、POST、HEAD请求。
+
+       2. 如果客户端希望通过PUT、DELETE等方式请求服务器的资源，则需要在服务器端，通过 Access-Control-Allow-Headers来指明实际请求所允许使用的HTTP方法
+
+          ```js
+          //只允许POST、GET、DELETE、HEAD请求方法
+          res.setHeader('Access-Control-Allow-Methods','POST,GET,DELETE,HEAD');
+          //允许所有的HTTP请求方法
+          res.setHeader('Access-Control-Allow-Methods','*');
+          ```
+
+    8. CORS请求的分类
+
+       1. 客户端在请求CORS接口时，根据请求方式和请求头的不同，可以将CORS的请求分为两大类
+       2. **简单请求**：**同时**满足以下两大条件
+          1. 请求方式：GET、POST、HEAD三者之一
+          2. HTTP头部信息不超过以下几种字段：**无自定义头部字段**、Accept、Accept-Language、Content-Language、DPR、Downlink、Save-Data、Viewport-Width、Width、Content-Type（值仅限于 text/plain、multipart/form-data、application/x-www-form-urlencoded三者之一）
+       3. **预检请求**：满足以下任何条件之一
+          1. 请求方式：GET、POST、HEAD之外的请求Method类型
+          2. 请求头部包含自定义头部字段
+          3. 向服务器发送了 application/json 格式的数据。
+       4. 预检请求的说明：在浏览器与服务器正式通信之前，浏览器会先发送OPTION请求进行预检，以获知服务器是否允许该实际请求，所以这一次的OPTION请求称为“预检请求”。服务器成功响应预检请求后，才会发送真正的请求，并携带真是数据。
+
+    9. 简单请求与预检请求的区别
+
+       1. 简单请求特点：客户端与服务器之间只会发生一次请求。
+       2. 预检请求的特点：客户端与服务器之间会发生两次请求，OPTION预检请求成功之后，才会发起真正的请求。
+       3. 测试：使用DELETE请求，使用jQuery发送DELETE请求，Express设置`.delete()`，可在浏览器的'网络'中看到点击DeleteBtn会发生两次请求。
+
+    10. JSONP概念与特点
+
+        1. 概念：
+           1. 浏览器通过`<script>`标签的src属性，请求服务器上的数据，同时，服务器返回一个函数的调用。这种请求叫做JSONP。
+        2. 特点：
+           1. JSONP不属于真正的Ajax请求，因为它没有使用XMLHttpRequest这个对象。
+           2. JSONP仅支持GET请求，不支持POST、PUT、DELETE请求。
+
+    11. JSONP接口：
+
+        1. 如果项目中已经配置了CORS跨域资源共享，为了防止冲突，必须在配置CORS中间件之前声明JSONP的接口。否则JSONP接口会被处理成开启了CORS的接口。
+
+           ```js
+           //1.优先创建JSONP 接口，【这个接口不会被处理成CORS接口】 先后顺序
+           app.get('/api/jsonp',(req,res)=>{ /*..*/});
+           //2.再配置CORS中间件 【后续的所有接口，都会被处理成CORS接口】
+           app.use(cors());
+           //3.这是一个开启了CORS的接口
+           app.get('/api/get',(req,res)=>{ /*...*/})
+           ```
+
+        2. 实现JSONP接口步骤
+
+           1. 获取客户端发送过来的回调函数的名字
+           2. 得到要通过JSONP形式发送给客户端的数据
+           3. 根据前两部得到的数据，拼接处一个函数调用的字符串
+           4. 把上一步拼接得到的字符串，响应给客户端的`<script>`标签进行解析执行
+
+           ```js
+           app.get('/api/jsonp',(req,res)=>{
+               //1.获取客户端发送来的回调函数的名字
+               const funcName = req.query.callback
+               //2. 得到要通过JSONP形式发送给客户端的数据
+               const data = { name:'zs', age:22 }
+               //3. 根据前两部得到的数据，拼接处一个函数调用的字符串
+               const scriptStr = `${funcName}(${JSON.stringify(data)})`; //JSON.stringify将data对象转成字符串
+               //4.把上一步拼接得到的字符串，响应给客户端的<script>标签进行解析执行
+               res.send(scriptStr)
+           })
+           ```
+
+        3. 网页端代码
+
+           ```html
+           <button id="btnJSONP">JSONP</button>
+           <script>
+           //调用$.ajax()，提供JSONP的配置选项，从而发起JSONP请求，代码如下
+           $('#btnJSONP').on('click'，function(){
+               $.ajax({
+                   method:'GET',
+                   url:'http://127.0.0.1/api/jsonp',
+                   dataType:'jsonp',//表示要发起JSONP的请求
+                   success:function(res){
+                       console.log(res)
+                   }
+               })
+           })
+           </script>
+           ```
+
+## 数据库
+
+1. MySQL、Oracle、SQL Server属于传统型数据库（又叫：关系型数据库或SQL数据库），这三者设计理念相同，用法比较类似。
+
+2. Mongodb属于新型数据库（又叫：非关系型数据库或NoSQL数据库），弥补了传统数据库的缺陷。
+
+3. Excel的数据组织结构：
+
+   1. 每个Excel中，数据的阻止结构分别为工作簿（整个excel）、工作表（下标的不同表名）、数据行、列 这四大部分组成。
+
+4. 传统型数据库的数据组织结构：
+
+   1. 传统型数据库，数据的阻止结构分为数据库（database）、数据表（table）、数据行（row）、字段（field） 这四大部分组成。
+
+5. MySQL Server：专门用来提供数据存储和服务的软件。
+
+   1. 安装注意事项：若提示错误，需要安装NDP452环境 - KB2901907
+
+6. MySQL Workbench：可视化MySQL管理工具。
+
+7. Express 项目中操作数据库
+
+   1. npm安装MySQL数据库的第三方模块（mysql）
+
+      1. 安装：`npm install mysql`
+
+      2. 使用之前需要对MySQL模块进行必要的配置 
+
+         ```js
+         //1.导入mysql模块
+         const mysql = require('mysql');
+         //2.建立与Mysql数据库的链接
+         const db = mysql.createPool({
+             host:'127.0.0.1',
+             user:'root',
+             password:'',
+             database:'my_db_01'
+         })
+         ```
+
+   2. 通过mysql模块连接到MySQL数据库
+
+   3. 通过mysql模块执行SQL语句
+
+      ```js
+      //检测mysql模块能否正常工作
+      db.query('select 1',(err, results)=>{
+          if(err) return console.log(err.message);
+          //只要能打印出 [RowDataPacket {'1':1} ]的结果，就证明数据库连接正常
+          console.log(results);
+      })
+      ```
+
+8. 查询
+
+   ```js
+   const sqlStr = 'select * from users';
+   db.query(sqlStr, (err,results)=>{
+       //查询失败
+       if(err) return console.log(err.message);
+       //查询成功 如果执行的是select语句，则执行的结果是数组。
+       console.log(results);
+   })
+   ```
+
+9. 插入
+
+   ```js
+   //1.要插入到users表中的数据对象
+   const user = {username:'spider',password:'pcc333'};
+   //2.待执行的sql语句，其中英文的？表示占位符
+   const sqlStr = 'insert into users (username, password) values (?,?)';
+   //3.使用数组形式，依次为？占位符指定具体的值
+   db.query(sqlStr, [user.username, user.password], (err, results)=>{
+       if(err) return console.log(err.message) //失败
+       //如果执行的是 insert into 插入语句， 则results是一个对象
+       if(results.affectedRows === 1) {console.log('插入数据成功'); }
+   })
+   ```
+
+10. 插入 - 便捷方式 set
+
+    ```js
+    //1.要插入到users表中的数据对象
+    const user = {username:'spider',password:'pcc333'};
+    //2.待执行的sql语句，其中英文的？表示占位符
+    const sqlStr = 'insert into users set ?';
+    //3.使用数组形式，依次为？占位符指定具体的值
+    db.query(sqlStr, user, (err, results)=>{
+        if(err) return console.log(err.message) //失败
+        //如果执行的是 insert into 插入语句， 则results是一个对象
+        if(results.affectedRows === 1) {console.log('插入数据成功'); }
+    })
+    ```
+
+11. 更新
+
+    ```js
+    //1.要更新的数据对象
+    const user = {id:7, username:'aaa', password:'000'};
+    //2.要执行的SQL语句
+    const sqlStr = 'update users set username=?,password=? where id=?'
+    /*便捷方式
+    const sqlStr = 'update users set ? where id=?'
+    */
+    //3.调用db.query()执行SQL语句的同时，使用数组依次为占位符指定具体的值
+    db.query(sqlStr,[user.username,user.password,user.id],(err,results)=>{
+    /*便捷方式
+    db.query(sqlStr,[user,user.id],(err,results)=>{
+    */    
+        if(err) return console.log(err.message);
+        if(results.affectedRows === 1){console.log('更新数据成功!');}
+    })
+    ```
+
+12. 删除
+
+    ```js
+    //要执行的SQL语句
+    const sqlStr = 'delete from users where id=?';
+    //调用db.query()执行SQL语句的同时，为占位符指定具体的值
+    //注意：如果SQL语句中有多个占位符，必须使用数组为每个占位符指定具体的值
+    //	如果SQL语句中只有一个占位符，则可以省略数组
+    db.query(sqlStr,7,(err,results)=>{
+        if(err) return console.log(err.message);
+        if(results.affectedRows === 1){console.log('删除数据成功!');}
+    })
+    ```
+
+13. **标记删除**
+
+    1. 使用DELETE语句，会把真正的数据从表中删除掉。为了保险起见，推荐使用标记删除的形式，来模拟删除的动作。
+
+    2. 所谓的标记删除，就是在表中设置类似于**status**这样的状态字段，来标记当前这条数据是否被删除。
+
+    3. 当用户执行了删除的动作时，并没有执行DELETE语句把数据删除掉，而是执行了UPDATE语句，将这条数据对应的status字段标记为删除即可。
+
+       ```js
+       //标记删除：使用UPDATE语句替代DELETE语句；只更新数据的状态，并没有真正的删除
+       db.query('update users set status=1 where id=?',6,(err,results)=>{
+           if(err) return console.log(err.message);
+           if(results.affectedRows === 1){console.log('删除数据成功!');}
+       })
+       ```
+
+## 前后端身份认证
+
+1. Web开发模式
+
+   1. 基于服务端渲染的传统Web
+   2. 基于前后端分离的新型Web
+
+2. 服务端渲染的Web开发
+
+   1. 概念：*服务器*发送给客户端的HTML页面，是在服务器通过字符串的拼接，动态生成的。因此，客户端不需要使用Ajax这样的技术额外请求页面的数据。如下代码
+
+      ```js
+      app.get('/index.html',(req,res)=>{
+          //1.要渲染的数据
+          const user = {name:'zs', age:20};
+          //2.服务器端通过字符串的拼接，动态生成HTML内容
+          const html = `<h1>姓名：${user.name},年龄：${user.age}</h1>`
+          //3.把生成好的页面内容响应给客户端。因此客户端拿到的是带有真实数据的HTML页面
+          res.send(html);
+      })
+      ```
+
+   2. 优点：
+
+      1. 前端耗时少：服务器端负责动态生成HTML内容，浏览器只需要直接渲染页面即可。尤其是移动端，更省电。
+      2. 有利于SEO：因为服务端响应的是完整的HTML页面内容，所以爬虫更容易爬取获得信息，更有利于SEO。
+
+   3. 缺点：
+
+      1. 占用服务器端资源：即服务器端完成HTML页面内容的拼接，如果请求较多，会对服务器造成一定的访问压力。
+      2. 不利于前后端分离，开发效率低：使用服务器端渲染，则无法进行分工合作，尤其对于前端复杂度高的项目，不利于项目高效开发。
+
+3. 前后端分离的Web开发模式
+
+   1. 概念：前后端分离的开发模式，依赖于Ajax技术的广泛应用。简而言之，前后端分离的Web开发模式，就是后端只负责提供API接口，前端使用Ajax调用接口的开发模式。
+   2. 优点：
+      1. 开发体验好：前端专注于UI页面的开发，后端专注于api的开发，且前端有更多的选择性。
+      2. 用户体验好：Ajax技术的广泛应用，极大的提高了用户的体验，可以轻松实现页面的局部刷新。
+      3. 减轻了服务器端的渲染压力：因为页面最终是在每个用户的浏览器中生成的。
+   3. 缺点：
+      1. 不利于SEO：因为完整的HTML页面需要在客户端动态拼接完成，所以爬虫对无法爬取页面的有效信息。（解决方案：利用Vue、React等前端框架的SSR - server side render 技术能够很好的解决SEO问题）
+
+4. 实际：根据业务场景
+
+   1. 企业级网站：主要功能，展示，没有复杂的交互，并且有良好的SEO，使用服务器端渲染。
+   2. 后台管理项目：交互性比较强，不需要考虑SEO，那么使用前后端分离的开发模式。
+   3. 同时兼容首页的渲染速度和前后端分离的开发效率，一些网站采用了首屏服务器端渲染 + 其他页面前后端分离的开发模式。
+
+5. 身份认证
+
+   1. Authentication，身份验证、鉴权，是指通过一定的手段，完成对用户身份的确认。
+   2. 不同开发模式下的身份认证
+      1. 服务端渲染：推荐使用 Session 认证机制
+      2. 前后端分离：推荐使用 JWT 认证机制
+
+6. Session认证机制
+
+   1. **HTTP协议的无状态性**
+      1. 指的是，客户端的每次HTTP请求都是独立的，连续多个请求之间没有直接的关系，服务器不会主动保留每次HTTP请求的状态。
+   2. Cookie
+      1. Cookie是存储在用户浏览器中的一段**不超过4KB的字符串**。由一个名称Name、一个值Value和其他几个用于空值Cookie 有效期、安全性、使用范围的可选属性组成。
+      2. 浏览器保存的位置：F12 - Application - Storage - Cookies
+      3. 不同域名下的Cookie各自独立，每当客户端发起请求时，会自动把当前域名下所有未过期的Cookie一同发送到服务器。
+   3. Cookie几大特性
+      1. 自动发送：发起请求时自动发送
+      2. 域名独立：不同域名不同cookie
+      3. 过期时限：有效期内的Cookie 才会被发送
+      4. 4KB限制：键值对形式
+
+7. Cookie在身份认证中的作用
+
+   1. 客户端**第一次**请求服务器时，服务器通过响应头的形式，向客户端发送一个身份认证的Cookie，客户端会自动将Cookie保存在浏览器中。
+   2. 随后，当客户端浏览器*每次*请求服务器的时候，浏览器会**自动**将身份认证相关的Cookie，通过请求头的形式发送给服务器，服务器即可验明客户端的身份。
+
+8. Cookie**不具有**安全性
+
+   1. 由于Cookie时存储在浏览器中的，而且浏览器页提供了读写Cookie的API，因此Cookie很容易被伪造，不具有安全性。因此**不建议**服务器将**重要的隐私数据**，通过Cookie的形式发送给浏览器。
+
+9. Session工作原理
+
+   ```js
+   浏览器								服务器
+   |->客户端登录：提交账号密码				|
+       					 	       | 验证账号和密码
+    服务器响应：将生成的Cookie响应给客户端<-| 将登陆成功后的用户信息存储在服务器内存中，同时生成对应的Cookie字符串
+   | 浏览器自动把Cookie存储在当前域名下
+   |->客户端再次发起请求时，通过请求头自动把当前域名下所有可用的Cookie发送给服务器
+   									|服务器根据请求头携带的Cookie，从内存中查找对应的用户信息
+    服务器响应：把当前用户对应的页面内容响应给浏览器<-|用户的身份认证成功后，服务器针对当前用户生成特定的相应内容
+   
+   ```
+
+10. 安装express-session中间件
+
+    1. 安装命令：`npm install express-session`
+
+    2. 配置express-session中间件：
+
+       ```js
+       //app.js
+       //1.导入session中间件
+       var session = require('express-session');
+       //2.配置Session中间件（全局）
+       app.use(session({
+           secret:'keyboard cat', //secret属性的值可以为任意字符串
+           resave: false, //固定写法
+           saveUninitialized: true //固定写法
+       }))
+       ```
+
+    3. 向session中存数据：
+
+       1. 当express-session中间件配置成功后，才可以通过`req.session`来访问和使用session对象，从而存储用户的关键信息。
+
+          ```js
+          app.post('/api/login',(req,res)=>{
+              //判断用户提交的登录信息是否正确
+              if(req.body.username !== 'admin' || req.body.password !== '000000'){
+                  return res.send({status:1, msg:'登陆失败'});
+              }
+              req.session.user = req.body //追加自定义属性，将用户的信息，存储到Session中
+              req.session.islogin = true //将用户的登陆状态，存储到Session中
+              res.send({status:0,msg:'登录成功'});
+          })
+          ```
+
+    4. 从session中取数据
+
+       ```js
+       app.get('/api/username',(req,res)=>{
+           //判断用户是否登录
+           if(!req.session.islogin){
+               return res.send({ status:1, msg:'fail'});
+           }
+           res.send({ status:0, msg:'success',username:req.session.user.username })
+       ```
+
+    5. 清空session
+
+       ```js
+       //退出登录时
+       app.post('/api/logout',(req,res)=>{
+           req.session.destroy();
+           res.send({
+               status:0,
+               msg:'退出登录'
+           });
+       })
+       ```
+
+11. **JWT认证机制**
+
+    1. Session认证的局限性：
+
+       1. Session认证机制需要配合Cookie才能实现。由于Cookie默认不支持跨域访问，所以，当设计到前端跨域请求后端接口的时候，需要做很多额外的配置，才能实现跨域Session认证。
+       2. 注意：
+          1. 当前端请求后端接口不存在跨域问题的时候，推荐使用Session身份认证机制。
+          2. 当前端需要跨域请求后端接口的时候，不推荐使用Session身份认证机制，推荐使用 JWT 认证机制。
+
+    2. JWT：JSON Web Token，目前最流行的跨域认证解决方案。
+
+    3. JWT工作原理
+
+       ```js
+       浏览器								服务器
+       |->客户端登录：提交账号密码				|
+           					 	       | 验证账号和密码
+        服务器响应：将生成的Token响应给客户端<-| 将登陆成功后的用户信息存储在服务器内存中，同时生成对应的Token字符串
+       | 讲Token存储到LocalStorage或SessionStorage
+       |->客户端再次发起请求时，通过请求头Authorization字段，将Token发送给服务器
+       									|服务器把Token字符串还原成用户的信息对象
+        服务器响应：把当前用户对应的页面内容响应给浏览器<-|用户的身份认证成功后，服务器针对当前用户生成特定的相应内容
+       
+       ```
+
+    4. JWT工作原理总结：用户的信息通过Token字符串的形式，保存在客户端浏览器中。服务器通过还原Token字符串的形式来认证用户的身份。
+
+    5. **JWT组成部分**：Header头部、Payload有效荷载、Signature签名。
+
+       1. 三者使用英文“.”分隔：`Header.Payload.Signature`
+
+          ```js
+          //示例
+          afasdfasdfasdf.adsfasdfasdf.adsfadsfa
+          ```
+
+       2. Payload：才是真正的用户信息，它是用户信息经过加密之后生成的字符串。
+
+       3. Header、Signature：是安全性相关的部分，只是为了保证Token的安全性。
+
+    6. JWT使用方式
+
+       1. 客户端收到服务器返回的JWT之后，通常会将它存储在`localStorage`或`sessionStorage`中。
+       2. 此后，客户端每次于服务器通信，都要带上这个JWT的字符串，从而进行身份认证。
+       3. **推荐做法**是把JWT放在HTTP请求头的Authorization字段中
+
+       ```js
+       /*  Authorization:Bearer <token>  */
+       ```
+
+12. JWT相关的包
+
+    1. 安装命令：`npm install jsonwebtoken express-jwt`
+
+    2. jsonwebtoken包：用于生成 JWT 字符串
+
+    3. express-jwt包：用于将JWT字符串解析还原成 JSON 对象
+
+    4. 导入相关包
+
+       ```js
+       //导入
+       const jwt = require('jsonwebtoken');
+       const expressJWT = require('express-jwt');
+       //新版本可能需要如下导入方式
+       const { expressjwt } = require("express-jwt");  
+       ```
+
+    5. 定义Secret密钥：为了保证JWT字符串的安全性，防止JWT字符在网络传输过程中被别人破解，需要定义一个加密和解密的secret密钥
+
+       1. 当生成JWT字符串的时候，需要使用secret密钥对用户的信息进行加密，最终得到加密好的JWT字符串。
+       2. 当把JWT字符串解析还原成JSON对象的时候，需要使用secret密钥进行解密。
+
+       ```js
+       const secretKey = 'itheima No.123 ^_^';
+       ```
+
+    6. 登录成功后生成JWT字符串：调用 jsonwebtoken包提供的`sign()`方法，将用户的信息加密成JWT字符串，响应给客户端。
+
+       ```js
+       //登录接口
+       app.post('/api/login',function(req,res){
+           //... 省略登录失败情况下代码
+           //用户登录成功之后，生成JWT字符串，
+           //注意：不要加密密码这种隐私的信息到token发送给前端
+           res.send({
+               status:200,
+               message:'登陆成功',
+               //调用 jwt.sign() 生成JWT字符串，三个参数分别是：用户信息对象、加密密钥、配置对象
+               token: jwt.sign({username:userinfo.username},secretKey,{expiresIn:'30'})
+           })
+       })
+       ```
+
+    7. 将JWT字符串还原为JSON对象
+
+       1. 客户端每次在访问那些有权限接口的时候，都需要主动通过请求头中的Authorization字段，将Token字段串发送到服务器进行身份认证。
+
+       2. 此时，服务器端可以通过express-jwt这个中间件，自动将客户端发送过来的Token解析还原成JSON对象
+
+          ```js
+          // 使用app.use()注册中间件
+          // expressJWT({secret:secretKey}) 用来解析Token的中间件
+          // .unless({path:[/^\/api\//]})用来指定哪些接口不需要访问权限 即/api，其他/admin开头需要权限
+          app.use(expressJWT( {secret:secretKey} ).unless( {path:[/^\/api\//]} ))
+          /*新版本，若出错，尝试以下：
+          app.use(expressJWT({secret:secretKey, algorithms: ['HS256'],}).unless({path:[/^\/api\//]}))
+          */
+          ```
+
+    8. 使用`req.user`获取用户信息（最新版使用`req.auth`获取）
+
+       1. 只要配置成功了 express-jwt这个中间件，就可以把解析出来的用户信息，挂载到req.user 属性上。
+
+       ```js
+       //这是 一个有权限的API接口
+       app.get('/admin/getinfo',function(req,res){
+           console.log(req.user);
+           res.send({
+               status:200,
+               message:'获取用户信息成功！',
+               data:req.user
+           })
+       })
+       ```
+
+    9. 使用Postman测试
+
+       1. POST发送（用于登录）：使用POST方式，地址栏使用`http://127.0.0.1:888/api/login`，并且在`Body`中选择`x-wwww-form-urlencoded`添加 `[Key - Value]`等登录用户米密码
+       2. GET发送（已登录）：使用GET方式登录，地址栏使用`http://127.0.0.1:888/admin/getinfo`，并且在`Headers`下添加 `[Key - Value]`，[ Authorization - 'Bearer `Token`']。注意格式，必须加Bearer和空格再添加Token字符串才能解析。
+
+    10. 捕获解析JWT失败后产生的错误
+
+        1. 当使用express-jwt解析Token字符串时，客户端发送过来的Token字符串过期或不合法，会产生一个解析失败的错误，影响项目的正常运行。
+
+        2. 可以通过Express的错误中间件，捕获这个错误并进行相关的处理
+
+           ```js
+           app.use((err,req,res,next)=>{
+               //token解析失败导致的错误
+               if(err.name === 'UnauthorizedError'){
+                   return res.send( {status:401,message:'无效的token'} );
+               }
+               //其他原因导致的错误
+               res.send( {status:500,message:'未知的错误'} );
+           })
+           ```
+
+13. 其他人整理完整笔记（包括案例）：[地址](https://brucecai55520.gitee.io/bruceblog/notes/nodejs/node.html)
+
+14. 
 
 ​	
 
