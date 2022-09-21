@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello React</title>
+
+</head>
+<body>
+<div id="test"></div>
+<div id="test2"></div>
+
+
+<script type="text/javascript" src="new/react.development.js"></script>
+<script type="text/javascript" src="new/react-dom.development.js"></script>
+<script type="text/javascript" src="new/babel.min.js"></script>
+
+<script type="text/babel">/*此处一定要写Babel(即使用的JSX语言)，默认是JS*/
+//1.创建虚拟DOM
+const VDOM = <h1 id="title">hello,React</h1>;
+// const VDOM = <h1 id="title"><span>hello,React</span></h1>;
+//2.渲染虚拟DOM到页面
+ReactDOM.render(VDOM,document.getElementById('test'));
+console.log(VDOM);
+const TDOM = document.getElementById('test2');
+console.log("真实DOM",TDOM);
+debugger
+</script>
+
+<script type="text/javascript">/*此处一是JS*/
+//1.创建虚拟DOM
+// 格式： React.createElement(标签名，标签属性，标签体内容)；
+const VDOM2 = React.createElement('h1',{id:'title2',class:'title2'},'Hello React - JS');
+// const VDOM2 = React.createElement('h1',{id:'title2',class:'title2'},React.createElement('span',{},'Hello React - JS'));
+//2.渲染虚拟DOM到页面
+ReactDOM.render(VDOM2,document.getElementById('test2'));
+console.log(VDOM2);
+console.log(VDOM2 instanceof Object);
+</script>
+</body>
+</html>

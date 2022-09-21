@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+  class Person{
+      constructor(name,age) {
+        this.name = name;
+          this.age=age;
+      }
+      //类中所有的方法，都默认开启了严格模式
+      speak(){
+          console.log(this);
+      }
+  }
+  const p1 = new Person('tom',18);
+  p1.speak(); //Person {name: 'tom', age: 18}
+  const x = p1.speak;
+  x(); //undefined
+
+
+  function demo1(){
+      console.log(this);
+  }
+  demo1(); //Window{..}
+  function demo2(){
+      'use strict';
+      console.log(this);
+  }
+  demo2(); //undefined
+
+  console.log(demo1.bind({a:1,b:2})) //.bind()返回的是新函数（未调用）
+  /*ƒ demo1(){
+      console.log(this);
+  }*/
+  const b = demo1.bind({a:1,b:2});
+  b() //调用新函数 {a: 1, b: 2}
+</script>
+</body>
+</html>

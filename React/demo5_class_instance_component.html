@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .title{
+            background-color: orange;
+        }
+    </style>
+</head>
+<body>
+    <div id="test"></div>
+
+    <script type="text/javascript" src="new/react.development.js"></script>
+    <script type="text/javascript" src="new/react-dom.development.js"></script>
+    <script type="text/javascript" src="new/babel.min.js"></script>
+
+    <script type="text/babel">
+        //1.创建函数式组件
+        class Weather extends React.Component{
+            constructor(props) {
+                super(props);
+                /*this.state = true; 不能直接赋值，若render中有多个状态需要更改，单个值无法实现*/
+                this.state = {isHot:false,wind:'大风'}; //3.初始化状态
+                this.changeWeather = this.changeWeather.bind(this);
+            }
+            render(){
+                console.log(this);
+                const {isHot} = this.state;//读取状态
+                /*4. return <h1>今天天气很{this.state.isHot ? '炎热':'凉爽'}，今天有大风</h1> */
+                /*return <h1 onClick={this.changeState}>今天天气很{isHot ? '炎热':'凉爽'}，今天有大风</h1>*/
+                return <h1 onClick={this.changeState}>今天天气很{isHot ? '炎热':'凉爽'}，今天有大风</h1>
+                /*React把onclick改为onClick*/
+            }
+            changeState(){
+                console.log('标题被点击了');
+                /*const {isHot} = this.state; babel翻译代码的时候this不能指向window，所以是undefined */
+                /*changeState 在Weather的原型对象上，供实例使用
+                 通过Weather实例调用changeState时，changeState中的this就是Weather实例
+                 当构造器没有this.changeWeather.bind(this);
+                 此处的this是undefined
+                */
+                console.log(this);
+            }
+        }
+        //2.渲染虚拟DOM到页面
+        ReactDOM.render(<Weather/>,document.getElementById('test'));
+    </script>
+
+    <button id="btn1">按钮1</button>
+    <button id="btn2">按钮2</button>
+    <button onclick="demo()">按钮3</button>
+    <script>
+        const btn1 = document.getElementById('btn1');
+        btn1.addEventListener('click',()=>{
+            alert('按钮1被点击了');
+        })
+        const btn2 = document.getElementById('btn2');
+        btn2.onclick= ()=>{
+            alert('按钮2被点击了');
+        };
+        function demo(){
+            alert('按钮3被点击了');
+        }
+    </script>
+</body>
+</html>

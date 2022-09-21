@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .title{
+            background-color: orange;
+        }
+    </style>
+</head>
+<body>
+    <div id="test"></div>
+
+    <script type="text/javascript" src="new/react.development.js"></script>
+    <script type="text/javascript" src="new/react-dom.development.js"></script>
+    <script type="text/javascript" src="new/babel.min.js"></script>
+
+    <script type="text/babel">
+        const myId = 'aTgUiGu';
+        const myData = 'HelLo,rEaCt';
+        //1.创建虚拟DOM
+        const vDOM= (
+            <h2 className="title" id={myId.toLowerCase()}>
+                <span style={{color:'white',fontSize:'20px'}}>{myData.toLowerCase()}</span>
+                <good>小写开头自定义html标签，报错能显示</good>
+                <Good>不显示且报错，需要定义组件Good</Good>
+            </h2>
+            // <div>错误，只能有一个根标签</div>
+        );
+        //渲染虚拟DOM到页面
+        ReactDOM.render(vDOM,document.getElementById('test'));
+    </script>
+</body>
+</html>

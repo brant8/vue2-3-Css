@@ -1897,9 +1897,44 @@
            })
            ```
 
-13. 其他人整理完整笔记（包括案例）：[地址](https://brucecai55520.gitee.io/bruceblog/notes/nodejs/node.html)
+    11. 密码加密模块：
 
-14. 
+        1. 安装：`npm i bcryptjs`
+        2. 使用前导入：`bcrypt.hashSync(明文密码，随机盐的长度)`
+
+13. 其他人整理完整笔记（包括案例）：[地址](https://brucecai55520.gitee.io/bruceblog/notes/nodejs/node.html) | 黑马案例老师笔记：[地址](http://escook.cn:8088/#/mds/1.init)
+
+14. 案例个别注意：
+
+    1. 在处理函数，多次调用`res.send()`向客户端响应处理失败的结果，为了简化代码，可以手动封装一个`res.cc()`函数。 
+
+       ```js
+       //全局响应数据的中间件(放在路由之前)
+       app.use(function(req,res,next){
+           //status=0为成功，status=1为失败；默认将status的值设置为1，方便处理失败的清空
+           res.cc = function(err, status=1){
+               res.send({
+                   //状态
+                   status，
+                   //状态描述，判断err时错误对象还是字符串
+                   message: err instanceof Error ? err.message : err,
+               })
+           }
+           next();
+       })
+       //其他代码
+       db.query(sqlStr, userinfo.username, (err, results)=>{
+           if(err){
+               //return res.send({status:1, message:err.message})
+               return res.cc(err);
+               //或者其他return
+               return res.cc('登陆失败，稍后再试！');
+               return res.cc('登录成功',0);
+           }
+       })
+       ```
+
+    2. 注意报错：可能出现两次`res.send()`
 
 ​	
 
@@ -2799,6 +2834,362 @@
          ```
 
       2. 前端AJAX正常写法
+
+
+
+
+
+
+
+# 尚硅谷 React
+
+## 概述
+
+1. 采用组件化模式、声明式编码，提高开发效率及组件复用率。
+
+2. 在React Native可以使用React用法进行**移动端开发** ios/android。
+
+3. 使用**虚拟DOM**+优秀的Diffing算法，尽量减少与真实DOM的交互。
+
+   1. 真实数据 -  虚拟DOM - 真实DOM
+
+4. 相关库使用
+
+   1. `react.js`：React核心库
+   2. `react-dom.js`：提供操作DOM的react扩展库
+   3. `babel.min.js`：解析 JSX 转成 JS的代码库，即ES6转为ES5。
+
+   ```html
+   <!--容器-->
+   <div id="test"></div>
+   
+   <!--注意引入顺序-->
+   <!--引入react核心库-->
+   <script type="text/javascript" src="new/react.development.js"></script>
+   <!--引入react-dom，用于支持react操作DOM-->
+   <script type="text/javascript" src="new/react-dom.development.js"></script>
+   <!--引入babel，用于将jsx转为js-->
+   <script type="text/javascript" src="new/babel.min.js"></script>
+   
+   <script type="text/babel">/*此处一定要写Babel(即使用的JSX语言)，默认是JS*/
+           //1.创建虚拟DOM
+           const VDOM = <h1>hello,React</h1>; /*此处一定不要写引号，因为不是字符串*/
+           //2.渲染虚拟DOM到页面
+           // 格式：ReactDOM.render(虚拟DOM，容器)
+           ReactDOM.render(VDOM,document.getElementById('test'));
+   </script>
+   ```
+
+5. 虚拟DOM创建两种方式
+
+   1. JSX方式
+
+      ```html
+      ...js库引用
+      <div id="test"></div>
+      <script type="text/babel">/*此处一定要写Babel(即使用的JSX语言)，默认是JS*/
+          //1.创建虚拟DOM
+          const VDOM = <h1 id="title">hello,React</h1>;
+          /* 嵌套
+          const VDOM = <h1 id="title"><span>hello,React</span></h1>; 
+          输出：<div id="test"><h1 id="title"><span>hello,React</span></h1></div>*/
+          //2.渲染虚拟DOM到页面
+          ReactDOM.render(VDOM,document.getElementById('test'));
+      </script>
+      ```
+
+   2. JS方式（一般不用）
+
+      ```html
+      ...js库引用
+      <div id="test2"></div>
+      <script type="text/javascript">/*此处是JS*/
+          //1.创建虚拟DOM
+          // 格式： React.createElement(标签名，标签属性，标签体内容)；
+          const VDOM2 = React.createElement('h1',{id:'title2',class:'title2'},'Hello React - JS');
+          /* 嵌套
+          const VDOM2 = React.createElement('h1',{id:'title2',class:'title2'},React.createElement('span',{},'Hello React - JS'));
+          输出：<div id="test"><h1 id="title"><span>hello,React</span></h1></div> */
+          //2.渲染虚拟DOM到页面
+          ReactDOM.render(VDOM2,document.getElementById('test2'));
+      </script>
+      ```
+
+6. 虚拟DOM
+
+   1. 虚拟DOM是Object类型
+
+      ```js
+      console.log(VDOM);
+      //{$$typeof: Symbol(react.element), type: 'h1', key: null, ref: null, props: {…}, …}
+      console.log(VDOM instanceof Object);
+      //true
+      ```
+
+   2. 查看真实DOM的属性
+
+      1. 真实DOM使用 console.log() 默认输出HTML元素
+
+      2. 使用`debugger`查看真实DOM属性
+
+         ```js
+         const TDOM = document.getElementById('#test2');
+         console.log("真实DOM",TDOM); //默认：<div id="test2">...</div>
+         debugger //鼠标移动到TDOM自动显示属性信息
+         ```
+
+   3. 虚拟DOM的属性少，真实DOM属性多。虚拟DOM是React内部再用，无需真实DOM那么多的属性。
+
+   4. 虚拟DOM最终会被React转化为真实DOM，呈现在页面上。
+
+7. JSX - JavaScript XML
+
+   1. react定义的一种类似XML的**JS扩展语法**。
+   2. XML早期用于存储和传输数据。后续使用JSON，JS内置JSON，常用`JSON.parse()`和`JSON.stringify()`。
+
+## JSX语法规则
+
+1. 定义虚拟DOM时，不需要写引号。
+
+2. 标签中混入**JS表达式**（非JS语句、代码）时要用`{}`
+
+   1. JS表达式：一个表达式会产生一个值，可以放在任何一个需要值的地方
+      1. 判定，使用`const x = 变量/运算/函数/函数调用/数组方法等`，能获得到值即为表达式
+
+      2. `const x = 函数`其返回值即是函数本身
+
+   2. JS语句/代码：多数为流程控制，比如 if判断、for循环、switch、
+
+3. 样式的类名不要用`class`，要使用`className='xxx'` (class是ES6定义的关键字，react使用className避免冲突)
+
+4. 内联样式，要用`style={{key:value}}`的形式去写，且用驼峰形式书写
+
+5. 虚拟DOM必须只有一个根标签，比如只能有一个`<div>`或者`<h1>`
+
+6. 标签必须闭合 比如`</div>`
+
+7. 自定义标签中，
+
+   1. 若是小写字母开头，JSX自动根据小写字母转成HTML同名元素标签（小写标签一般使用HTML标准标签）
+   2. 若html中无同名元素，则报错
+   3. 若大写字母开头，react就去渲染对应的组件，若组件没有定义，则报错。
+
+   ```html
+       <style>
+           .title{
+               background-color: orange;
+           }
+       </style>
+   <div id="test"></div>
+   
+   <script type="text/javascript" src="new/react.development.js"></script>
+   <script type="text/javascript" src="new/react-dom.development.js"></script>
+   <script type="text/javascript" src="new/babel.min.js"></script>
+   
+   <script type="text/babel">
+           const myId = 'aTgUiGu';
+           const myData = 'HelLo,rEaCt';
+           //1.创建虚拟DOM
+           const vDOM= (
+               <h2 className="title" id={myId.toLowerCase()}>
+                   <span style={{color:'white',fontSize:'20px'}}>{myData.toLowerCase()}</span>
+                   <good>小写开头自定义html标签，报错能显示</good>
+                   <Good>不显示且报错，需要定义组件Good</Good>
+       </h2>
+               // <div>错误，只能有一个根标签</div>
+           );
+           //渲染虚拟DOM到页面
+           ReactDOM.render(vDOM,document.getElementById('test'));
+   </script>
+   ```
+
+
+1. 练习与延申
+
+   ```jsx
+   //模拟数据
+   const data = ['Angular','React','Vue'];
+   //1.创建虚拟DOM
+   const vDom = (
+   	<div>
+       	<h1>前端JS框架列表</h1>
+           <ul>
+             {
+           	data.map((item,index)={ //注意此处只能使用JS表达式，不能使用JS（流程控制）语句，即必须要有返回值
+                   return <li key={index}>{item}</li //变量使用{}
+               })
+             }
+           </ul>
+       </div>
+   );
+   //2.渲染虚拟DOM到页面
+   ReactDOM.render(vDom, document.getElementById('test'));
+   ```
+
+## 模块与组件
+
+1. 模块：向外提供特定功能的js程序，一般就是一个js文件。
+
+2. 组件：用来实现局部功能效果的代码和资源的集合（html/css/js/image等）
+
+3. 模块化：当应用的js都以模块来编写，这个应用就是模块化的应用
+
+4. 组件化：当应用以多组件的方式实现，这个应用就是一个组件化。
+
+5. 使用谷歌插件React Developer Tools可以查看当前网页是否使用React。
+
+6. React分为两种组件方式
+
+   1. 函数式组件
+
+      ```html
+      <script type="text/babel">
+      	//1.创建函数式组件
+          function Demo(){ //注意函数名大写，JSX语法规则
+              console.log(this);
+              /*Babel官网使用Try it out复制整段函数代码:
+              	'use strict'严格模式，this不能指向window undefined*/
+              return <h2>我是用函数定义的组件（适用于【简单组件】的定义）</h2>
+          }
+          //2.渲染组件到页面 - 函数类型不能作为React节点（React child）
+          ReactDOM.render(<Demo/>,document.getElementById('test'));
+          //错误：ReactDOM.render(Demo,document.getElementById('test'));
+      /*
+      执行了ReactDOM.render(<Demo/>....之后，发生了什么
+      	1.React解析组件标签，找到了Demo组件
+      	2.发现组件是使用函数定义的，随后调用该函数，将返回的虚拟DOM转为真实DOM，随后呈现在页面中。
+      */
+      </script>
+      ```
+
+   2. 类式组件
+
+      ```html
+      <script type="text/javascript">
+          //复习： 创建一个Person类
+          class Person{
+              //构造器方法
+              constructor(name,age){
+                  this.name=name;
+                  this.age=age;
+              }
+              speak(){ console.log(`我叫${this.name}`) }
+              //普通方法，放在类的原型对象上，供实例使用
+          }
+          //创建一个Person的实例对象
+          const p1 = new Person()
+          console.log(p1);
+          class Student extends Person{
+              constructor(name,age,grade){
+                  /*this.name = name
+                  super规则：一个类，继承另一个类，且重写构造器这三个因素，必须调用super。*/
+                  super(name,age);
+                  this.grade=grade;
+              }
+          }
+          const s1 = new Student('校长',26,'高层');
+          s1.speak();//没有重写speak方法，找的是原型链__proto__的__proto__的speak
+      </script>
+      <script type="text/babel">
+      	//1.创建类式组件
+      	class MyComponent extends React.Component {
+      		render(){
+      			//render是放在哪里的？  --- 类的原型对象上，供实例使用
+      			
+      			//render中的this是谁？ --- MyComponent的实例对象 = MyComponent组件实例对象
+      			console.log('render中的this' , this);
+      			/*输出包括，其中组件实例（表示类组件）重要的三大属性，prop:{},refs:{},state:null*/
+      			
+      			return (
+      				<div>我是用类定义的组件（适用于【复杂组件】的定义） </div>
+      			)
+      		}
+      	}
+      	//2.渲染组件到页面
+      	ReactDom.render(<MyComponent/>,document.getElementById('test'));
+      	/*此处的render与类中的render毫无关系
+      	执行了ReactDOM.render(<Demo/>....之后，发生了什么
+      		1.React解析组件标签，找到了MyComponent组件
+      		2.发现组件时使用类定义的，随后new出来该类的实例，并通过该实例调用到原型上的render方法。
+      		3.将render返回的虚拟DOM转为真实DOM，随后呈现在页面中。
+      	*/
+      </script>
+      ```
+
+7. **组件三大核心属性之**：**state**（类组件的实例对象才会有，只有类才有实例对象，函数组件没有，未来通过hooks可以让函数也有）
+
+   1. 理解：
+
+      1. state是组件对象最重要的属性，值是对象（可以包含多个key-value的组合）
+      2. 组件被称为“状态机”，通过更新组件的state来更新对应的页面显示（重新渲染组件）
+      3. state表示有状态，复杂组件会有（实例对象）
+
+   2. 注意：
+
+      1. 组件中render方法中的this为组件实例对象
+      2. 组件自定义的方法中this为undefined，如何解读
+         1. 强制绑定this：通过函数对象的bind()
+         2. 箭头函数
+      3. 状态数据，不能直接修改或更新。
+
+   3. 巩固知识
+
+      ```js
+        function demo1(){
+            console.log(this);
+        }
+        demo1(); //Window{..}
+        function demo2(){
+            'use strict';
+            console.log(this);
+        }
+        demo2(); //undefined
+      ```
+
+   4. 扩展知识
+
+      ```js
+        console.log(demo1.bind({a:1,b:2})) //.bind()返回的是新函数（未调用）
+        /*ƒ demo1(){
+            console.log(this);
+        }*/
+        const b = demo1.bind({a:1,b:2});
+        b() //调用新函数 {a: 1, b: 2}
+      ```
+
+   5. 讲解state
+
+      ```js
+      //1.创建函数式组件
+      class Weather extends React.Component{
+          constructor(props) {
+              super(props);
+              this.state = {isHot:false,wind:'大风'}; 
+              this.demo = this.changeWeather.bind(this);
+              /*this.changeWeather.bind(this)的解析
+              this - 原型
+              .changeWeather - 原型对象上的changeWeather
+              .bind(this) - .bind()生成新的函数，并且把this改成Weather的实例对象
+              this.demo - 挂载的地方
+              */
+          }
+          render(){
+              console.log(this);
+              const {isHot} = this.state;
+              return <h1 onClick={this.demo}>今天天气很{isHot ? '炎热':'凉爽'}，今天有大风</h1>
+          }
+          changeWeather(){
+              console.log('标题被点击了');
+              console.log(this);
+          }
+      }
+      //2.渲染虚拟DOM到页面
+      ReactDOM.render(<Weather/>,document.getElementById('test'));
+      ```
+
+      1. `changeWeather()`在原型对象上，供实例使用
+      2. React把在HTML上的事件从`onclick`改成`onClick`
+      3. `state`不能直接赋值，若render中有多个状态需要更改，单个值无法实现
 
 
 
