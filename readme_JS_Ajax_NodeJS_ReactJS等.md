@@ -3803,7 +3803,130 @@
    
    ```
 
-5. 
+5. **生命周期流程图（旧）** ![旧流程图](https://github.com/brant8/vue2-3-Css/blob/main/pictures/react_lifecycle_old.png)
+
+6. 生命流程图说明 - 案例
+
+   1. 初始化阶段：由`ReactDOM.render()`触发 --- 初次渲染 (组件的使用)
+      1. `constructor()`
+      2. ``componentWillMount()` 
+      3. `render()` ：必须用
+      4. `componentDidMount()` ：常用于初始化的事，比如，开启定时器、发送网络请求、订阅消息
+   2. 更新阶段：由组件内部`this.setState()`或`父组件`重新render触发
+      1. `shouldComponentUpdate()`、`componentWillUpdate()`、`render()`、`componentDidUpdate()`
+   3. 卸载组件：由`ReactDOM.unmountComponentAtNode()`触发
+      1. `componentWillUnmount()`：常用在做一些收尾的事，比如，关闭定时器、取消订阅消息
+
+   ```js
+   //创建组件
+       class Count extends React.Component{
+           //挂载1. 构造器，当有构造器的时候，一般state写在构造器内部
+           constructor(props) {
+               super(props);
+               console.log('Count - constructor...');
+               this.state = {count:0};
+           }
+           //没有构造器的时候state写在外面
+           //state= { count:0 };
+           add = ()=>{
+               //获取原状态
+               const {count} = this.state;
+               //更新状态
+               this.setState({count:count+1});
+           }
+           //挂载2. 组件将要挂载的钩子， Warning: componentWillMount has been renamed
+           componentWillMount(){
+               console.log('Count - componentWillMount...');
+           }
+           //挂载4. 组件挂在完毕的钩子
+           componentDidMount(){
+               console.log('Count - componentDidMount...');
+           }
+   
+           //挂载5.1 卸载组件按钮的回调
+           remove=()=>{
+               ReactDOM.unmountComponentAtNode(document.getElementById('test'));
+           }
+           /*【setState()】设置状态
+           *【forceUpdate()】强制更新，跳过阀门，直接componentWillUpdate() */
+           //强制更新回调
+           force = ()=>{
+               this.forceUpdate();
+           }
+   
+           //挂载5.2 将要卸载钩子 ；  设置状态5.
+           componentWillUnmount(){
+               console.log('Count - componentWillUnmount...');
+           }
+   
+           //设置状态1. 组件是否更新 ； 挂载时默认为true ；
+           shouldComponentUpdate(){ /*相当于'阀门'，控制组件是否更新*/
+               console.log('Count - shouldComponentUpdate...');
+               return true; //手动写了阀门，必须写true or false
+           }
+   
+           //设置状态2. 组件将要更新；
+           componentWillUpdate(){
+               console.log('Count - componentWillUpdate...');
+           }
+           //设置状态4. 组件更新完毕的钩子;
+           componentDidUpdate(){
+               console.log('Count - componentDidUpdate...');
+           }
+           //挂载3. ； 设置状态3.
+           render(){
+               console.log('Count - render...');
+               return (
+                   <div>
+                       <h2>当前求和: { this.state.count }</h2>
+                       <button onClick={this.add}>点我+1</button>
+                       <button onClick={this.remove}>卸载组件</button>
+                       <button onClick={this.force}>不更改任何状态中的数据，强制更新以下</button>
+                   </div>
+               )
+           }
+       }
+   
+       class A extends React.Component{
+           //初始化状态
+           state = {carName:'奔驰'};
+           changeCar = ()=>{
+               this.setState({carName:'奥托'});
+           };
+           render(){
+               return (
+                   <div>
+                       <div>我是A组件</div>
+                       <button onClick={this.changeCar}>换车</button>
+                       <B/>
+                       <B carName={this.state.carName}/>
+                   </div>
+               );
+           }
+       }
+   
+       class B extends React.Component{
+           componentDidMount(){
+               console.log('B - componentDidMount...')
+           }
+           //组件将要接收新的props的钩子
+           componentWillReceiveProps(props){ /*真正意思：componentWillReceiveNewProps*/
+               console.log('B - componentWillReceiveProps...',props);
+           }
+           render(){
+               return (/*页面打开的时候this.props.carName就有接收到钩子，但是componentWillReceiveProps得第二次（手动点击一次）才会有新的Props传递*/
+                   <div>我是B组件，从A接收到的换车是: {this.props.carName}</div>
+               );
+           }
+       }
+       //渲染
+       // ReactDOM.render(<Count/>,document.getElementById('test'));
+       //让A和B形成父子关系：A为父，B为子
+       ReactDOM.render(<A/>,document.getElementById('test'));
+   
+   ```
+
+7. react生命周期（新） ![生命周期](https://github.com/brant8/vue2-3-Css/blob/main/pictures/react_lifecycle_new.png)
 
 
 
