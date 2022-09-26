@@ -3116,7 +3116,7 @@
       </script>
       ```
 
-7. **组件三大核心属性之**：**state**（类组件的实例对象才会有，只有类才有实例对象，函数组件没有，未来通过hooks可以让函数也有）
+7. **组件实例三大核心属性之**：**state**（类组件的实例对象才会有，只有类才有实例对象，函数组件没有，未来通过hooks可以让函数也有）
 
    1. 理解：
 
@@ -3157,14 +3157,14 @@
         b() //调用新函数 {a: 1, b: 2}
       ```
 
-   5. 讲解state
+   5. 讲解state [未整理说明示例](https://github.com/brant8/vue2-3-Css/blob/main/React%E7%AC%94%E8%AE%B0%E8%B5%84%E6%96%99/demo5_class_instance_component.html)：构造器写法
 
       ```js
       //1.创建函数式组件
       class Weather extends React.Component{
           constructor(props) {
               super(props);
-              this.state = {isHot:false,wind:'大风'}; 
+              this.state = {isHot:false,wind:'大风'};//因为React有内置setState，所以此处使用state
               this.demo = this.changeWeather.bind(this);
               /*this.changeWeather.bind(this)的解析
               this - 原型
@@ -3176,11 +3176,15 @@
           render(){
               console.log(this);
               const {isHot} = this.state;
+              const {isHot, windd} = this.state;
               return <h1 onClick={this.demo}>今天天气很{isHot ? '炎热':'凉爽'}，今天有大风</h1>
           }
           changeWeather(){
-              console.log('标题被点击了');
-              console.log(this);
+              console.log(this);//默认this是undefined，需要bind()重新指向
+              /*严重注意：状态state不可以直接更改，要借助一个内置API去更改
+              this.state.isHot = !isHot; 是错误的*/
+              const isHot = this.state.isHot;
+              this.setState({isHot:!isHot});
           }
       }
       //2.渲染虚拟DOM到页面
@@ -3189,7 +3193,619 @@
 
       1. `changeWeather()`在原型对象上，供实例使用
       2. React把在HTML上的事件从`onclick`改成`onClick`
-      3. `state`不能直接赋值，若render中有多个状态需要更改，单个值无法实现
+      3. `state`不能直接赋()值，若render中有多个状态需要更改，单个值无法实现
+      4. 类中的方法默认开启了局部的严格模式，[参考](https://github.com/brant8/vue2-3-Css/blob/main/React%E7%AC%94%E8%AE%B0%E8%B5%84%E6%96%99/demo6_this_relearn.html)
+      5. 状态state不可以直接更改，要借助一个内置API`.setState({})`去更改
+      6. `.setState({})`是合并的行为，非覆盖式
+
+   6. 基础巩固
+
+      ```js
+      class Car{
+          constructor(name,price){
+              this.name=name;
+              this.price=price
+              this.wheel=4
+          }
+          //类中可以直接写赋值语句，下面代码的含义：给Car的示例对象添加一个属性，名为a，值为1；不通过构造器
+          a=1;
+          /*
+          类 非函数体，不能随意定义变量、console.log()、alert，也不能直接声明变量
+          */
+          static demo = 100;
+      }
+      const c1 = new Car('宝马',299); 
+      console.log(c1);//实例中带有 a:1
+      console.log(Car.demo); //输出100
+      ```
+
+   7. state写法二：无构造器写法
+
+      ```js
+      //1.创建函数式组件
+      class Weather extends React.Component{
+          render(){
+              const {isHot} = this.state;
+              const {isHot, windd} = this.state;
+              return <h1 onClick={this.demo}>今天天气很{isHot ? '炎热':'凉爽'}，今天有大风</h1>
+          }
+          state = {isHot:false,wind:'微风'};
+          /* 报错失败
+          changeWeather=function(){
+              const isHot = this.state.isHot;
+              this.setState({isHot:!isHot});
+          }*/
+          //箭头函数可以成功；因为箭头函数没有自己的this，找上一层的this
+          changeWeather=()=>{
+              const isHot = this.state.isHot;
+              this.setState({isHot:!isHot});
+          }
+          //自定义方法 ---要用赋值语句的形式+箭头函数
+      }
+      //2.渲染虚拟DOM到页面
+      ReactDOM.render(<Weather/>,document.getElementById('test'));
+      ```
+
+8. **组件实例三大核心属性之**：**props** （function函数组件可以有props - 因为函数可以接收参数）
+
+   1. 理解：
+
+      1. 每个组件都会有props（properties的简写）属性
+      2. 组件标签的所有属性都保存在props中
+
+   2. 作用：
+
+      1. 通过标签属性从组件外向组件内传递变化的数据
+      2. 注意：组件内部不需要修改props数据（只读）
+
+   3. 知识巩固
+
+      ```js
+      let arr1 = [1,3,5,7];
+      let arr2 = [2,4,6,8];
+      console.log(...arr1); //展开数组分别输出
+      let arr3 = [...arr1,...arr2];
+      console.log(arr3); //连接数组
+      function sum(...num){
+          console.log('@',num); //数组(3)[1, 2, 3]
+          return num.reduce((pre,current)=>{ //reduce有返回值
+              return pre+current;
+          })
+      }
+      console.log(sum(1,2,3));  //求和
+      
+      let person = {name:'tom',age:18};
+      //let person2 = person; //复制对象，此处非复制，知识传递地址引用，深复制、浅复制
+      let person2 = {...person}; //新语法，展开语法（火狐MDN），复制对象
+      // console.log(...person);  //报错，无法展开一个对象
+      console.log(person2.name);
+      
+      let person3 = {...person,name:'jack'};//合并，复制的同时修改属性值
+      console.log(person3);
+      ```
+
+   4. 单个传递以及批量传递props（标签属性）
+
+      ```jsx
+      //创建组件
+      class Person extends React.Component{
+          render(){
+              console.log(this); //props: {name: 'Tom', age: '18'}
+              // const {name,age} = this.props;   解构赋值 Destructuring
+              /*this.props.name = 'Jack';  报错，props是只读的*/
+              return (
+                  <ul>
+                      <li>姓名：{this.props.name}</li>
+                      //<li>姓名：{name}</li> 解构赋值
+                      <li>性别：男</li>
+                      <li>年龄：{this.props.age}</li>
+                  </ul>
+              );
+          }
+      }
+      const p = {name:'老刘',age:18,sex:'女'};
+      
+      //渲染
+      ReactDOM.render(<Person name="Tom2" age='18'/>,document.getElementById('test'));
+      ReactDOM.render(<Person name="Tom2" age={18}/>,document.getElementById('test'));//Number是JS的所以要加{}
+      
+      ReactDOM.render(<Person name={p.name} age={p.age}/>,document.getElementById('test2'));
+      ReactDOM.render(<Person {...p}/>,document.getElementById('test2')); //相当于上面一行的语法糖
+      /*babel和react.development两个可以展开对象，但【仅限于】标签属性的传递，{...p}
+          console.log('@',...p); //没有显示任何内容，对象的展开不能随便用
+          正常情况JS不能展开对象*/
+      ```
+
+   5. props渲染传递时的注意点
+
+      1. 对传递标签属性的类型限制，比如age
+      2. 对于必要性的限制，比如某个属性必须要传
+      3. 给某个属性指定默认值
+      4. props是只读的
+
+      ```html
+      <script type="text/javascript" src="new/react.development.js"></script> <!--React-->
+      <script type="text/javascript" src="new/react-dom.development.js"></script><!--ReactDOM-->
+      <script type="text/javascript" src="new/babel.min.js"></script>
+      <script type="text/javascript" src="new/prop-types.js"></script> <!--用于对组件标签属性进行限制 PropTypes-->
+      <script type="text/babel">
+          //创建组件
+          class Person extends React.Component{
+              render(){
+                  return (
+                      <ul>
+                          <li>姓名：{this.props.name}</li>
+                          //<li>姓名：{name}</li> 解构赋值
+                          <li>性别：男</li>
+                          <li>年龄：{this.props.age}</li>
+                      </ul>
+                  );
+              }
+          }
+          
+          //prop属性规则，固定名字，React会在类中的属性查找propTypes当作规则
+          Person.propTypes = { 
+              /*name:React.PropTypes.string, //具体的规则时大写PropTypes,此处适用于React版本15.5以前，让React不会太臃肿*/
+              //React版本16对于规则限制需要导入：prop-types.js才有的PropTypes
+              name:PropTypes.string.isRequired, 
+              sex:PropTypes.string,
+              age:PropTypes.number,
+              speak:Proptypes.func,//限制传递需要传入函数
+          }
+          Person.defaultProps = {
+              sex:'不男不女', //设置默认值
+              age:18
+          }
+          
+          const p = {name:'老刘',age:18,sex:'女'};
+      	function speak(){
+      		console.log('我说话了');
+      	}
+      	
+          //渲染
+          ReactDOM.render(<Person name="Tom2" age='18' speak={speak}/>,document.getElementById('test'));
+      
+      </script>
+      ```
+
+   6. props的简写
+
+      ```jsx
+      class Person extends React.Component{
+          //规则写到类内部，让类自身有其属性
+          static propTypes = { 
+              name:PropTypes.string.isRequired, 
+              sex:PropTypes.string,
+              age:PropTypes.number,
+              speak:Proptypes.func,
+          };
+          static defaultProps = {
+              sex:'不男不女', 
+              age:18
+          };
+          state = {}; //初始化状态
+          render(){
+              return (
+                  <ul>
+                      <li>姓名：{this.props.name}</li>
+                      //<li>姓名：{name}</li> 解构赋值
+                      <li>性别：男</li>
+                      <li>年龄：{this.props.age}</li>
+                  </ul>
+              );
+          }
+      }
+      
+      const p = {name:'老刘',age:18,sex:'女'};
+      function speak(){
+          console.log('我说话了');
+      }
+      //渲染
+      ReactDOM.render(<Person name="Tom2" age='18' speak={speak}/>,document.getElementById('test'));
+      ```
+
+   7. 通过类组件构造器给`props`传参的必要性
+
+      1. 在React中，构造函数仅用于以下两种情况（官方）
+         1. 通过给`this.state`赋值对象来初始化内部state
+         2. 为事件处理函数绑定实例
+      2. 在`React.Component`子类实现构造函数时，应在其他语句之前调用`super(props)`。否则，`this.props`在构造函数中可能会出现未定义的bug。
+
+      ```js
+      class Person extends React.Component{
+          //要么不用构造器，要么有构造器必须传props
+          constructor(props){
+              super(props);
+              console.log('constructor',this.props) //输出：正常对象{...}
+              console.log('constructor',props)//与上面this.props一样
+          }
+          //有构造器不传props时，或者接props但不传给super时
+          constructor(){
+              super();
+              console.log('constructor',this.props) //输出：undefined
+          }
+          state ={}; //初始化方法
+          demo = ()=>{...} //自定义方法+箭头函数，this保持指向实例
+          static propTypes = {..}//对标签属性进行类型、必要性的限制
+          static defaultProps = {..}//指定标签默认属性值
+          render(){...}
+          ReactDome.render(<Person name="jerry"/>,document.getElementById('test'));
+      }
+      ```
+
+   8. **函数式组件的 props**
+
+      ```js
+      function Person(props){
+          console.log(props);
+          return (
+          	<ul>
+              	<li>姓名：{props.name}</li>
+      			<li>性别：{props.gender}</li>
+      			<li>年龄：{props.age}</li>
+              </ul>
+          );
+      }
+      Person.propTypes = {..}//对标签属性进行类型、必要性的限制
+      Person.defaultProps = {..}//指定标签默认属性值
+      ReactDome.render(<Person name="jerry" gender="女" age={18}/>,document.getElementById('test'));
+      ```
+
+9. **组件实例三大核心属性之**：**refs** 
+
+   1. 组件内的标签，可以定义ref属性来标识自己
+
+   2. **字符串形式的ref**（最老式写法/过时） `<input ref="input1" />`
+
+      1. 舍弃原因：过多使用string形式的ref，会有效率问题
+      2. 未来版本可能会移除，当前学习版本16.8；弹幕 React 18.2已移除
+
+      ```js
+      //代码示例
+       class Demo extends React.Component{
+              showData = ()=>{
+                  /*render中return的<input id="input1" type="text" placeholder="点击按钮提示数据"/>
+                  const input1 = document.getElementById('input1');
+                  alert(input1.value);*/
+                  console.log(this);
+                  console.log(this.refs.input1); //refs不获取虚拟DOM，而是获取真实DOM节点
+                  debugger;
+                  const {input1} = this.refs;
+                  alert(input1.value);
+              }
+              showData2 = ()=>{
+                  const {input2} = this.refs;
+                  alert(input2.value);
+              }
+              render(){
+                  return (
+                      <div>
+                          <input ref="input1" type="text" placeholder="点击按钮提示数据"/>&nbsp;
+                          <button ref="button1" onClick={this.showData}>点我提示左侧的数据</button> &nbsp;
+                          <input onBlur={this.showData2} ref="input2" type="text" placeholder="失去焦点提示数据"/>
+                      </div>
+                  );
+              }
+          }
+      
+          ReactDOM.render(<Demo/>,document.getElementById('test'));
+      ```
+
+   3. **回调形式的ref**  `<input ref={ (c)=>{this.input1=c} } />`
+
+      1. 回调ref回调函数是以内联函数的方式定义的。
+      2. 在**更新**过程中，ref会被执行两次，第一次传入参数null，第二次传入参数DOM元素。比如更新天气（非与用户输入交互）。
+      3. 这是因为每次渲染时，会创建一个新的函数实例，所以React清空旧`render()`的ref并设置新的。通过将ref的回调函数定义成**class的绑定函数**的方式可以避免上述问题，但大多数清空下是无关要紧的。
+
+      ```jsx
+      class Demo extends React.Component{
+          showData = ()=>{
+              debugger;
+              const {input1} = this; //解构赋值，直接从实例上取属性
+              alert(input1.value);
+          }
+          showData2 = ()=>{
+              const {input2} = this; //解构赋值，直接从实例上取属性
+              alert(input2.value);
+          }
+          saveInput = ()=>{
+              this.input1 = c;
+              console.log('@',c);
+          }
+          render(){
+              return (
+                  <div>
+                  <input ref={ (a)=>{ console.log(a) } } type="text" placeholder="点击按钮提示数据"/> 
+                      {/*输出当前节点<input ../>，且此处书写形式称为内联函数*/}
+          
+          		<input ref={ (a)=>{ this.input1 = a } } placeholder="点击按钮提示数据"/>&nbsp; 
+      			 {/*'this.input1=a'表示ref拿到当前节点'a'<input>放在组件自身上，给与属性input1，其中的this因为其是箭头函数，向上找调用者，在render()中的this，其调用者为组件实例对象*/}
+      
+      			<input ref={ (currentNode)=>{ this.input1 = currentNode } } placeholder="点击按钮提示数据"/>&nbsp;  {/*正常模式*/}
+      
+      			<input ref={ c=> this.input1 = c } placeholder="点击按钮提示数据"/>&nbsp;  
+      			 {/*简写模式*/}
+                  <input ref={ this.saveInput } placeholder="点击按钮提示数据"/>&nbsp; 
+                   {/*class的绑定函数，上面的3-3, 不会造成像 ref与箭头函数 在更新过程中出现null值（就算有null值一般不会影响代码运行）*/}   
+      		
+      			<button onClick={this.showData}>点我提示左侧的数据</button> &nbsp;
+      			<input onBlur={this.showData2} ref={ c=> this.input2 = c } type="text" placeholder="失去焦点提示数据"/>
+          </div>
+      		);
+      	}
+      }
+      
+      ReactDOM.render(<Demo/>,document.getElementById('test'));
+      ```
+
+   4. **createRef创建ref容器**（最新式写法）`myRef = React.createRef()`
+
+      1. `React.createRef`调用后可以返回一个容器，该容器可以存储被ref 所标识的节点；该容器是”专人专用“的（只能存一个节点，后存的会覆盖前面的）
+
+      ```jsx
+          class Demo extends React.Component{
+              
+              myRef = React.createRef();
+      
+              showData = ()=>{
+                  console.log(this.myRef); //输出 {current:input} - {键：值}
+                  console.log(this.myRef.current.value);//输出 用户键入的值
+              }
+      
+              render(){
+                  return (
+                      <div>
+                          <input ref={this.myRef} type="text" placeholder="点击按钮提示数据"/>&nbsp;
+                          {/*React.createRef得到一个容器myRef，当ref标记后，<input>节点会存到this.myRef中*/}
+                          <button ref="button1" onClick={this.showData}>点我提示左侧的数据</button> &nbsp;
+                      </div>
+                  );
+              }
+          }
+      
+          ReactDOM.render(<Demo/>,document.getElementById('test'));
+      
+      ```
+
+10. react中的事件处理
+
+    1. 通过onXxx属性指定事件处理函数（注意大小写）
+       1. React使用的是自定义（合成）事件，而不是使用的原生DOM事件 ---为了更好的兼容性
+       2. React中的事件是通过事件委托方式处理的（委托给组件最外层的元素），比如`<ul><li>`冒泡 --- 为了高效
+    2. 通过 Event.target 得到发生事件的DOM元素对象
+
+## 组件
+
+1. 表单的 非受控组件 - **UnControlled Component**：
+
+   1. 现用现取的组件，用户提交表单后获取的数据，即为非受控组件
+
+   2. 有多少个变量就需要写多少个 ref
+
+      ```js
+          class Login extends React.Component{
+              handleSubmit = (event)=>{
+                  event.preventDefault();//原生JS阻止表单提交（页面刷新跳转—）
+                  const {username,password} = this;
+                  alert(`你输入的用户名是${username.value}`);
+              }
+              render(){
+                  return (
+                      <form onSubmit={this.handleSubmit}>
+                          用户名：<input ref={c=>this.username=c} type="text" name="username"/>
+                          密码：  <input ref={c=>this.password=c} type="password" name="password"/>
+                          <button>登录</button>
+                      </form>
+                  );
+              }
+          }
+      
+          ReactDOM.render(<Login/>,document.getElementById('test'));
+      ```
+
+2. 表单的 受控组件（Vue中的双向数据绑定）
+
+   1. 获取的数据存到state状态中，用户但凡对表单有任何状态更改都可以即时接收到反馈。
+
+   2. 不必写ref。（推荐，官方不推荐过度使用ref）
+
+      ```js
+       class Login extends React.Component{
+              //初始化状态
+              state = {
+                  username:'',
+                  password:''
+              }
+              //保存用户名到状态中
+              saveUsername=(event)=>{
+                  console.log(event.target.value);
+                  this.setState({username:event.target.value}); //可查看开发者工具检查是否设置（最好初始化state）
+              }
+              handleSubmit = (event)=>{
+                  event.preventDefault();//原生JS阻止表单提交（页面刷新跳转—）
+                  alert(`你输入的用户名是${username}`);
+              }
+              render(){
+                  return (
+                      <form onSubmit={this.handleSubmit}>
+                          用户名：<input onChange={this.saveUsername} type="text" name="username"/>
+                          密码：  <input type="password" name="password"/>
+                          <button>登录</button>
+                      </form>
+                  );
+              }
+          }
+      
+          ReactDOM.render(<Login/>,document.getElementById('test'));
+      ```
+
+3. 高阶函数 - 函数柯里化
+
+   1. 优化受控组件代码，剔除重复代码
+
+      ```js
+       class Login extends React.Component{
+              //初始化状态
+              state = {
+                  username:'',
+                  password:''
+              }
+           	//保存表单数据到状态中
+              saveFormData=(dataType)=>{  //此刻的SaveFormData就是【高级函数】
+                  console.log(dataType);
+                  return (event)=>{ //实际调用者onChange
+                      console.log(dataType, event.target.value);
+                      this.setState({[dataType]:event.target.value}); //注意此处用[]
+                  } 
+              }
+              handleSubmit = (event)=>{
+                  event.preventDefault();//原生JS阻止表单提交（页面刷新跳转—）
+                  alert(`你输入的用户名是${username}`);
+              }
+              render(){
+                  return (
+                      <form onSubmit={this.handleSubmit}>
+                          用户名：<input onChange={this.saveFormData('username')} type="text" name="username"/>
+                         {/*onClick={this.changeWeather()} 不能加括号（），否则还没点击就被调用
+                         onChange={this.saveFormData()} 当saveFormData没有返回箭头函数，只是this.setState时，表示把saveFormData函数的返回值给onChange（回调），此处是undefined值给onChange
+                         onChange={this.saveFormData} 表示把saveFormData函数最为回调给onChange
+                         本例中：saveFormData的返回值也是一个函数this.SaveFormData() 给onChange做回调*/}
+                          密码：  <input onChange={this.saveFormData('password')} type="password" name="password"/>
+                          <button>登录</button>
+                      </form>
+                  );
+              }
+          }
+      
+          ReactDOM.render(<Login/>,document.getElementById('test'));
+      ```
+
+   2. 复习，为啥上面存状态使用`[]`
+
+      ```js
+      //对象相关的知识
+      let a = 'name';
+      let oj = {} //让其变成这样 -> {name:'tom'}
+      obj.name = 'tom'； //手动形式
+      obj[a] = 'tom'; //自动形式
+      console.log(obj);
+      ```
+
+   3. 高级函数：如果一个函数符合下面两个规范中的任何一个，那该函数就是高阶函数
+
+      1. 若A函数，接收的参数是一个函数，那么A就可以成为高阶函数。
+      2. 若A函数，调用的返回值依然是一个函数，那么A就可以称之为高阶函数。
+
+   4. 常见的高阶函数：
+
+      1. Promise： `new Promise( ()=>{} )`
+      2. setTimeout：`setTimeout( ()=>{} )`
+      3. arr.map() ...
+
+   5. **函数的柯里化**：通过函数调用继续返回函数的方式，实现多次接收参数,最后统一处理的函数编码形式。
+
+      ```js
+      //普通写法
+      function sum(a,b,c){
+          return a+b+c;
+      }
+      const result = sum(1,2,3);
+      //柯里化写法
+      function sum(a){
+          return (b)=>{
+              return (c)=>{
+                  return a+b+c; //统一处理
+              }
+          }
+      }
+      const result = sum(1)(2)(3);
+      ```
+
+   6. 不用柯里化的写法
+
+      ```js
+       class Login extends React.Component{
+              //初始化状态
+              state = {
+                  username:'',
+                  password:''
+              }
+           	//保存表单数据到状态中
+              saveFormData=(dataType,value)=>{
+                  this.setState({[dataType]:value}); //注意此处用[]
+              }
+           
+              handleSubmit = (event)=>{
+                  event.preventDefault();
+                  alert(`你输入的用户名是${username}`);
+              }
+              render(){
+                  return (
+                      <form onSubmit={this.handleSubmit}>
+                      	/*onChange需要一个函数，则给他一个()=>{}，在此调用的是onChange事件，所以有event*/
+                          用户名：<input onChange={(event)=>{this.saveFormData('username',event.target.value)}} type="text" name="username"/>
+                          密码：  <input onChange={(event)=>{this.saveFormData('password',event.target.value)}} type="password" name="password"/>
+                          <button>登录</button>
+                      </form>
+                  );
+              }
+          }
+      
+          ReactDOM.render(<Login/>,document.getElementById('test'));
+      ```
+
+4. React组件生命周期
+
+   ```js
+    //创建组件
+       class Life extends React.Component{
+           /*挂载组件 mount
+           卸载组件 unmount
+           生命周期回调函数 <=> 生命周钩子函数
+           */
+           state = {opacity:0};
+           death = ()=>{
+               //卸载之前，清除定时器
+               clearInterval(this.timer); //方式一
+               //卸载组件
+               ReactDOM.unmountComponentAtNode(document.getElementById('test')); //注意JS方式获取节点
+           }
+           //组件挂在页面之后调用（只调用一次）
+           componentDidMount(){ /*componentDidMount与render均属于React预置函数， 类Life实例对象X.componentDidMount*/
+               this.timer = setInterval(()=>{
+                   let {opacity} = this.state;
+                   //减小0.1
+                   opacity -= 0.1;
+                   if(opacity<=0) opacity = 1;
+                   //设置新的透明度
+                   this.setState({opacity:opacity}); /*同名简写：this.setState({opacity});*/
+               },200);
+           }
+           //组件将要卸载的时候调用
+           componentWillUnmount(){
+               //卸载之前，清除定时器
+               clearInterval(this.timer); //方式二
+           }
+           /*类中不可以随便写js代码，函数内可以*/
+           //render调用的时机：初始化渲染、状态更新之后
+           render(){ /*render每次改变状态state都会调用*/
+               console.log('render()...')
+               return (
+                   <div>
+                       <h2 style={{opacity:this.state.opacity}}>React学不会怎么办？</h2>
+                       <button onClick={this.death}>不活了</button>
+                   </div>
+               )
+           }
+       }
+       //渲染
+       ReactDOM.render(<Life/>,document.getElementById('test'));
+   
+   ```
+
+5. 
+
+
 
 
 
