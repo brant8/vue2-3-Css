@@ -3803,7 +3803,7 @@
    
    ```
 
-5. **生命周期流程图（旧）** ![旧流程图](https://github.com/brant8/vue2-3-Css/blob/main/pictures/react_lifecycle_old.png)
+5. **生命周期流程图（旧 版本16）** ![旧流程图](https://github.com/brant8/vue2-3-Css/blob/main/pictures/react_lifecycle_old.png)
 
 6. 生命流程图说明 - 案例
 
@@ -3870,8 +3870,8 @@
                console.log('Count - componentWillUpdate...');
            }
            //设置状态4. 组件更新完毕的钩子;
-           componentDidUpdate(){
-               console.log('Count - componentDidUpdate...');
+           componentDidUpdate(preProps,preState){
+               console.log('Count - componentDidUpdate...',preProps,preState);
            }
            //挂载3. ； 设置状态3.
            render(){
@@ -3926,7 +3926,555 @@
    
    ```
 
-7. react生命周期（新） ![生命周期](https://github.com/brant8/vue2-3-Css/blob/main/pictures/react_lifecycle_new.png)
+7. **react生命周期（新 版本17）** ![生命周期](https://github.com/brant8/vue2-3-Css/blob/main/pictures/react_lifecycle_new.png)
+
+8. react新版17更改：所有Will的方法都改为UNSAFE，除Will了Unmount
+
+   1. `componentWillUpdate` 改名为 `UNSAFE_componentWillUpdate`
+
+   2. `componentWillMount` 改名为 `UNSAFE_componentWillMount`
+
+   3. `componentWillReceiveProps` 改名为 `UNSAFE_componentWillReceiveProps`
+
+   4. 更改原因：这些在未来的异步渲染中，容易被误解滥用，导致潜在问题。
+
+   5. 未来版本强制使用UNSAFE，否则报错。
+
+   6. 多出来的两个新钩子（实际用处不大）
+
+      ```js
+      //示例
+      static getDerivedStateFromProps(props，state){
+          console.log('Count - getDerivedStateFromProps...',props,state);
+          return null; //必须由返回值，null或state Obj（状态对象），null不影响任何
+          return {count:109}; //影响状态更新
+          return props; //props被当作状态用，props来自<A name='Tom'/>
+      }
+      /*此方法适用于罕见的用例，即state的值在任何时候都取决于props。
+      派生状态会导致代码冗余，并使组件难以维护*/
+      ```
+
+      ```js
+      getSnapshotBeforeUpdate(preProps,preState){
+          console.log('getSnapshotBeforeUpdate...',preProps,preState);
+          return null; //返回null或者snapshot值（任何值）
+      }
+      /*在最近一次渲染输出（提交到DOM节点）之前调用。是的组件能在发生更改之前从DOM中捕获一些信息，比如：滚动位置。
+      在生命周期的任何返回值将作为参数传递给componentDidUpdate(preProps,preState,snapshotValue)
+      用法并不常见，但可能出现在UI处理中，比如需要以特殊方式处理滚动位置的聊天线程等*/
+      /*
+        getSnapshotBeforeUpdate
+      	React更新DOM和refs ↓
+        componentDidUpdate
+      */
+      ```
+
+9. 重要的勾子
+
+   1. render：初始化渲染或更新渲染调用
+   2. componentDidMount：开启监听，发送ajax请求
+   3. componentWillUnmount：做一些收尾工作，比如，清理定时器
+
+10. 经典面试题
+
+    1. react/vuew中的key由什么作用，内部原理事什么？
+
+    2. 为什么遍历列表时，key最好不要用index？
+
+    3. 虚拟DOM中key的作用：
+
+       1. 简单的说：key事虚拟DOM对象的标识，在更新显示时，key起着及其重要的作用。
+       2. 详细的说：当状态中的数据发生变化时，react会根据【新数据】生成【新的虚拟DOM】，随后React进行【新虚拟DOM】与【旧虚拟DOM】的diff比较，比较规则如下：
+          1. 旧虚拟DOM找到了与新虚拟DOM相关的key
+             1. 若虚拟DOM中内容没变，直接使用之前的真实DOM
+             2. 若虚拟DOM中内容变了，则生成新的真实DOM，随后替换掉页面中之前的真实DOM
+          2. 旧虚拟DOM中未找到与新虚拟DOM相同的key
+             1. 根据数据创建新的真实DOM，随后渲染到页面
+
+    4. 用index作为key*可能*会引发的问题
+
+       1. 若对数据进行：逆序添加、逆序删除等破坏顺序操作（比如：添加数据在原数据之前）
+          1. 会产生没有必要的真实DOM更新 --> 界面效果没有问题，但是效率低
+       2. 如果结构中还包含输入类DOM
+          1. 会产生错误DOM更新 --> 界面有问题
+       3. 注意：如果不存在对数据逆序添加、逆序删除等破坏顺序操作，仅用于选哪让你列表作用于展示，使用index作为可以是没有问题的。
+
+    5. 开发中如何选择key？
+
+       1. 最好使用每条数据的唯一标识作为key，比如id、手机号、身份证号、学号等唯一值。
+       2. 如果确定只是简单的展示数据，用index也是可以的。
+
+    6. 演示代码
+
+       ```js
+       //创建组件
+           class Person extends React.Component{
+               state = {
+                   persons:[
+                       {id:1,name:'小张',age:18},
+                       {id:2,name:'小李',age:19}
+                   ]
+               }
+               add=()=>{
+                   //获取原来的数据
+                   const {persons} = this.state;
+                   const p = {id:persons.length+1, name:'小王',age:20};
+                   //更新数据状态
+                   // this.setState({persons:[...persons,p]});
+                   this.setState({persons:[p,...persons]});
+               }
+               render(){
+                   return (
+                       <div>
+                           <h2>展示人员信息</h2>
+                           <button onClick={this.add}>添加一个小王</button>
+                           <h3>使用Index索引值作为key</h3>
+                           <ul>
+                           {this.state.persons.map((personObj,index)=>{
+                               return <li key={index}>{personObj.id} - {personObj.name} - {personObj.age}<input type="text"/></li>
+                               })}
+                           </ul>
+                           <hr/>
+                           <h3>使用id唯一标识符作为key</h3>
+                           <ul>
+                               {this.state.persons.map((personObj,index)=>{
+                                   return <li key={personObj.id}>{personObj.id} - {personObj.name} - {personObj.age}<input type="text"/></li>
+                               })}
+                           </ul>
+                       </div>
+                   )
+               }
+           }
+           ReactDOM.render(<Person/>,document.getElementById('test'));
+           /*慢动作回放：使用index索引值作为key
+           * 初始数据：
+           *       {id:1,name:'小张',age:18},
+           *       {id:2,name:'小李',age:19}
+           * 初始虚拟DOM：
+           *       <li key=0>小张---18</li>
+           *       <li key=1>小李---19</li>
+           * 更新后的数据：
+           *       {id:3,name:'小王',age:20},
+           *       {id:1,name:'小张',age:18},
+           *       {id:2,name:'小李',age:19}
+           * 更新后的虚拟DOM：
+           *       <li key=0>小王---20</li>
+           *       <li key=1>小张---18</li>
+           *       <li key=2>小李---19</li>
+           * 索引值与对应的内容被打乱了，原来的DOM不能复用，真实DOM全部重新渲染
+           * */
+       ```
+
+## React脚手架
+
+1. react脚手架：
+
+   1. 用来帮助程序员快速创建一个基于xx库的模板项目
+      1. 包含了所有需要的配置（语法检查、jsx编译、devServer...）
+      2. 下载好了所有相关的依赖
+      3. 可以之间运行一个简单的效果
+   2. react提供了一个用于react项目的脚手架库：`create-react-app`
+   3. 项目整体技术架构：react + webpack + es6 + eslint
+   4. 使用脚手架开发的项目特点：模块化，组件化，工程化
+
+2. 创建项目并启动
+
+   1. 第一步，全局安装：`npm install -g create-react-app`
+   2. 第二步，切换到像创建项目的目录，使用敏玲：`create-react-app hello-react`
+   3. 第三步，进入项目文件夹：`cd hello-react`
+   4. 第四步，启动项目：`npm start`
+
+3. 方式一：yarn相关命令
+
+   ```js
+   //如果有必要，安装yarn
+   npm install -g yarn
+   //starts the development server (常用)
+   yarn start
+   //bundles the app into static fiels for production
+   yarn build
+   //starts the test runner
+   yarn test
+   //removes this tool and copies build dependencies, configuration files and scripts into the app directory.即暴露所有webpack.config.js相关配置，并且不可后退！
+   yarn eject
+   ```
+
+4. 方式二：npm相关命令
+
+   ```js
+   /*Created git commit.
+   
+   Success! Created react_staging_1 at C:\Users\win10pure\Desktop\otherDoc\react_cli\react_staging_1
+   Inside that directory, you can run several commands:*/
+   
+     npm start
+       //Starts the development server.
+   
+     npm run build
+       //Bundles the app into static files for production.
+   
+     npm test
+       //Starts the test runner.
+   
+     npm run eject
+       /*Removes this tool and copies build dependencies, configuration files
+       and scripts into the app directory. If you do this, you can’t go back!*/
+   
+   //We suggest that you begin by typing:
+   
+     cd react_staging_1
+     npm start
+   
+   //Happy hacking!
+   ```
+
+5. 如何运行一个包：查看package.json，当中的`scripts:{ 命令 }`可做参考
+
+6. React生成的目录解构
+
+   1. node_modules：依赖
+
+   2. public - 静态文件：`favicon.icon`（网站页签图标）、**`index.html`（主页面）**、`robots.txt`（爬虫规则文件）、`maifest.json`（应用加壳的配置文件）、`logo192.png`（logo图）、`logo512.png`（logo图）
+
+      ```html
+      <!DOCTYPE html> <!--index.html-->
+      <html lang="en">
+        <head>
+          <meta charset="utf-8" />
+          <!--%PUBLIC_URL%代表public文件夹的路径，浏览器favicon.ico小图标-->
+          <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+          <!--开启理想视口，用于做移动端网页的适配-->
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <!--用于配置浏览器页签+地址栏的颜色（只在安卓手机浏览器有用）-->
+          <meta name="theme-color" content="#000000" />
+          <meta
+            name="description"
+            content="Web site created using create-react-app"
+          />
+          <!--苹果手机通过书签方式添加到手机桌面显示的图标-->
+          <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+          <!--应用加壳：浏览器应用加壳变成 安卓/iOS 手机应用 ； manifest.json用于配置手机图片、获取手机权限，比如声音等-->
+          <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+          <title>React App</title>
+        </head>
+        <body>
+          <!--若浏览器不支持JS时显示这句-->
+          <noscript>You need to enable JavaScript to run this app.</noscript>
+          <div id="root"></div>
+      
+        </body>
+      </html>
+      
+      ```
+
+   3. src - 资源文件：
+
+      1. `App.css`（App组件的样式）、**`App.js`（App组件）**、`App.test.js`（几乎不用）、`index.css`（可迁徙到public目录中并在index.html引用）、**`index.js`（入口文件）**、`logo.svg`（首页logo图片）、`reportWebVitals.js`（页面性能分析文件，需要web-vitals库的支持）、`setupTest.js`（组件单元测试，需要jest-dom库支持）
+
+         ```js
+         //index.js 部分讲解
+         ReactDOM.render(
+           <React.StrictMode>
+             <App />
+           </React.StrictMode>,
+           document.getElementById('root')
+         );
+         //类似于 ReactDOM.render(<App />, document.getElementById('root') );
+         ```
+
+7. 知识巩固 - export暴露 和 import导入
+
+   ```js
+   /*-----------module.js-----------*/
+   const React = {a:1,b:2}; //定义React对象
+   
+   React.Component = class Component { //给React对象追加属性
+   }
+   export default React;
+   //分别暴露（针对第二种导入方式）
+   export class Component{
+   }
+   /*-----------index.js-------------*/
+   //导入方式一
+   import React from './module.js'
+   //使用方式一
+   console.log(React);
+   new React.Component();
+   //使用方式二
+   const {Component} = React;
+   new Component();
+   //导入方式二
+   import React,{Component} from 'react' //{Component}此处非解构赋值
+   new Component();
+   ```
+
+8. ReactCLI自动生成目录及其文件例子：地址]()
+
+9. ReactCLI手动生成案例
+
+   1. 创建目录及文件
+
+      1. `public/index.html`、`src/App.js`、`src/index.js`、`src/components/Hello.js`、`src/components/Hello.css`
+
+   2. 普通js文件与组件区分的两种方式
+
+      1. 组件使用大写字母标识，比如`Hello.js`，其他js使用小写形式开头
+      2. 组件使用`.jsx`结尾，比如 `Hello.jsx`、`App.jsx`，导入import时,`.js`和`.jsx`可以省略
+
+   3. 其他公司可能导入方式：
+
+      1. `src/components/Hello/`目录下的`Hello.js`使用`index.js`命名，每个组件下都使用该方式
+      2. `App.jsx`导入时，可以省略该`index`：`import Hello from './components/Hello'`即可。
+
+   4. CSS样式冲突解决方式一(较少使用)
+
+      1. 组件CSS文件命名为：`Hello/index.module.css`
+      2. 在组件内部`Hello/index.jsx`导入使用：`import hello from './index.module.css'`
+      3. 在render代码中使用：`<h2 className={hello.title}>Hello,React</h2>`
+
+   5. CSS样式冲突解决方式二：使用less
+
+      1. 在CSS中使用嵌套方式：`.hello{ .title{background-color:orange;} }`
+
+   6. 代码示例
+
+      ```js
+      /*---------------index.js-----------------*/
+      //引入React核心库
+      import React from 'react';
+      //引入ReactDOM
+      import ReactDOM from 'react-dom';
+      //引入App组件
+      import App from './App';
+      
+      //渲染App到页面
+      ReactDOM.render(<App/>,document.getElementById('root'));
+      /*---------------App.js-----------------*/
+      //创建外壳组件App
+      import React from 'react';
+      import Hello from './components/Hello'
+      
+      class App extends React.Component{
+          render(){
+              return (
+                  <div>
+                      <Hello/>
+                  </div>
+              );
+          }
+      }
+      //暴露App组件
+      export default App;
+      /*---------------Hello.js-----------------*/
+      import React,{Component} from "react";
+      import './Hello.css'; //注意：资源文件需要带目录符号
+      
+      export default class Hello extends Component{
+          render(){
+              return (
+                  <h1 className="title">Hello React</h1>
+              );
+          }
+      }
+      ```
+
+   7. VSCode插件安装推荐：ES7 React/Redux/GraphQL
+
+      1. 快捷键快速插入类组件模板：`rcc`
+      2. 快捷键快速插入函数组件模板：`rfc`
+
+10. 案例讲解：
+
+    1. 子组件与父组件之间的数据交互
+
+       1. App通过虚拟数据状态`state.todos`设置初始数据
+       2. 通过调用子组件向组件传递数据`<Header a={this.a} addTodo={this.addTodo}/>`
+       3. 父组件的方法使用箭头函数，让子组件向父组件传值`addTodo=(todoObj)=>{..}`
+       4. 子组件通过组件赋值方式获得父组件传递来的值`const{todos}=this.props`
+       5. 子组件同通过父组件传递过来的箭头函数，在子组件中获取的值对象当参数传递给箭头函数，进而给父组件传值`this.props.addTodo(todoObj)`
+       6. 子组件通过`.map()`进行遍历数组对象`todos.map((todo,index)=>{...})`
+       7. 在render中对于指定事件回调时`<li onMouseLeave={this.handleMouse(false)} ..`，有括号传参，需要使用让其调用的方法使用箭头函数并且返回一个箭头函数才行。`handleMouse=(flag)=>{..}`；关键字：高阶函数。
+       8. 事件触发时，若使用的是箭头函数，调用者是诸如页面节点时，可以传递`event`
+
+    2. index.js（src目录下的）
+
+       ```js
+       //引入React核心库
+       import React from 'react';
+       //引入ReactDOM
+       import ReactDOM from 'react-dom';
+       //引入App组件
+       import App from './App';
+       
+       //渲染App到页面
+       ReactDOM.render(<App/>,document.getElementById('root'));
+       ```
+
+    3. App.jsx
+
+       ```jsx
+       //创建外壳组件App
+       import React from 'react';
+       import Header from './components/Header'
+       import List from './components/List'
+       import Footer from './components/Footer'
+       import  './App.css';
+       
+       class App extends React.Component{
+           //初始化状态
+           state = {
+               todos:[
+                   {id:'001',name:'吃饭',done:true},
+                   {id:'002',name:'睡觉',done:true},
+                   {id:'003',name:'打代码',done:false},
+               ]
+           };
+           //子传父方式：通过箭头函数，在App定义，调用子组件传递给子组件传递该箭头函数，
+           a = (data)=>{
+               console.log('APP...',data);
+           }
+           addTodo = (todoObj)=>{ //最好传递一个对象到子组件进行返回给数组对象
+               console.log('App',todoObj);
+               //获取原todos
+               const {todos} = this.state;
+               const newTodos = [todoObj,...todos];
+               this.setState({todos: newTodos});
+           }
+           render(){
+               const {todos} = this.state;
+               return (
+                   <div className="todo-container">
+                       <div className="todo-wrap">
+                           {/* <Header a={1}/>  通过App.js给Header组件传数据*/}
+                           <Header a={this.a} addTodo={this.addTodo}/>
+                           <List todos={todos}/> {/*todos变量在List组件中也要用todos接收*/}
+                           <Footer />
+                       </div>
+                   </div>
+               );
+           }
+       }
+       //暴露App组件
+       export default App;
+       ```
+
+    4. Header.jsx
+
+       ```jsx
+       import React, {Component} from 'react';
+       import {nanoid} from 'nanoid';
+       import './index.css';
+       
+       class Index extends Component {
+           handleKeyUp = (event)=>{
+               //结构赋值获取keyCode,target，下面的值可使用keyCode作为参数
+               const {keyCode,target} = event;
+               //event.keyCode获得回车确认
+               if(keyCode !== 13) return
+               //如果为空不能添加
+               if(target.value.trim() ===''){
+                   alert('输入不能为空')
+                   return
+               }
+                   console.log(event.target.value,event.keyCode);
+                   //通过App.jsx传递过来的回调函数，在子函数传递参数即可返回数据给父组件
+                   this.props.a(event.target.value);
+               //准备好一个todo对象,使用uuid进行唯一值的设定，'npm i uuid'（库占容量大，使用nanoid小巧同时也可以生成uuid）
+               const todoObj = {id:nanoid(),name:target.value,done:false};
+               //将todoObj传递给App
+               this.props.addTodo(todoObj);
+               //回车添加完毕后，清空输入
+               target.value='';
+           }
+       
+       
+           render() {
+               return (
+                       <div className="todo-header">
+                           <input onKeyUp={this.handleKeyUp} type="text" placeholder="请输入你的任务名称，按回车键确认"/>
+                       </div>
+               );
+           }
+       }
+       
+       export default Index;
+       ```
+
+    5. List.jsx
+
+       ```jsx
+       import React, {Component} from 'react';
+       import Item from '../Item';
+       import './index.css';
+       
+       class Index extends Component {
+           render() {
+               const {todos} = this.props;
+               return (
+                   <ul className="todo-main">
+                       {
+                           todos.map((todo,index)=>{
+                               return <Item key={todo.id} {...todo}/> /*批量传递参数 ； 在Item中接收方式与傻瓜式传一样*/
+                               /* 傻瓜式传递参数到ITEM中
+                               return <Item key={todo.id} id={todo.id} name={todo.name} done={this.done}/> */
+                               /*Warning:Each child in a list should have a unique "key" prop
+                               * 能用id最好用id，否则用key*/
+                           })
+                       }
+                   </ul>
+               );
+           }
+       }
+       
+       export default Index;
+       ```
+
+    6. Item.jsx
+
+       ```jsx
+       import React, {Component} from 'react';
+       import './index.css';
+       
+       class Index extends Component {
+           render() {
+               //接收从List传过来的参数
+               const {id,name,done} = this.props;
+               return (
+                   <li>
+                       <label>
+                           <input type="checkbox" id={id} defaultChecked={done}/>
+                           {/* 使用：checked={done} 报以下错误
+                           Warning: You provided a `checked` prop to a form field without an `onChange` handler.
+                           This will render a read-only field. If the field should be mutable use `defaultChecked`.
+                           defaultChecked={done} 后期会由bug*/}
+                           <span>{name}</span>
+                       </label>
+                       <button className="btn btn-danger" style={{display:'none'}}>删除</button>
+                   </li>
+               );
+           }
+       }
+       
+       export default Index;
+       ```
+
+    7. 报错信息部分提示
+
+       ```js
+       /**当更新状态非this.setState({mouse:flag});而是this.setState(flag);时报以下错
+       * Uncaught Error: setState(...): takes an object of state variables to update or a function
+       * which returns an object of state variables.*/
+       ```
+
+    8. 知识巩固（案例中用到类似的）
+
+       ```js
+       //更改对象中的值(浅拷贝)
+       let obj = {a:1,b:2};
+       let obj2 = {...obj,b:3}; 
+       console.log{obj2}  //{a:1,b:3}
+
+
 
 
 

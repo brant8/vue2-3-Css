@@ -23,7 +23,7 @@
                 super(props);
                 /*this.state = true; 不能直接赋值，若render中有多个状态需要更改，单个值无法实现*/
                 this.state = {isHot:false,wind:'大风'}; //3.初始化状态
-                this.changeWeather = this.changeWeather.bind(this);
+                this.changeState = this.changeState.bind(this);
             }
             render(){
                 console.log(this);
@@ -42,6 +42,12 @@
                  此处的this是undefined
                 */
                 console.log(this);
+                const isHot = this.state.isHot;
+                //严重注意：状态state不可以直接更改，要借助一个内置API去更改
+                //this.state.isHot = !isHot;
+                //
+                this.setState({isHot:!isHot})
+                console.log(this.state.isHot)
             }
         }
         //2.渲染虚拟DOM到页面

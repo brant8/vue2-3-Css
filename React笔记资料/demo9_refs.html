@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div id="test"></div>
+
+
+<script type="text/javascript" src="new/react.development.js"></script> <!--React-->
+<script type="text/javascript" src="new/react-dom.development.js"></script><!--ReactDOM-->
+<script type="text/javascript" src="new/babel.min.js"></script>
+<script type="text/javascript" src="new/prop-types.js"></script> <!--用于对组件标签属性进行限制 PropTypes-->
+
+<script type="text/babel">
+    class Demo extends React.Component{
+        showData = ()=>{
+            /*render中return的<input id="input1" type="text" placeholder="点击按钮提示数据"/>
+            const input1 = document.getElementById('input1');
+            alert(input1.value);*/
+            console.log(this);
+            console.log(this.refs.input1); //refs不获取虚拟DOM，而是获取真实DOM节点
+            debugger;
+            const {input1} = this.refs;
+            alert(input1.value);
+        }
+        showData2 = ()=>{
+            const {input2} = this.refs;
+            alert(input2.value);
+        }
+        render(){
+            return (
+                <div>
+                    <input ref="input1" type="text" placeholder="点击按钮提示数据"/>&nbsp;
+                    <button ref="button1" onClick={this.showData}>点我提示左侧的数据</button> &nbsp;
+                    <input onBlur={this.showData2} ref="input2" type="text" placeholder="失去焦点提示数据"/>
+                </div>
+            );
+        }
+    }
+
+    ReactDOM.render(<Demo/>,document.getElementById('test'));
+
+</script>
+
+
+
+
+
+</body>
+</html>

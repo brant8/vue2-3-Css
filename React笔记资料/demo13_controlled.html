@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div id="test"></div>
+
+
+<script type="text/javascript" src="new/react.development.js"></script> <!--React-->
+<script type="text/javascript" src="new/react-dom.development.js"></script><!--ReactDOM-->
+<script type="text/javascript" src="new/babel.min.js"></script>
+<script type="text/javascript" src="new/prop-types.js"></script> <!--用于对组件标签属性进行限制 PropTypes-->
+
+<script type="text/babel">
+    class Login extends React.Component{
+        //初始化状态
+        state = {
+            username:'',
+            password:''
+        }
+        //保存用户名到状态中
+        saveUsername=(event)=>{
+            console.log(event.target.value);
+            this.setState({username:event.target.value}); //可查看开发者工具检查是否设置（最好初始化state）
+        }
+        handleSubmit = (event)=>{
+            event.preventDefault();//原生JS阻止表单提交（页面刷新跳转—）
+            alert(`你输入的用户名是${username}`);
+        }
+        render(){
+            return (
+                <form onSubmit={this.handleSubmit}>
+                    用户名：<input onChange={this.saveUsername} type="text" name="username"/>
+                    密码：  <input type="password" name="password"/>
+                    <button>登录</button>
+                </form>
+            );
+        }
+    }
+
+    ReactDOM.render(<Login/>,document.getElementById('test'));
+
+</script>
+
+
+
+
+
+</body>
+</html>

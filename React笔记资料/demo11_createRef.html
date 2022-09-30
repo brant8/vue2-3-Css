@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div id="test"></div>
+
+
+<script type="text/javascript" src="new/react.development.js"></script> <!--React-->
+<script type="text/javascript" src="new/react-dom.development.js"></script><!--ReactDOM-->
+<script type="text/javascript" src="new/babel.min.js"></script>
+<script type="text/javascript" src="new/prop-types.js"></script> <!--用于对组件标签属性进行限制 PropTypes-->
+
+<script type="text/babel">
+    class Demo extends React.Component{
+        myRef = React.createRef();
+
+        showData = ()=>{
+            console.log(this.myRef); //输出 {current:input} - {键：值}
+            console.log(this.myRef.current.value);//输出 用户键入的值
+        }
+
+        render(){
+            return (
+                <div>
+                    <input ref={this.myRef} type="text" placeholder="点击按钮提示数据"/>&nbsp;
+                    {/*React.createRef得到一个容器myRef，当ref标记后，<input>节点会存到this.myRef中
+
+                    */}
+                    <button ref="button1" onClick={this.showData}>点我提示左侧的数据</button> &nbsp;
+                </div>
+            );
+        }
+    }
+
+    ReactDOM.render(<Demo/>,document.getElementById('test'));
+
+</script>
+
+
+
+
+
+</body>
+</html>

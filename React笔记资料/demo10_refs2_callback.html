@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div id="test"></div>
+
+
+<script type="text/javascript" src="new/react.development.js"></script> <!--React-->
+<script type="text/javascript" src="new/react-dom.development.js"></script><!--ReactDOM-->
+<script type="text/javascript" src="new/babel.min.js"></script>
+<script type="text/javascript" src="new/prop-types.js"></script> <!--用于对组件标签属性进行限制 PropTypes-->
+
+<script type="text/babel">
+    class Demo extends React.Component{
+        state = {isHot:true};
+
+        showData = ()=>{
+            debugger;
+            const {input1} = this; //直接从实例上取属性
+            alert(input1.value);
+        }
+        showData2 = ()=>{
+            const {input2} = this; //直接从实例上取属性
+            alert(input2.value);
+        }
+        render(){
+            return (
+                <div>
+                    <h2>今天天气很{isHot ? '炎热':'凉爽'}</h2>
+                    <input ref={ (a)=>{ console.log('@',a) } } type="text" placeholder="点击按钮提示数据"/> {/*输出当前节点<input ..>*/}
+                    <input ref={ (a)=>{ this.input1 = a } } placeholder="点击按钮提示数据"/>&nbsp; {/*this.input1=a表示把当前节点放在组件自身上，给与属性input1，其中的this因为其是箭头函数，向上找调用这，在render()中的this，其调用者为组件实例对象*/}
+                    <input ref={ (currentNode)=>{ this.input1 = currentNode } } placeholder="点击按钮提示数据"/>&nbsp; {/*正常模式*/ }
+                    <input ref={ c=> this.input1 = c } placeholder="点击按钮提示数据"/>&nbsp;  {/*简写模式*/}
+                    <button onClick={this.showData}>点我提示左侧的数据</button> &nbsp;
+                    <input onBlur={this.showData2} ref={ c=> this.input2 = c } type="text" placeholder="失去焦点提示数据"/>
+                </div>
+            );
+        }
+    }
+
+    ReactDOM.render(<Demo/>,document.getElementById('test'));
+
+</script>
+
+
+
+
+
+</body>
+</html>

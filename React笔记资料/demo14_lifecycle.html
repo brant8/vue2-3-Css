@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div id="test"></div>
+
+
+<script type="text/javascript" src="new/react.development.js"></script> <!--React-->
+<script type="text/javascript" src="new/react-dom.development.js"></script><!--ReactDOM-->
+<script type="text/javascript" src="new/babel.min.js"></script>
+<script type="text/javascript" src="new/prop-types.js"></script> <!--用于对组件标签属性进行限制 PropTypes-->
+
+<script type="text/babel">
+    //创建组件
+    class Life extends React.Component{
+        /*挂载组件 mount
+        卸载组件 unmount
+        */
+        state = {opacity:0};
+        death = ()=>{
+            //卸载之前，清除定时器
+            clearInterval(this.timer); //方式一
+            //卸载组件
+            ReactDOM.unmountComponentAtNode(document.getElementById('test'));
+        }
+        //组件挂在页面之后调用（只调用一次）
+        componentDidMount(){ /*componentDidMount与render均属于React预置函数， 类Life实例对象X.componentDidMount*/
+            this.timer = setInterval(()=>{
+                let {opacity} = this.state;
+                //减小0.1
+                opacity -= 0.1;
+                if(opacity<=0) opacity = 1;
+                //设置新的透明度
+                this.setState({opacity:opacity});
+            },200);
+        }
+        //组件将要卸载的时候调用
+        componentWillUnmount(){
+            //卸载之前，清除定时器
+            clearInterval(this.timer); //方式二
+        }
+        /*类中不可以随便写js代码，函数内可以*/
+        //render调用的时机：初始化渲染、状态更新之后
+        render(){ /*render每次改变状态state都会调用*/
+            console.log('render()...')
+            return (
+                <div>
+                    <h2 style={{opacity:this.state.opacity}}>React学不会怎么办？</h2>
+                    <button onClick={this.death}>不活了</button>
+                </div>
+            )
+        }
+    }
+    //渲染
+    ReactDOM.render(<Life/>,document.getElementById('test'));
+
+</script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div id="test"></div>
+
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script type="text/javascript" src="new/babel.min.js"></script>
+<script type="text/babel">
+    //创建组件
+    class Time extends React.Component {
+        state = {date:new Date()};
+        componentDidMount(){
+            setInterval(()=>{
+                this.setState({
+                    date:new Date()
+                })
+            },1000)
+        }
+        render(){
+            return (
+                <div>
+                    <h1>Hello</h1>  {/*在真实DOM不变*/}
+                    <input type="text" />  {/*在真实DOM不变*/}
+                    <span>现在是：{this.state.date.toTimeString()}</span> {/*最小力度的标签/节点*/}
+                </div>
+            );
+        }
+    }
+    ReactDOM.render(<Time/>,document.getElementById('test'));
+
+</script>
+
+</body>
+</html>

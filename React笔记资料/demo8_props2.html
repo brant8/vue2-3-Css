@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div id="test"></div>
+<div id="test2"></div>
+
+<script type="text/javascript" src="new/react.development.js"></script> <!--React-->
+<script type="text/javascript" src="new/react-dom.development.js"></script><!--ReactDOM-->
+<script type="text/javascript" src="new/babel.min.js"></script>
+<script type="text/javascript" src="new/prop-types.js"></script> <!--用于对组件标签属性进行限制 PropTypes-->
+
+<script type="text/babel">
+    //创建组件
+    class Person extends React.Component{
+        render(){
+            return (
+                <ul>
+                    <li>姓名：{this.props.name}</li>
+                    //<li>姓名：{name}</li> 解构赋值
+                    <li>性别：男</li>
+                    <li>年龄：{this.props.age}</li>
+                </ul>
+            );
+        }
+    }
+    Person.propTypes = { //prop属性规则，固定名字，React会在类中的属性查找propTypes当作规则
+        /*name:React.PropTypes.string, //具体的规则时大写PropTypes,此处适用于React版本15以前 */
+        name:PropTypes.string.isRequired,
+        sex:PropTypes.string,
+        age:PropTypes.number
+    }
+    Person.defaultProps = {
+        sex:'不男不女', //设置默认值
+        age:18
+    }
+    const p = {name:'老刘',age:18,sex:'女'};
+
+    //渲染
+    ReactDOM.render(<Person name="Tom2" age='18'/>,document.getElementById('test'));
+
+</script>
+
+
+
+
+
+<script>
+    let arr1 = [1,3,5,7];
+    let arr2 = [2,4,6,8];
+    console.log(...arr1); //展开数组分别输出
+    let arr3 = [...arr1,...arr2];
+    console.log(arr3); //连接数组
+    function sum(...num){
+        console.log('@',num); //数组(3)[1, 2, 3]
+        return num.reduce((pre,current)=>{ //reduce有返回值
+            return pre+current;
+        })
+    }
+    console.log(sum(1,2,3));  //求和
+
+    let person = {name:'tom',age:18};
+    //let person2 = person; //复制对象，此处非复制，知识传递地址引用，深复制、浅复制
+    let person2 = {...person}; //新语法，展开语法（火狐MDN），复制对象
+    // console.log(...person);  //报错，无法展开一个对象
+    console.log(person2.name);
+
+    let person3 = {...person,name:'jack'};//复制的同时修改属性值
+    console.log(person3);
+</script>
+
+</body>
+</html>

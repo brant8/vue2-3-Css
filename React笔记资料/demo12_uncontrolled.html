@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div id="test"></div>
+
+
+<script type="text/javascript" src="new/react.development.js"></script> <!--React-->
+<script type="text/javascript" src="new/react-dom.development.js"></script><!--ReactDOM-->
+<script type="text/javascript" src="new/babel.min.js"></script>
+<script type="text/javascript" src="new/prop-types.js"></script> <!--用于对组件标签属性进行限制 PropTypes-->
+
+<script type="text/babel">
+    class Login extends React.Component{
+        handleSubmit = (event)=>{
+            event.preventDefault();//原生JS阻止表单提交（页面刷新跳转—）
+            const {username,password} = this;
+            alert(username.value);
+        }
+        render(){
+            return (
+                <form action="http://www.atguigu.com" onSubmit={this.handleSubmit}>
+                    用户名：<input ref={c=>this.username=c} type="text" name="username"/>
+                    密码：  <input ref={c=>this.password=c} type="password" name="password"/>
+                    <button>登录</button>
+                </form>
+            );
+        }
+    }
+
+    ReactDOM.render(<Login/>,document.getElementById('test'));
+
+</script>
+
+
+
+
+
+</body>
+</html>
