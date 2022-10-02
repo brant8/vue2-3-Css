@@ -4294,7 +4294,15 @@
        5. 子组件同通过父组件传递过来的箭头函数，在子组件中获取的值对象当参数传递给箭头函数，进而给父组件传值`this.props.addTodo(todoObj)`
        6. 子组件通过`.map()`进行遍历数组对象`todos.map((todo,index)=>{...})`
        7. 在render中对于指定事件回调时`<li onMouseLeave={this.handleMouse(false)} ..`，有括号传参，需要使用让其调用的方法使用箭头函数并且返回一个箭头函数才行。`handleMouse=(flag)=>{..}`；关键字：高阶函数。
-       8. 事件触发时，若使用的是箭头函数，调用者是诸如页面节点时，可以传递`event`
+       8. 同样对事件回调不使用高阶函数，在调用时直接用箭头函数`<button onClick={()=>{this.handleDelete(id)}}`，然后在组件中定义`handleDelete=(id)=>{ console.log('通知App删除',id) }`，避开使用高阶函数
+       9. 事件触发时，若使用的是箭头函数，调用者是诸如页面节点时，可以传递`event`
+       10. 对propType进行限制，新版React需要额外安装：`npm i prop-types`
+       11. 对于删除按钮，使用`window.confirm('确定删除吗')`进行条件判断，不让用户直接删除，从父组件传过来的方法，使用`this.props.deleteTodos(id)`进行接收调用
+       12. 使用数组方法`.reduce((前一个值,当前值)=>{return ..},初始值)`进行数量统计，使用方法，查看[MDN](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce)
+       13. 勾选框中的`<div .. checked=true>`必须使用onchange函数，或者使用`defaultChecked`（可临时在Item组件使用），但是defaultChecked只能在第一次的时候奏效（页面第一次加载的时候）；`checked`可以指定多次，且以最后一次指定为主。`<div onChange={this.changeStatus} checked={..}`
+       14. 使用`event`获取勾选框的勾选状态，常用在`onChange=XX`的回调函数上，`event.target.checked`；或者获取输入框的值`event.target.value`
+       15. 每个App下面的函数调用要对数据进行操作的时候，都要先获取原数据`const {todos} = this.state`才能对数据进行操作加工
+       16. 使用数组方法`.filter((objItem)=>{ return 条件 })`对数据进行筛选
 
     2. index.js（src目录下的）
 
@@ -4473,6 +4481,21 @@
        let obj = {a:1,b:2};
        let obj2 = {...obj,b:3}; 
        console.log{obj2}  //{a:1,b:3}
+       ```
+
+    9. toDoList案例总结：
+
+       1. 拆分组件、实现静态组件，注意className、style的写法
+       2. 动态初始化李彪，如何确定将数据放在哪个组件中的state中？
+          1. 某个组件使用：放在自身的state中
+          2. 某些组件使用：放在他们共同的父组件state中（官方称此操作为：状态提升）
+       3. 关于父子之间通信：
+          1. 【父组件】给【子组件】传递数据：通过props传递
+          2. 【子组件】给【父组件】传递数据：通过props传递，要求父提前给子传递一个函数
+       4. 注意defaultChecked和checked的区别，类似的还有 defaultValue 和 value
+       5. 状态在哪里，操作状态的方法就在哪里
+
+    10. 
 
 
 
