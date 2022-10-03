@@ -4495,7 +4495,62 @@
        4. 注意defaultChecked和checked的区别，类似的还有 defaultValue 和 value
        5. 状态在哪里，操作状态的方法就在哪里
 
-    10. 
+## React与Ajax
+
+1. 说明
+
+   1. React本身只关注于界面，并包含发送ajax 请求的代码。
+   2. 前端应用需要通过ajax请求与后端进行交互（json 数据）
+   3. react应用中需要继承第三方ajax（或自己封装）
+
+2. 常用的ajax请求库
+
+   1. jQuery：比较重，如果需要另外引入，不建议使用。
+   2. Axios：轻量级，建议使用
+      1. 封装XmlHttpRequest对象的ajax
+      2. promise风格
+      3. 可以用在浏览器端和node服务器端
+
+3. 注意跨域问题：
+
+   1. 同服务器不同端口，也属于跨域。
+   2. React中，对于跨域问题，使用代理服务器解决。
+
+4. 代理服务器：
+
+   1. 【client:3000 - client:3000(代理) - server:5000】：中间人，没有ajax引擎，
+   2. 跨域产生的根本：ajax引擎把响应给拦住了
+
+5. React配置代理的两种方式
+
+   1. 方式一：配置`package.json` （单个代理服务器）
+
+      ```json
+      "proxy": "http://localhost:5000" //单独写一行，不能写localhost:5000/student具体接口，否则其他资源无法获取
+      ```
+
+      1. 在App中使用axios获取
+
+         ```js
+         getStudentData=()=>{
+             axios.get('http://localhost:3000/students').then(
+             //axios.get('http://localhost:3000/index.html') 得到的时本地public中的index.html代码输出
+             //axios.get('http://localhost:3000/index2.html') 得到报错，当本地资源没有时，向服务器端获取，若服务器端也没有则报错
+                 response=>{
+                     console.log('成功了',response.data);
+                 },
+                 error=>{
+                     console.log('失败了',error);
+                 }
+             )
+         }
+         ```
+
+      2. 
+
+   2. 方式二：
+
+6. 
 
 
 
