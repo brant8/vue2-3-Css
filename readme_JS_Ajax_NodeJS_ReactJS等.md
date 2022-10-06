@@ -4283,9 +4283,9 @@
       1. 快捷键快速插入类组件模板：`rcc`
       2. 快捷键快速插入函数组件模板：`rfc`
 
-10. 案例讲解：
+10. **案例讲解：todoList**
 
-    1. 子组件与父组件之间的数据交互
+    1. 子组件与父组件之间的**数据交互**
 
        1. App通过虚拟数据状态`state.todos`设置初始数据
        2. 通过调用子组件向组件传递数据`<Header a={this.a} addTodo={this.addTodo}/>`
@@ -4521,7 +4521,7 @@
    1. 【client:3000 - client:3000(代理) - server:5000】：中间人，没有ajax引擎，
    2. 跨域产生的根本：ajax引擎把响应给拦住了
 
-5. React配置代理的两种方式
+5. **React配置代理的两种方式** （[尚硅谷笔记连接](https://github.com/brant8/vue2-3-Css/blob/main/%E5%B0%9A%E7%A1%85%E8%B0%B7reactCLI/react%E8%84%9A%E6%89%8B%E6%9E%B6%E9%85%8D%E7%BD%AE%E4%BB%A3%E7%90%86.md)）
 
    1. 方式一：配置`package.json` （单个代理服务器）
 
@@ -4546,11 +4546,801 @@
          }
          ```
 
-      2. 
+   2. 方式二：创建配置文件`src/setupProxy.js`
 
-   2. 方式二：
+      1. 配置文件方式优点：配置多个代理；灵活控制请求是否走代理。但是配置繁琐
 
-6. 
+      ```js
+      //React找到setupProxy文件，加载到webpack中的node里面
+      /*低版本配置时：
+      const proxy = require('http-proxy-middleware') //React脚手架初始化时自动下载好
+       */
+      /*高版本*/
+      const {createProxyMiddleware} = require('http-proxy-middleware') //React脚手架初始化时自动下载好
+      
+      module.exports = function(app){ //app为服务对象
+          app.use(
+              // proxy('路径',{ 配置对象 })
+              createProxyMiddleware('/api1',{
+                  target:'http://localhost:5000',
+                  secure:false,//验证是否https的安全证书
+                  changeOrigin:true, //必须是true，控制服务器收到的响应头中Host字段的值
+                  /*不加changeOrigin,服务器输出显示知道来自端口3000的请求
+                  * 有了changeOrigin，服务器输出限制地址来自自身端口5000的请求*/
+                  pathRewrite:{"^/api1":""} //重写请求路径
+              }),
+              createProxyMiddleware('/api2',{
+                  target:'http://localhost:5001',
+                  secure:false,
+                  changeOrigin:true,
+                  pathRewrite:{'^/api2':''}
+              }),
+          )
+      }
+      ```
+
+      ```js
+      import React, {Component} from 'react';
+      import axios from 'axios';
+      
+      class App extends Component {
+          getStudentData=()=>{
+              axios.get('http://localhost:3000/api1/students0').then(
+                  response=>{
+                      console.log('成功了',response.data);
+                  }).catch(
+                  error=>{
+                      console.log('失败了',error);
+                  }
+              )
+          }
+          getCarData=()=>{
+              axios.get('http://localhost:3000/api2/cars').then(
+                  response=>{
+                      console.log('成功了',response.data);
+                  },
+                  error=>{
+                      console.log('失败了',error);
+                  }
+              )
+          }
+          render() {
+              return (
+                  <div>
+                      <button onClick={this.getStudentData}>点击获取学生数据</button>
+                      <button onClick={this.getCarData}>点击获取学生数据</button>
+                  </div>
+              );
+          }
+      }
+      
+      export default App;
+      ```
+
+6. **案例：Github搜索用户**
+
+   1. 使用bootstrap的CSS，对于有生态的静态文件，把其放在`/public`目录中，可以具体分类到`/public/css`下，在`/public/index.html`中进行引用。
+
+   2. 自定义CSS可以放在APP中或者组件中进行分别引用。
+
+   3. 使用`target="_blank"`控制跳转当前页还是到其他页，旧版需要配合使用`rel="noreferrer"`
+
+   4. 在`<img>`标签中，需要使用`<img alter="xx" ..`来定义，当图片没有显示出来时使用文字输出。
+
+      ```js
+      //通过ref获取input用户输入的值
+      console.log(this.keyWordElement.value);
+      /*const {value} = this.keyWordElement; -> console.log(value)
+              const {keyWordElement} = this;  -> console.log(keyWordElement.value) */
+      const {keyWordElement:{value}} = this; //解构赋值的解构赋值；解构赋值连续写法;console.log(keyWordElement)报错
+      //发送网络请求
+      axios.get(`http://localhost:3000/api1/search/users?q=${value}`).then(...
+          //axios.get(`/api1/search/users?q=${value}`)...   当在localhost:3000页面下，给localhost:3000发送请求，可以省略地址
+      ```
+
+   5. 当接收的数据来自 子组件的时候，在App根组件里的`state={data:[]}`先定于预留接收的参数名（初始化）
+
+   6. 在List中，把获取到的`this.props`内容直接在`render`混合输出
+
+      ```js
+      class Index extends Component {
+          render() {
+              return (
+                  <div className="row"> {/*一定要有根div*/}
+                  {this.props.users.map((userObj)=>{
+                      return (
+                          <div key={userObj.id} className="card"> {/*遍历的内容，一定要加key*/}
+                              <a href={userObj.html_url} rel="noreferrer" target="_blank">
+                                  <img alt="avatar" src={userObj.avatar_url} style={{width: '100px'}}/>
+                              </a>
+                              <p className="card-text">{userObj.login}</p>
+                          </div>
+                      )
+                    })
+                  }
+                  </div>
+              );
+          }
+      }
+      
+      export default Index;
+      ```
+
+   7. 展示输出界面要有不同情况的输出
+
+      1. 加载登陆后首次显示的内容
+      2. 用户输入后显示加载中
+      3. 从服务器获得数据后加载的内容
+      4. 当服务器挂掉后显示的err内容
+
+   8. render中的return里面：jsx不能写if没有返回结果的语句，可以用三元表达式
+
+      ```js
+      class Index extends Component {
+          render() {
+              const {users, isFirst, isLoading, err} = this.props; //使用props接收父组件传过来的state
+              return (
+                  <div className="row">
+                  { /*jsx不能写if没有返回结果的语句，可以用三元表达式，三元可以使用多个表达*/
+                      isFirst ? <h2>输入关键字后，点击搜索</h2> :
+                      isLoading ? <h2>Loading...</h2> :
+                      err ? <h2>{err}</h2> :
+                      users.map((userObj)=>{
+                      return (
+                          <div key={userObj.id} className="card">
+                              <a href={userObj.html_url} rel="noreferrer" target="_blank">
+                                  <img alt="avatar" src={userObj.avatar_url} style={{width: '100px'}}/>
+                              </a>
+                              <p className="card-text">{userObj.login}</p>
+                          </div>
+                      )
+                    })
+                  }
+                  </div>
+              );
+          }
+      }
+      
+      export default Index;
+      ```
+
+   9. 父组件传递给子组件state，可以使用批量传递`<List {...this.state} />`
+
+      ```js
+      state = {
+              users:[],
+              isFirst:true, //是否第一次打开页面
+              isLoading:false, //标识是否处于加载中
+              err:''//存储请求相关的错误信息
+          }//初始化数据
+      ```
+
+7. 其他知识巩固
+
+   1. 对于解构赋值的用法：连续解构赋值
+
+      ```js
+      let obj={a:{b:{c:1}}}
+      let obj2={a:{b:1}}
+      console.log(obj.a.b.c); //1
+      const {a:{b:{c}}} = obj
+      console.log(c);//获取c -> 1
+      const {a:{b}} = obj2
+      console.log(b);//获取b
+      //获取b的同时给b改名
+      const {a:{b:data}} = obj2
+      console.log(data); //1
+      ```
+
+## 消息订阅与发布机制
+
+1. 基本 - 工具库：PubSubJS
+
+   1. 安装命令：`npm install pubsub-js --save`
+
+2. 使用：
+
+   1. 引入 `import PubSub from 'pubsub-js'`
+   2. 订阅 `PubSub.subscribe('delete',function(data){..})`
+   3. 发布消息 `PubSub.publish('delete',data)`
+
+3. 例如Github的Search搜索和List展示组件
+
+   1. Search组件 - 发布消息
+
+      ````js
+      class Index extends Component {
+          search=()=>{
+              const {keyWordElement:{value}} = this; //解构赋值的解构赋值；解构赋值连续写法
+              console.log('@@',value)
+              //发送请求前通知List更新状态
+              // this.props.updateAppState({isFirst:false,isLoading:true})
+              PubSub.publish('atguigu',{isFirst:false,isLoading:true})
+              //发送网络请求
+              axios.get(`http://localhost:3000/api1/search/users?q=${value}`).then(
+                  response =>{
+                      console.log('成功了',response.data)
+                      // this.props.updateAppState({isLoading:false,users:response.data.items})
+                      PubSub.publish('atguigu',{isLoading:false,users:response.data.items})
+                  },
+                  error=>{
+                      console.log('失败了',error)
+                      // this.props.updateAppState({isLoading:false,err:'数据获取失败:'+error.message}) //不能存错误对象error，只能使用error.message
+                      PubSub.publish('atguigu',{isLoading:false,err:'数据获取失败:'+error.message})
+                  }
+              )
+          }
+          render() {
+              return (
+                  <section className="jumbotron">
+                      <h3 className="jumbotron-heading">搜索 Github 用户</h3>
+                      <div>
+                          <input ref={ c=>this.keyWordElement = c} type="text" placeholder="输入关键词点击搜索"/>&nbsp;
+                          <button onClick={this.search}>搜索</button>
+                      </div>
+                  </section>
+              );
+          }
+      }
+      
+      export default Index;
+      ````
+
+   2. List组件 - 接收/订阅消息
+
+      ```js
+      class Index extends Component {
+          state = {
+              users:[],
+              isFirst:true, //是否第一次打开页面
+              isLoading:false, //标识是否处于加载中
+              err:''//存储请求相关的错误信息
+          }
+      
+          componentDidMount() {
+              /**订阅消息*/
+              this.token = PubSub.subscribe('atguigu',(msg,stateObj)=>{
+                  this.setState(stateObj);
+              })
+          }
+          componentWillUnmount(){
+              PubSub.unsubscribe(this.token) //类似于定时器关闭
+          }
+      
+      
+          render() {
+              const {users, isFirst, isLoading, err} = this.state;
+              return (
+                  <div className="row">
+                  { /*jsx不能写if没有返回结果的语句，可以用三元表达式*/
+                      isFirst ? <h2>输入关键字后，点击搜索</h2> :
+                      isLoading ? <h2>Loading...</h2> :
+                      err ? <h2>{err}</h2> :
+                      users.map((userObj)=>{
+                      return (
+                          <div key={userObj.id} className="card">
+                              <a href={userObj.html_url} rel="noreferrer" target="_blank">
+                                  <img alt="avatar" src={userObj.avatar_url} style={{width: '100px'}}/>
+                              </a>
+                              <p className="card-text">{userObj.login}</p>
+                          </div>
+                      )
+                    })
+                  }
+                  </div>
+              );
+          }
+      }
+      
+      export default Index;
+      ```
+
+4. 补充知识：
+
+   1. jQuery和Axios都是对 `Ajax-XHR`**XMLHttpRequest** 的封装。
+
+   2. 与 `Ajax-XHR`  同级别的时 `fetch`。
+
+   3. `fetch`非第三方库，window自带，可直接使用，也是返回Promise。
+
+   4. XHR发送json请求代码样式
+
+      ```js
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET',url);
+      xhr.responseType = 'json';
+      xhr.onload = function(){
+          console.log(xhr.response);
+      }
+      xhr.onerror = function(){
+          console.log("Oops,error");
+      }
+      xhr.send();
+      ```
+
+   5. 使用Fetch
+
+      ```js
+      fetch(url,{
+          method:"POST",
+          body:JSON.stringify(data),
+          headers:{
+              'Content-Type':'application/json'
+          },
+          credentials:'same-origin'
+      }).then(function(response){
+          response.status //=> number 100-599
+          response.statusText //=>String
+          response.headers //=>Headers
+          response.url //=>String
+          return response.json(); //或return response.text()
+      }).then(function(){
+          console.log(data);
+      }).catch(function(e){
+          console.log('Oops,error');
+      })
+      ```
+
+   6. JSX中的JS代码可以使用`//#region 内容` 和 `//#endregion` 使代码可以折叠
+
+5. Fetch在Github搜索用户案例中的使用场景
+
+   1. 在Search发送请求中
+
+      ```js
+      //发送网络请求 -- fetch发送
+      fetch(`/api1/search/users9?q=${value}`).then( //注意此处地址users9实际不存在
+          response => {
+              console.log('联系成功',response)}, 
+          /*输出：联系成功 （即使返回404，也是服务器响应的）
+          Response {type: 'basic', url: 'http://localhost:3000/api1/search/users9?q=23', redirected: false, status: 404, ok: false, …}*/
+          error => {
+              console.log('联系失败',error)}
+          /*当服务器offline/down的时候，才会显示失败*/
+      )
+      ```
+
+   2. 当使用`.json()`方法时
+
+      ```js
+      fetch(`/api1/search/users2?q=${value}`).then(
+          response => {
+              console.log('联系成功',response.json())},
+          /*输出： 联系成功 Promise {<pending>}*/
+      )
+      ```
+
+   3. 当使用Promise实例中有Promise对象时，使用return然后再来个`.then()`链式调用
+
+      ```js
+      fetch(`/api1/search/users2?q=${value}`).then(
+          response => {
+              console.log('联系服务器成功了');
+          	return response.json();
+          }, /*规矩1：若此处不是response.json()而是返回非Promise值(包含undefined)，则外层第一个.then的Promise返回值就是成功succeed的，其值就是return的返回值
+          	规矩2：若此处返回值时Promise实例显示pending，则需要下一层的then调用进行获取数据*/
+         	error => {..}
+      ).then{
+          response => {
+              console.log('获取数据成功了',response);//此处response包含真实数据
+          }
+          error => {...}
+      }
+      ```
+
+   4. 当浏览器offline（network）里面设置后，发送请求，会先失败然后成功，为防止后门，需要在失败时结束Promise。
+
+      ```js
+      fetch(`/api1/search/users2?q=${value}`).then(
+          response => {
+              console.log('联系服务器成功了');
+          	return response.json();
+          }, 
+         	error => {
+          	console.log('联系服务器失败了',error); 
+          	return new Promise(()=>{}) //返回空Promise
+              /*浏览器离线时发送请求输出1：联系失败 TypeError: Failed to fetch*/
+          }
+      ).then{
+          response => {
+              console.log('获取数据成功了',response);/*浏览器离线时发送请求输出2：数据成功 undefined*/
+          }
+          error => {...}
+      }
+      ```
+
+   5. **优化步骤**4的代码，可以把then里面的error去除，然后用`.catch(){..}`抓捕错误，就不会有先输出错误又返回成功的场景。
+
+   6. **使用await优化**步骤4的代码
+
+      ```js
+      search= async ()=>{
+              /*..略去其他代码*/
+              try{
+                  const response = await fetch(`/api1/search/users2?q=${value}`); //查看与服务器连接情况
+                  const data =  await response.json(); //真正的数据
+                  console.log(data.items);
+              }catch(error){
+                  console.log('请求出错',error);
+              }
+          }
+      /*优化规则：
+      1. 步骤4通过两次then等待获取成功的值，await右侧一定是Promise实例
+      2. 第一个await获取的需要在第二个 await里获取真实数据
+      3. 在await最近的一个函数那里使用 async
+      4. await只能等到成功的结果，异常不管，因此需要使用try..catch
+      */
+      ```
+
+   7. fetch使用率不高，有些浏览器不兼容。
+
+6. **Github用户案例尚硅谷总结**：
+
+   1. 设计状态时，要考虑全面。例如带有网络请求的组件，要考虑失败怎么办。
+
+   2. ES6小知识点：解构赋值+重命名
+
+      ```js
+      let obj = {a:{b:1}}
+      const {a} = obj; //传统解构赋值
+      const {a:{b}} = obj; //连续解构赋值
+      const {a:{b:value}} = obj; //连续解构赋值+重命名
+      ```
+
+   3. 消息订阅与发布机制
+
+      1. 先订阅，再发布（理解：有一种隔空对话的感觉）
+      2. 适用于任意组件间的通信
+      3. 要在组件的componentWillUnmount中取消订阅
+
+   4. fetch发送请求（关注分离的设计思想）
+
+## React路由
+
+1. SPA的理解：单页Web应用
+
+   1. 整个应用只有一个完整的页面
+   2. 点击页面中的连接不会刷新页面，指挥做页面的局部更新
+   3. 数据都需要通过**ajax请求获取**，并在前端异步展现。
+
+2. 路由的理解
+
+   1. 一个路由就是一个映射关系（key:value）
+   2. key为路径，value可能是function 或 component
+
+3. 路由的分类
+
+   1. **后端路由**：
+      1. 理解：value是 function，用来处理客户端提交的请求
+      2. 注册路由：`router.get(path, function(req,res))`
+      3. 工作过程：当node接收到一个请求时，根据请求路径找到匹配的路由，调用路由中的函数来处理请求，返回响应数据。
+      4. 类似Nodejs的express，`app.get('url',fun(){..})`中url是key，fun是value。
+   2. **前端路由**：
+      1. 浏览器端路由，value是 component，用于展示页面内容。
+      2. 注册路由：`<Route path="/test" component={Test} >`
+      3. 工作过程：当浏览器的path变为`/test`时，当前路由组件就会变为Test组件。
+      4. 前端路由的基石：history
+   3. 浏览器：浏览器是栈结构，BOM的history中的push会压栈，replace替换当前栈。
+      1. 操作方法一：直接使用H5推出的history身上的API。`History.createBrowserHistory()` [Histroy参考](https://www.npmjs.com/package/history)
+      2. 操作方法二：hash值（锚点`#`井号），`History.createHashHistory()`
+      3. 锚点跳转：不会引起页面的刷新，但是有历史记录可以后退前进。`<a href="#demo1">锚点1</a>`
+      4. **锚点注意事项**：`http://url/#/abc`中的井号后面的路径或参数不会作为资源发给服务器作为参数传
+
+4. React-router的理解
+
+   1. `react-router`是react的一个插件库。
+   2. 专门用来实现一个SPA应用。可以在不同场景使用
+      1. web：实际学习的是 react-router-dom
+      2. native
+      3. any
+   3. 基于react的项目基本都会用到此库。
+
+5. react-router 相关 API
+
+   1. 内置组件：`<BrowserRouter>`、`<HashRouter`、`<Route>`、`<Redirect>`、`<Link>`、`<NavLink>`、`<Switch>`
+   2. 其他：history对象、match对象、withRouter函数
+
+6. 中文文档整合：[印记中文](https://docschina.org/)
+
+7. 安装命令：`npm install react-router-dom`
+
+   1. 尚硅谷视频版本：`npm install react-router-dom@5`，最新版`@6.4`
+   2. 前端路由 BrowserRouter会监听 路由的变化
+
+8. react路由的基本使用：
+
+   1. **导入**需要使用的路由API组件`import {Link,Route} from 'react-router-dom'`
+
+   2. **前端路由监听**，在index.js中包裹APP，一劳永逸。因为页面两个路由器标签，标识两个不同路由器，无法切换内容
+
+      ```js
+      import {BrowserRouter} from "react-router-dom";
+      //渲染App到页面
+      ReactDOM.render(
+          <BrowserRouter>
+              <App/>
+          </BrowserRouter>,
+          document.getElementById('root')
+      );
+      //也可以在当前组件的根组件进行<BrowserRouter>包裹，但是效果不如在index.js中直接包裹整个根目录
+      ```
+
+   3. **使用路由**
+
+      ```jsx
+      import {Link,Route} from 'react-router-dom';
+      
+      <Link className="list-group-item active" to="/about">About</Link> //<Link>相当于<a>
+      <Link className="list-group-item active" to="/home">Home</Link> //href 使用to 替代
+      //<Link>等路由API都需要被Router中的BrowserRouter或者HashRouter包裹，比如index.js中已包裹的BrowserRouter
+      ```
+
+   4. **注册路由**
+
+      ```jsx
+      <Route path='/about' component={About}/>
+      <Route path='/home' component={Home}/>
+      ```
+
+9. 组件的分类：
+
+   1. 一般组件：`<List/>`组件标签直接使用渲染
+
+      1. 一般放在`src/components/`目录下
+      2. 一般组件在*渲染*、*不传递参数*的时候啥都收不到，传递参数后`<List a={1}/>`使用`this.props`接收
+
+   2. 路由组件：`<Route path='/home' component={Home}/>`
+
+      1. 一般路由组件放在`src/pages/`目录下
+
+      2. 路由组件在*调用渲染*的时候自动接收`this.props`参数：
+
+         ```js
+         //路由组件默认props输出
+         {history: {…}, location: {…}, match: {…}, staticContext: undefined}
+         ```
+
+      3. 路由组件详细props
+
+         ```properties
+         history: 
+             action: "PUSH" 
+             block: ƒ block(prompt)
+             createHref: ƒ createHref(location)
+             go: ƒ go(n) 【常用】
+             goBack: ƒ goBack() 【常用】
+             goForward: ƒ goForward() 【常用】
+             length: 6
+             listen: ƒ listen(listener)
+             location: {pathname: '/about', search: '', hash: '', state: undefined, key: 'jsqwe8'} 【与下面重复】
+             push: ƒ push(path, state) 【常用】
+             replace: ƒ replace(path, state) 【常用】
+             [[Prototype]]: Object
+         location: 
+             hash: ""
+             key: "jsqwe8"
+             pathname: "/about" 【常用】
+             search: "" 【常用】
+             state: undefined 【常用】
+             [[Prototype]]: Object
+         match: 
+             isExact: true 【模糊匹配、精确匹配】
+             params: {} 【常用】
+             path: "/about" 【常用】
+             url: "/about" 【常用】
+             [[Prototype]]: Object
+         staticContext: undefined
+         ```
+
+   3. **动态高亮**：当选择某个`<li>`之类的时候需要高亮显示时，使用NavLink
+
+      ```jsx
+      import {NavLink,Route} from 'react-router-dom'
+      
+      <NavLink activeClassName="active" className="list-group-item" to="/about">About</NavLink>
+      <NavLink activeClassName="active" className="list-group-item" to="/home">Home</NavLink>
+      //默认activeClassName的值为active，所以若css高亮命名也是active时，可以省略
+      //相当于 className="list-group-item active"
+      //注意：若使用Bootstrap时，bootstrap权重比较中，需要使用'!Important'；如'.atgu{color:white !important;}'
+      ```
+
+   4. **封装`NavLink`**去除重复代码的使用方法
+
+      ```jsx
+      //APP.js
+      <MyNavLink to="/about" title="About" />
+      <MyNavLink to="/home" title="Home" />
+      //注意此处的 MyNavLink封装为一般组件，且传参到组件
+      ```
+
+      1. MyNavLink一般组件写法
+
+         ```js
+         import {NavLink} from "react-router-dom";
+         
+         class Index extends Component {
+             render() {
+                 const {to,title} = this.props;
+                 console.log(this.props); //点击跳转后收到的内容-> {to: '/about', children: 'About2'}
+                 return (
+                     <NavLink activeClassName="active" className="list-group-item" to={to}>{title}</NavLink>
+                 {/*多参数情况懒人接收方式
+                     <NavLink activeClassName="active" className="list-group-item" {...this.props}>{title}</NavLink>
+                     */}
+             );
+             }
+         }
+         ```
+
+      2. 额外说明：React中，标签体时特殊的标签属性，可以获取
+
+         ```jsx
+         <MyNavLink to="/about" title="About">About</MyNavLink>
+         <标签名 标签属性>标签体</标签名>
+         
+         ```
+
+   5. 配置**标签体**中的方式
+
+      1. 在封装的MyNavLink中，使用`this.props.children`
+
+         ```js
+         <NavLink activeClassName="active" className="list-group-item" to={to}>{this.props.children}</NavLink>
+         在APP.js中使用
+         <MyNavLink to="/home">Home</MyNavLink>
+         ```
+
+      2. 自闭和形式
+
+         ```js
+         <NavLink activeClassName="active" className="list-group-item" {...this.props} />
+         在APP.js中使用
+         <MyNavLink to="/home" children="Home"/>
+         /*效果：
+         <a class="list-group-item active" href="/home" aria-current="page">Home</a>*/
+         ```
+
+   6. 当多个路由和组件有重复的时候：页面会显示全部匹配的组件内容
+
+      1. `<switch>`提高路由匹配效率 `import {Switch} from 'react-router-dom'`
+
+      ````jsx
+      <Route path='/home' component={Home}/>
+      <Route path='/home' component={Test}/>
+      //输出： Home组件内容 Test组件内容
+      //路由一样时，组件不一样，则输出两个组件的内容
+          
+      <Switch>{/*注意引用*/}
+          <Route path='/about' component={About}/>
+          <Route path='/home' component={Home}/>{/*当路由与组件匹配成功后，不会向下再继续匹配*/}
+          <Route path='/home' component={Test}/>
+      </Switch>
+      ````
+
+10. 扩展：路由多级情况下出现的问题
+
+    1. 当页面地址访问不存在时，React内置服务器默认把`index.html`返回给用户，且如css资源返回的也是`index.html`
+
+       ```jsx
+        {/*访问地址: http://localhost:3000*/}
+       <MyNavLink to="/atguigu/about" >About2</MyNavLink> 
+       <MyNavLink to="/atguigu/home" >Home</MyNavLink>
+        {/*注册路由：*/}
+       <Switch>
+           <Route path='/atguigu/about' component={About}/>
+           <Route path='/atguigu/home' component={Home}/>
+           <Route path='/atguigu/home' component={Test}/>
+       </Switch>
+       {/*
+       1. 打开页面未任何操作时，地址为 http://localhost:3000
+       页面为index.html且资源如bootstrap.css加载正常 【Network - Bootstrap - Response - css代码】
+       2. 点击Nav后，页面地址为 http://localhost:3000/atguigu/home 
+       页面加载正常，NavLink内容可以正常显示，如bootstrap.css加载正常
+       3. 点击刷新后，页面地址为 http://localhost:3000/atguigu/home
+       页面加载显示public/index.html，丢失CSS样式，NavLink内容可以切换显示，bootstrap.css资源查看Network，实为index.html返回的Response。
+       4. 原因：加载页面后，页面均正常，因为前端路由点击页面内容时，不会发送网络请求。
+       	点击切换NavLink时，无网络请求，但是地址栏已变更错误的地址 http://localhost:3000/atguigu/home，但是css等资源不变（缓存）,bootstrap资源地址为 http://localhost:3000/css/bootstrap.css
+       	点击刷新后，地址为 http://localhost:3000/atguigu/home；页面向服务器重新请求，地址错误返回index.html，且bootstrap.css资源地址变为 http://localhost:3000/atguigu/css/bootstrap.css（实际内容index.html）
+       */}
+       ```
+
+11. **多级路由资源**（CSS等）问题问题解决方法：(浏览器shift+F5强制刷新测试)
+
+    1. 去掉`.`点的相对路径
+
+       ```html
+       <link rel="stylesheet" href="./css/bootstrap.css" />
+       替换为
+       <link rel="stylesheet" href="/css/bootstrap.css" />
+       ```
+
+    2. 使用`%PUBLIC_URL%`： public目录的绝对路径
+
+       ```html
+       <link rel="stylesheet" href="%PUBLIC_URL%/css/bootstrap.css" />
+       ```
+
+    3. 使用HashRouter（不常用）
+
+       ```js
+       /*资源路径形式还是使用相对形式，即有'.'*/
+       import {HashRouter} from "react-router-dom"; //在地址栏加井号
+       //引入App组件
+       import App from './App';
+       
+       //渲染App到页面
+       ReactDOM.render(
+           <HashRouter>
+               <App/>
+           </HashRouter>,
+           document.getElementById('root'));
+       /*
+       http://localhost:3000/#/atguigu/home
+       */
+       ```
+
+12. 其他： 混用yarn和npm安装包，容易造成包丢失
+
+13. **模糊匹配** - 默认
+
+    ```jsx
+    {/*导航区*/}
+    {/*情况一：地址栏多级，内容区非多级，内容正常显示*/}
+    <MyNavLink to="/about" >About2</MyNavLink> 
+    <MyNavLink to="/home/a/b/c" >Home</MyNavLink> 
+    {/*注册路由：内容展示区*/}
+    <Switch>
+        <Route path='/about' component={About}/>
+        <Route path='/home' component={Home}/>
+    </Switch>
+    {/*情况二：内容多级，路由非多级，内容不显示*/}
+    <MyNavLink to="/about" >About2</MyNavLink> 
+    <MyNavLink to="/home" >Home</MyNavLink> 
+    {/*注册路由：内容展示区*/}
+    <Switch>
+        <Route path='/about' component={About}/>
+        <Route path='/home/a/b/c' component={Home}/>
+    </Switch>
+    {/*情况三：内容不显示*/}
+    <MyNavLink to="d/home/a/b/c" >Home</MyNavLink>
+    <Switch>
+    	<MyNavLink to="/home" >Home</MyNavLink> 
+    </Switch>
+    ```
+
+14. **精准匹配**
+
+    ```jsx
+    {/*导航区*/}
+    <MyNavLink to="/about" >About2</MyNavLink> 
+    <MyNavLink to="/home/a/b/c" >Home</MyNavLink> 
+    {/*内容展示区*/}
+    <Switch>
+        <Route exact={true} path='/about' component={About}/>{/*开启精准匹配地址*/}
+        <Route exact path='/home' component={Home}/>{/*开启可省略true*/}
+    </Switch>
+    ```
+
+    1. 严格匹配不要随便开启，需要再开，有些时候开启会导致无法继续匹配二级路由。
+
+15. **Redirect重定向**：`import {Redirect} from 'react-router-dom'`
+
+    1. 当所有的路由都无法匹配时，跳转到Redirect指定的路由
+
+    2. Redirect放在【路由注册】的最下方
+
+       ```jsx
+        {/*注册路由：什么路径看什么组件的内容*/}
+       <Switch>
+           <Route path='/about' component={About}/>
+           <Route path='/home' component={Home}/>
+           <Redirect to="/home"/>  {/*展示默认内容（也i按打开的时候）*/}
+       </Switch>
+       ```
+
+16. 
+
+
 
 
 
