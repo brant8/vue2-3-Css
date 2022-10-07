@@ -5100,7 +5100,7 @@
          {history: {…}, location: {…}, match: {…}, staticContext: undefined}
          ```
 
-      3. 路由组件详细props
+      3. **路由组件详细props**（注意区别一般组件 ，一般组件没有`history`的方法，需要额外）
 
          ```properties
          history: 
@@ -5720,7 +5720,106 @@
        }
        ```
 
-    4. 
+    4. 注意：路由组件有`history`，一般组件没有`history`，因此一般组件不能前进后退。可以使用`withRouter`给与一般组件拥有`history`等方法
+
+       ```jsx
+       import {withRouter} from 'react-router-dom';
+       
+       class Header extends Component{
+           back=()=>{
+               this.props.history.goBack();
+           }
+           render(){
+               return ( 
+                   <button onclick={this.back}>回去</button>
+               )
+           }
+       }
+       export default withRouter(Header);//让一般组件拥有路由组件的API
+       ```
+
+    5. `withRouter`路由API可以加工一般组件，让一般组件具备路由组件特有的API。
+
+       1. `withRouter`的返回值是一个新组件。
+
+    6. BrowserHistory和HashHistory
+
+       1. 底层原理
+          1. `this.props.history`是React的封装
+          2. BrowserRouter使用的是H5de history API，不兼容IE9以及以下版本。
+          3. HashRouter使用的是URL的哈希值。井号后面的参数不会发送给服务器，但是可以形成历史记录。
+       2. url（path）表现形式不一样
+          1. BrowserRouter的路径没有`#`，例如：`localhost:3000/demo/test`
+          2. HashRouter的路径包含`#`，例如：`localhost:3000/#/demo/tets`
+       3. 刷新后对路由state参数的影响
+          1. BrowserRouter没有任何影响，因为state保存在history对象中。
+          2. HashRouter刷新后会导致路由state参数的丢失。HashRouter没有使用history对象保存数据。
+       4. 备注：HashRouter可以用于解决一些路径错误相关的问题。
+          1. 比如CSS资源在二级导航时出现问题。
+
+## React UI
+
+1. 流行的开源React UI组件库
+
+   1. 国外：material-ui
+   2. 国内：ant-design蚂蚁金服
+
+2. 使用蚂蚁做案例演示学习，
+
+   1. 安装命令：`npm install antd`
+
+   2. 导入所需要的组件以及样式
+
+      ```jsx
+      import {Button} from 'antd';
+      import 'antd/dist/antd.css'; //从node_modules中的antd目录下找css
+      ```
+
+   3. ![使用图示](https://github.com/brant8/vue2-3-Css/blob/main/pictures/react_antdemo.png)
+
+3. 安装antd其他组件
+
+   1. 若没有安装`antd`，需要额外安装icon：`npm install --save @ant-design/icons`
+
+   2. 引入并使用图标
+
+      ```jsx
+      import {WechatOutlined，SearchOutlined} from '@ant-design/icons';
+      render() {
+          return (
+              <div id="app">
+                  <button>原生点击</button>
+                  <Button type="primary">antd点击</Button> {/*属性参数可查看手册右侧API*/}
+                  <Button type="link">antd点击</Button>
+                  {/*使用Icon图标*/}
+                  <WechatOutlined />
+                  {/*使用Button & Icon图标*/}
+                  <Button type="primary" icon={<SearchOutlined />}>
+                         Search
+                  </Button>
+              </div>
+          );
+      }
+      ```
+
+   3. 使用日期 数据录入（Data Entry） - DatePicker
+
+      ```jsx
+      import React from 'react';
+      import { DatePicker, Space } from 'antd';
+      const { RangePicker } = DatePicker;
+      render() {
+          return (
+              <div id="app">
+       			<RangePicker 
+               </div>
+          );
+      }
+      ```
+
+4. Antd被分割成多个组件库，需要引用哪些组件需要查看API。
+
+
 
 
 
