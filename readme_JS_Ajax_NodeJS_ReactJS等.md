@@ -5338,7 +5338,391 @@
        </Switch>
        ```
 
-16. 
+16. **嵌套路由**
+
+    1. 每次**路由匹配都是从最开始注册的路由到最后注册的路由挨个匹配**。
+
+    2. 情景一：二级路由只写自己的路由时
+
+       ```jsx
+       //Home.js,路径 -> /home/news
+       <MyNavLink to='/news'>News</MyNavLink>
+       //APP.js主路由，注册的路由由上往下匹配，匹配不到/news则返回/about
+       <Route path='/about' component={About}/>
+       <Route path='/home' component={Home}/>
+       <Redirect to='/about'/>
+       ```
+
+    3. 情景二：二级路由带有父路由时（需要使用模糊匹配，即路由注册中不能有`exact`）
+
+       ```js
+       //Home.js,路径 -> /home/news
+       <MyNavLink to='/home/news'>News</MyNavLink>
+       //APP.js主路由，注册的路由由上往下匹配
+       <Route path='/about' component={About}/>
+       <Route path='/home' component={Home}/> //模糊匹配到/home，然后到组件Home中查看，发现Home组件也有注册路由
+       <Redirect to='/about'/>
+       //Home.js注册路由，注意导入import {Route} from 'react-router-dom';
+       <Route path="/home/news" component={News}/>
+       <Route path="/home/message" component={Message}/>
+       ```
+
+    4. 注意事项，React V6版本 `/home/news`
+
+       1. 一级路由在`path`后面加`/*`，比如`/home/*`
+       2. 二级导航不变，二级路由path只写子路由，比如`/news`
+       3. 其他弹幕:V6 Route写法：
+          1. `<MyNavLink to="home/*">Home</MyNavLink>`
+          2. `<Route path="home/*" element={<Home/>}/>`
+          3. `<Route path="news" element={<News/>}/>`
+       4. 其他弹幕:V6嵌套路由的路由注册还是写在App.js中，同时要在父组件中加入`<Outlet>`来保证子路由的展示区域
+
+17. 扩展：Ajax传递参数的几种方式
+
+    1. 使用query：`url/?a=xx&b=xx`
+    2. 使用params：直接在url路径上写 `url/1/abc`匹配 `url/:id/:name`
+    3. 使用body
+       1. urlencode
+       2. json
+
+18. **向路由组件传递参数 - params形式**
+
+    1. 数据 Message.js
+
+       ```js
+       state = {
+           messageArr:[
+               {id:'01',title:'消息1'},
+               {id:'02',title:'消息2'},
+               {id:'03',title:'消息3'}
+           ]
+       }
+       ```
+
+    2. 向路由组件传递params参数 并且接收参数
+
+       ```jsx
+       render() {
+         const {messageArr} = this.state;
+         return (
+           <div>
+             <ul>{
+               messageArr.map((msgObj)=>{
+                 return (
+                   <li key={msgObj.id}>
+                   {/*向路由组件传递携带params参数*/}
+                    <NavLink to={`/home/message/detail/${msgObj.id}/${msgObj.title}`}>{msgObj.title}</NavLink>&nbsp;&nbsp;
+                    </li>
+                    )
+                  })
+                 }
+              </ul>
+              <hr/>
+              {/*声明接收params参数*/}
+              <Route exact path="/home/message/detail/:id/:title" component={Detail} />
+           </div>
+         );
+       }
+       ```
+
+    3. Details.js 接收展示组件
+
+       ```jsx
+       //类外声明模拟数据
+       const data = [
+           {id:'01',content:'你好中国1'},
+           {id:'02',content:'你好中国2'},
+           {id:'03',content:'你好中国3'},
+       ];
+       //类中
+       render() {
+               console.log(this.props)
+               /* match:
+               *    params :{id: '02', title: '消息2'} */
+               //接收params参数
+               const {id,title} = this.props.match.params;
+           	/*使用数组.find()搜索过滤数据*/
+               const findResult = data.find((detailObj)=>{
+                   return detailObj.id === id;
+               })
+               return (
+                   <ul>
+                       <li>ID2:{id}</li>
+                       <li>Title:{title}</li>
+                       <li>Content:{findResult.content}</li>
+                   </ul>
+               );
+           }
+       ```
+
+    4. 要点：
+
+       1. 组件传递参数使用 JSX + 模板字符串 + 模板字符串中使用变量`${X}`
+       2. 接收参数使用`/:abc`预留
+       3. 子组件展示使用`params`接收参数
+       4. 使用数组方法`.find(()=>{return xx})`返回单个（第一个匹配）数据
+
+19. **向路由组件传递参数 - search形式**
+
+    1. search形式需要解析地址栏获取到的值：`?id=01&消息1` 分割出来转为对象
+
+    2. React自带解析（qs来自node核心库）：
+
+       1. `import QueryString from 'query-string'` （弹幕：需要手动安装，因为已弃用`npm i --save-dev query-string`）
+
+       2. 使用`import qs from 'qs'` （新版Node.js可用）
+
+          ```js
+          import qs from 'querystring' //或者 import qs from 'query-string' （旧版NodeJS）
+          //或者 import qs from 'qs' （可用）
+          
+          let obj = {name:'tom',age:18} 
+          console.log(qs.stringify(obj)) 
+          //-> name=tom&age=18； key=value&key=value 称为urlencoded编码
+          
+          let str = 'carName=奔驰&price=199';
+          console.log(qs.parse(str))
+          ```
+
+       3. 去除问号`?id=02&消息2`： `(?id=02&title=消息2).slice(1)` 切割一下即可
+
+    3. Message.js代码
+
+       ```jsx
+       render() {
+         const {messageArr} = this.state;
+         return (
+           <div>
+             <ul>{
+               messageArr.map((msgObj)=>{
+                  return (
+                     <li key={msgObj.id}>
+                     {/*向路由组件传递search参数*/}
+                     <NavLink to={`/home/message/detail/?id=${msgObj.id}&title=${msgObj.title}`}>{msgObj.title}</NavLink>&nbsp;&nbsp;
+                      </li>
+                    )
+                 })
+                }
+               </ul>
+               <hr/>
+               {/*声明接收search参数：无需声明接收，正常注册路由即可*/}
+               <Route path="/home/message/detail" component={Detail} />
+           </div>
+          );
+       }
+       ```
+
+    4. Details.js代码
+
+       ```jsx
+       render() {
+               console.log(this.props)
+               /* location:
+                *   hash: ""
+                *   key: "sugwfl"
+                *   pathname: "/home/message/detail/"
+                *   search: "?id=01&title=消息1" */
+               //接收search参数
+               const {search} = this.props.location;
+               console.log(search) //?id=03&title=消息3
+               const result = qs.parse(search.slice(1)); //截取问好
+               console.log(result);//{id: '01', title: '消息1'}
+               const {id,title} = result;
+               const findResult = data.find((detailObj)=>{
+                   return detailObj.id === id;
+               })
+               return (
+                   <ul>
+                       <li>ID2:{id}</li>
+                       <li>Title:{title}</li>
+                       <li>Content:{findResult.content}</li>
+                   </ul>
+               );
+           }
+       ```
+
+    5. 注意：
+
+       1. 使用search传递参数时，路由注册正常注册即可。
+       2. 获取到的search是urlencoded编码字符串，需要借助querystring解析。
+
+20. **向路由组件传递参数 - state(路由)形式**
+
+    1. 注意此state是路由的属性，非组件属性。
+
+    2. Message.js代码
+
+       ```js
+       render() {
+         const {messageArr} = this.state;
+         return (
+           <div>
+             <ul>{
+               messageArr.map((msgObj)=>{
+                  return (
+                     <li key={msgObj.id}>
+                     {/*向路由组件传递state参数 to={ {对象} }*/}
+                     <NavLink to={{pathname:'/home/message/detail',state:{id:msgObj.id,title:msgObj.title}}}>{msgObj.title}</NavLink>&nbsp;&nbsp;
+                      </li>
+                    )
+                 })
+                }
+               </ul>
+               <hr/>
+               {/*声明接收state参数：无需声明接收，正常注册路由即可*/}
+               <Route path="/home/message/detail" component={Detail} />
+           </div>
+          );
+       }
+       ```
+
+    3. Details.js代码
+
+       ```js
+       render() {
+               console.log(this.props)
+               /*location:
+               *   hash: ""
+               *   key: "ehe9rs"
+               *   pathname: "/home/message/detail"
+               *   search: ""
+               *   state: {id: '01', title: '消息1'} */
+               //接收state参数
+               const {id,title} = this.props.location.state || {};//没有值就给空对象
+               const findResult = data.find((detailObj)=>{
+                   return detailObj.id === id;
+               })
+               return (
+                   <ul>
+                       <li>ID2:{id}</li>
+                       <li>Title:{title}</li>
+                       <li>Content:{findResult.content}</li>
+                   </ul>
+               );
+           }
+       ```
+
+21. params、search、state三者之间区别
+
+    1. params `url/a/b/c`与search `url/?a=x&b=y`的参数都会在地址栏显示，刷新的话参数也会依然起作用（根据地址栏获取参数）。
+
+    2. state参数在地址栏中没有体现，刷新的话参数也依然起作用。
+
+    3. 原因：BrowserHistory维护的是浏览器的history，浏览器中有个API - history.xxx。即使刷新浏览器也有记录。
+
+    4. 若删除浏览器的cookie 缓存，state获取不到参数了，则会报错。
+
+       ```js
+        const {id,title} = this.props.location.state || {}; //防止网页报错，空值是给空对象
+       //最多id、title是undefined
+       ```
+
+    5. 所有需要在页面显示的内容获取值时，若参数为空，获取值也要预留空值。
+
+       ```js
+       const findResult = data.find((detailObj)=>{
+           return detailObj.id === id;
+       }) || {}; //同样空值，否则页面内容显示错误
+       ```
+
+22. **开启replace路由模式**
+
+    1. 默认路由是 `push`压栈模式，即可以后退前进。
+
+    2. 开启`replace`模式，即点击该连接后，当前连接的压栈被替换称要去的地址。
+
+       ```jsx
+       <NavLink replace={true} to=”/home/news“>News</NavLink>
+       //或者省略true
+       <NavLink replace to=”/home/news“>News</NavLink>
+       ```
+
+23. **编程式路由导航**
+
+    1. 编程式路由导航，使用代码进行跳转
+
+    2. 注意子组件Detail接收参数也不同，有的需要query-string辅助
+
+       ```jsx
+       replaceShow = (id,title)=>{ //push(path[,state])
+           //1.2 编写一段代码，让其实现跳转到Detail组件，且为replace跳转,【携带params参数】
+           this.props.history.replace(`/home/message/detail/${id}/${title}`)
+           
+           //2.2 【携带search参数】
+           this.props.history.replace(`/home/message/detail/?id=${id}&title=${title}`)
+           
+           //3.2 【携带state参数】
+           this.props.history.replace(`/home/message/detail`,{id:id,title:title})
+       }
+       pushShow = (id,title)=>{//replace(path[,state])
+           //1.3 编写一段代码，让其实现跳转到Detail组件，且为push跳转，【携带params参数】
+           this.props.history.push(`/home/message/detail/${id}/${title}`)
+           
+           //2.3 【携带search参数】
+           this.props.history.push(`/home/message/detail/?id=${id}&title=${title}`)
+           
+           //3.3 【携带state参数】
+           this.props.history.push(`/home/message/detail`,{id:id,title:title})
+       }
+       
+       render() {
+         const {messageArr} = this.state;
+         return (
+           <div>
+             <ul>{
+               messageArr.map((msgObj)=>{
+                  return (
+                     <li key={msgObj.id}>
+                    {/*1.1 向路由组件传递params参数*/}
+                     <NavLink to={`/home/message/detail/${msgObj.id}/${msgObj.title}`}>{msgObj.title}</NavLink>     
+                          
+                    {/*2.1 向路由组件传递search参数,detail/可省略斜杠，也可以有斜杠*/}
+                     <NavLink to={`/home/message/detail/?id=${msgObj.id}&title=${msgObj.title}`}>{msgObj.title}</NavLink>   
+                          
+                     {/*3.1 向路由组件传递state参数 to={ {对象} }*/}
+                     <NavLink to={{pathname:'/home/message/detail',state:{id:msgObj.id,title:msgObj.title}}}>{msgObj.title}</NavLink>&nbsp;&nbsp;
+                    
+                     {/*【高阶函数】，传递参数，
+                      * 此处this.replaceShow(..) 标识用户自己调用的，非React调用*/}     
+               &nbsp;<button onClick={()=>this.pushShow(msgObj.id,msgObj.title)}>push查看</button>
+               &nbsp;<button onClick={()=>this.replaceShow(msgObj.id,msgObj.title)}>replace查看</button>
+                      </li>
+                    )
+                 })
+                }
+               </ul>
+               <hr/>
+               {/*1.4 声明接收params参数*/}
+               <Route path="/home/message/detail/:id/:title" component={Detail} />
+                 
+               {/*2.4&3.4 声明接收search参数：无需声明接收，正常注册路由即可*/}
+               <Route path="/home/message/detail" component={Detail} />
+           </div>
+          );
+       }
+       ```
+
+    3. 后退、前进按钮类似
+
+       ```jsx
+       back=()=>{
+           this.props.history.goBack()
+       }
+       forward=()=>{
+           this.props.history.goForward()
+       }
+       //this.props.history.go(n) 表示前进/回退步数 正/负数
+       render(){
+           return (
+           	<button onclick={this.back}>回退</button>
+               <button onclick={this.forward}>前进</button>
+           )
+       }
+       ```
+
+    4. 
+
+
 
 
 
