@@ -7120,48 +7120,46 @@
 
             4. ES6模块化语法
 
-                   1. **export**命令用于规定模块的对外接口
+                 1. **export**命令用于规定模块的对外接口
 
+                       ```js
+                       //m1.js
+                       //1.分别暴露
+                       export let school = '尚硅谷';
+                       export function teach(){
+                           console.log("教你东西");
+                       }
+                       //2.统一暴露 m2.js
+                       export {school, teach}; 
+                       //3.默认暴露
+                       export default{ //任意类型，对象居多
+                           school:'AIGUIGU',
+                           change:function(){
+                               console.log("尚硅谷");
+                           },
+                       }
+                       ```
 
-                 ```jsx
-                 //m1.js
-                 //1.分别暴露
-                 export let school = '尚硅谷';
-                 export function teach(){
-                     console.log("教你东西");
-                 }
-                 //2.统一暴露 m2.js
-                 export {school, teach}; 
-                 //3.默认暴露
-                 export default{ //任意类型，对象居多
-                     school:'AIGUIGU',
-                     change:function(){
-                         console.log("尚硅谷");
-                     },
-                 }
-                 ```
+                 2. **import**命令用于输入其他模块提供的功能
 
-                   1. **import**命令用于输入其他模块提供的功能
-
-
-                 ```html
-                 <script type="module">
-                     //1.通用导入方式
-                     import * as m1 from './m1.js'; //m1的所有标记export 暴露的导入
-                     console.log(m1); //Module {Symbol(Symbol.toStringTag):"Module"}..
-                     import * as m3 from 'm3.js';
-                     m3.default.change();
-                     //2.解构赋值形式(统一暴露)
-                     import {school,teach} from 'm2.js'; //相当于分别暴露
-                     console.log(school);
-                     console.log(teach);
-                     import {school as guigu, findJob} from 'm2.js'; //重名用as重命名
-                     console.log(guigu);
-                     import {default as m3} from "m3.js";//对应默认暴露（观看行对象形式友好）
-                     //3.简便形式，针对默认暴露
-                     import m3 from "m3.js";
-                 </script>
-                 ```
+                       ```html
+                       <script type="module">
+                           //1.通用导入方式
+                           import * as m1 from './m1.js'; //m1的所有标记export 暴露的导入
+                           console.log(m1); //Module {Symbol(Symbol.toStringTag):"Module"}..
+                           import * as m3 from 'm3.js';
+                           m3.default.change();
+                           //2.解构赋值形式(统一暴露)
+                           import {school,teach} from 'm2.js'; //相当于分别暴露
+                           console.log(school);
+                           console.log(teach);
+                           import {school as guigu, findJob} from 'm2.js'; //重名用as重命名
+                           console.log(guigu);
+                           import {default as m3} from "m3.js";//对应默认暴露（观看行对象形式友好）
+                           //3.简便形式，针对默认暴露
+                           import m3 from "m3.js";
+                       </script>
+                       ```
 
             5. 在HTML中的引入
 
