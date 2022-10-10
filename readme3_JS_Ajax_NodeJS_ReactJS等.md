@@ -5819,6 +5819,206 @@
 
 4. Antd被分割成多个组件库，需要引用哪些组件需要查看API。
 
+   1. Ant Design官网最新版4.x部分**入门步骤**省略，版本3.x步骤会更详细。
+   2. 在`create-react-app`中使用说明，[地址](https://3x.ant.design/docs/react/use-with-create-react-app)。
+   3. 按需引入需要配置，即配置`webpack`，然而webpack的配置文件隐藏起来了，**且**暴露出来后无法更改。
+   4. 创建 demo： `create-react-app demo`
+   5. 暴露配置命令（在项目目录中）：`npm run eject` 或者 `yarn eject`
+   6. 多出两个目录：`config`和`scripts`
+   7. `config/webpack.config.js`
+      1. webpack中的plugin必须先下载，然后引入再实例化才能用。
+      2. loader的插件可以下载，然后直接使用
+
+5. 【高级使用UI】[使用插件](https://3x.ant.design/docs/react/use-with-create-react-app#Advanced-Guides)，在不直接更改webpack.config的情况下修改启动配置【版本3.x（适用4.x）】
+
+   1. 安装两个插件：`npm install react-app-rewired customized-cra`
+
+      1. 真正修改借助于：`customized-cra`
+      2. 当`customized-cra`通过`config-overrides.js`修改了配置，就不能使用`package.json`里面的命令了。只能通过`react-app-rewired`来启动脚手架
+
+   2. `package.json`内容
+
+      ```json
+      "scripts": {
+      -   "start": "react-scripts start", //此处相当于npm start启动脚手架 替换成reac-app-rewired的命令
+      +   "start": "react-app-rewired start",
+      -   "build": "react-scripts build",
+      +   "build": "react-app-rewired build",
+      -   "test": "react-scripts test",
+      +   "test": "react-app-rewired test",
+      }
+      ```
+
+   3. 【说明配置】然后项目目录创建一个`config-overrides.js`（与`src`同级别）用于修改默认配置。
+
+      ```js
+      module.exports = function override(config,env){
+          return config;
+      }
+      /*react-app-rewired start命令中react-app-rewired会把配置传给config*/
+      ```
+
+   4. 安装`babel-plugin-import`：`npm install babel-plugin-import`
+
+      1. 此插件时用于按需加载组件代码和样式的babel插件。
+
+   5. 【实际配置】`config-overrides.js`
+
+      ```js
+      const { override, fixBabelImports } = require('customize-cra');
+      module.exports = override(
+           //import表示要做按需引入
+            fixBabelImports('import', {
+                libraryName: 'antd',//antd表示对antd按需引入
+                libraryDirectory: 'es',//antd里面用es模块化规范
+                style: 'css',//按需引入css
+            }),
+      );
+      ```
+
+      1. 注意：配置好此js文件后，在App.js中不需要引入`import '~antd/dist/antd.css';`
+
+   6. 【4.x配置】[官网](https://ant.design/docs/react/use-with-create-react-app#Advanced-Guides)配置了简略版本步骤，使用craco配置，步骤比上面的简单。
+
+      1. ` yarn add @craco/craco`
+
+6. 自定义主题：
+
+   1. Antd所有的样式都是通过`less`写的，通过编译成css进行使用。
+
+   2. 安装less：`npm install less less-loader`
+
+   3. 配置`config-overrides.js`
+
+      ```js
+      const { override, fixBabelImports, addLessLoader } = require('customize-cra');
+      module.exports = override(
+            fixBabelImports('import', {
+                libraryName: 'antd',
+                libraryDirectory: 'es',
+                style: true,//变更参数，通过更改css样式按需引入
+            }),
+            //添加addLessLoader【旧版less】
+            addLessLoader({ //解析loader
+               javascriptEnabled:true, //允许修改底层less文件
+               modifyVars:{ '@primary-color': 'orange' },//修改某个变量
+            })
+            //【新版less】
+            addLessLoader({
+               lessOptions:{
+                   javascriptEnabled:true,
+                   modifyVars:{ '@primary-color': 'orange' },
+               }
+             })
+      );
+      ```
+
+   4. 修改后重启
+
+   5. 推荐使用新版4.x配置简单。
+
+## Redux
+
+1. 介绍：
+
+   1. redux时一个专门用于做状态管理的 JS库（非react插件库）。
+   2. 它可以用在react，angular，vue等项目中，但基本与react配合使用。
+      1. vue可以使用`vuex`进行管理。
+   3. 作用：集中式管理react应用中多个组件共享的状态。
+
+2. 什么情况下使用redux
+
+   1. 某个组件的状态，需要让其他组件可以随时拿到（共享）。
+   2. 一个组件需要改变另外一个组件的状态（通信）。
+   3. 总体原则：能不用就不用，如果不用比较吃力才考虑使用。
+
+3. ![redux原理图](https://github.com/brant8/vue2-3-Css/blob/main/pictures/redux_basic.png)
+
+   1. 注：Reducers作为*初始化状态*和*加工状态*。初始化时，previousState的初始值时`undefined`。
+   2. 注：action实际为对象，dispatch为方法。
+   3. 注：type初始化状态值：`@@init@@`
+
+4. Redux的三个核心概念
+
+   1. action：
+      1. 动作的对象
+      2. 包含2个属性
+         1. type：标识属性，值为字符串，唯一，必要属性。
+         2. data：数据属性，值类型任意，可选属性
+      3. 例子：`{type:'ADD_STUDENT,data:{name:'tom',age:18}}`
+   2. reducer：
+      1. 用于初始化状态、加工状态。
+      2. 加工时，根据旧的state和action，产生新的state的纯函数。
+   3. store
+      1. 将state、action、reducer联系在一起的对象
+      2. 如何得到此对象？
+         1. `import {createStore} from 'redux'`
+         2. `import reducer from './reducers'`
+         3. `const store = createStore(reducer)`
+      3. 此对象的功能
+         1. `getState()`：得到state
+         2. `dispatch(action)`：分发action，触发reducer调用，产生新的state
+         3. `subscribe(listener)`：注册监听，当产生了新的state时，自动调用。
+   4. 补充：`ref`用户获取用户输入的值、选择的值
+
+5. 通过案例了解Redux
+
+   1. 原始react方式，求和，加、减一；奇数加一、异步加一
+
+      ```jsx
+      state={
+          count:0
+      }
+      increment=()=>{
+          const {value} = this.selectNumber; //获得的是字符串
+          const {count} = this.state;
+          this.setState({count:count+value*1});
+      }
+      decrement=()=>{
+          const {value} = this.selectNumber; //获得的是字符串
+          const {count} = this.state;
+          this.setState({count:count-value*1});
+      }
+      incrementIfOdd=()=>{
+          const {value} = this.selectNumber; //获得的是字符串
+          const {count} = this.state;
+          if(count%2 !==0) {
+              this.setState({count: count + value * 1});
+          }
+      }
+      incrementAsync=()=>{
+          const {value} = this.selectNumber; //获得的是字符串
+          const {count} = this.state;
+          setTimeout(()=>{
+              this.setState({count:count+value*1});
+          },500)
+      
+      }
+      
+      render() {
+          return (
+              <div>
+                  <h1>当前求和为：{this.state.count}</h1>
+                  <select ref={c=>this.selectNumber=c}>
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                  </select> &nbsp;
+                  <button onClick={this.increment}>+</button>&nbsp;
+                  <button onClick={this.decrement}>-</button>&nbsp;
+                  <button onClick={this.incrementIfOdd}>当前求和为奇数再加</button>&nbsp;
+                  <button onClick={this.incrementAsync}>异步 加</button>
+              </div>
+          );
+      }
+      ```
+
+   2. 
+
+
+
+
+
 
 
 

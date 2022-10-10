@@ -6829,7 +6829,7 @@
                console.log(s2.has('大事')); //返回Boolean
                ```
 
-            4. 遍历Set
+                 4. 遍历Set
 
                ```js
                for(let v of s2){
@@ -6837,14 +6837,14 @@
                }
                ```
 
-            5. 数组去重
+                 5. 数组去重
 
                ```js
                let arr = [1,2,3,4,5,4,3,2,1];
                let result = [...new Set(arr)]; //去重后再转为数组
                ```
 
-            6. 交集
+                 6. 交集
 
                ```js
                let arr2 = [4,5,6,7];
@@ -6858,13 +6858,13 @@
                });
                ```
 
-            7. 并集
+                 7. 并集
 
                ```js
                let result = [...newSet([...arr,...arr2])]; //先合并数组，然后用集合去重后再转为数组
                ```
 
-            8. 差集
+                 8. 差集
 
                ```js
                //差集根据主体不一样的结果
@@ -6873,40 +6873,41 @@
 
    12. ## Map
 
-            1. ES6提供了Map数据解构。它类似于对象，也是键值对的集合。但是“键”的范围不限于字符串，各种类型的值（包括对象）都可以当作键。
+               1. ES6提供了Map数据解构。它类似于对象，也是键值对的集合。但是“键”的范围不限于字符串，各种类型的值（包括对象）都可以当作键。
+              
+                      2. Map也实现了iterator接口，所以可以使用 '扩展运算符' 和 `for...of...` 进行遍历。
+              
+                      3. Map的属性和方法：
+              
+                       1. size：返回Map 的元素个数
+                       2. set：增加一个新元素，返回当前Map
+                       3. get：返回键名对象的键值
+                       4. delete：删除
+                       5. has：检测Map 中是否包含某个元素，返回boolean值。
+                       6. clear： 清空，返回undefined
 
-                   2. Map也实现了iterator接口，所以可以使用 '扩展运算符' 和 `for...of...` 进行遍历。
 
-                   3. Map的属性和方法：
-
-                    1. size：返回Map 的元素个数
-                    2. set：增加一个新元素，返回当前Map
-                    3. get：返回键名对象的键值
-                    4. delete：删除
-                    5. has：检测Map 中是否包含某个元素，返回boolean值。
-                    6. clear： 清空，返回undefined
-
-                 
-                 ```js
-                 //创建一个Map
-                 let m = new Map();
-                 //添加元素
-                 m.set('name','尚硅谷'); //"name" => "尚硅谷"
-                 m.set('change',function(){ //"change" => f（）{。。}
-                     console.log("改变你我他");
-                 })
-                 let key = {
-                     school: 'ATGUIGU'
-                 };
-                 me.set(key, ['北京','上海']); //{Object => Array(2)}
-                 //大小
-                 console.log(m.size);
-                 //删除
-                 m.delete('name');
-                 //获取
-                 console.log(m.get(key));
-                 console.log(m.get('change'));
-                 ```
+          ​          
+                    ```js
+                    //创建一个Map
+                    let m = new Map();
+                    //添加元素
+                    m.set('name','尚硅谷'); //"name" => "尚硅谷"
+                    m.set('change',function(){ //"change" => f（）{。。}
+                        console.log("改变你我他");
+                    })
+                    let key = {
+                        school: 'ATGUIGU'
+                    };
+                    me.set(key, ['北京','上海']); //{Object => Array(2)}
+                    //大小
+                    console.log(m.size);
+                    //删除
+                    m.delete('name');
+                    //获取
+                    console.log(m.get(key));
+                    console.log(m.get('change'));
+                    ```
 
    13. ## class
 
@@ -7103,98 +7104,100 @@
 
    16. ## 模块化
 
-         1. 模块化指将一个大的程序文件，拆分成许多小的文件，然后将小文件组合起来。
+            1. 模块化指将一个大的程序文件，拆分成许多小的文件，然后将小文件组合起来。
 
-                2. 模块化优点：
+            1. 模块化优点
 
-                 1. 防止命名冲突
-                 2. 代码复用
-                 3. 高维护性
+                   1. 防止命名冲突
+                   2. 代码复用
+                   3. 高维护性
+                 
+            3. 模块化规范产品，ES6之前的模块化规范及产品有：
 
-                3. 模块化规范产品，ES6之前的模块化规范及产品有：
+                   1. CommonJS => NodeJS、Browserify
+                   2. AMD => requireJS
+                   3. CMD => seaJS
 
-                 1. CommonJS => NodeJS、Browserify
-                 2. AMD => requireJS
-                 3. CMD => seaJS
+            4. ES6模块化语法
 
-                4. ES6模块化语法
+                   1. **export**命令用于规定模块的对外接口
 
-                 1. **export**命令用于规定模块的对外接口
 
-                    ```js
-                    //m1.js
-                    //1.分别暴露
-                    export let school = '尚硅谷';
-                    export function teach(){
-                        console.log("教你东西");
-                    }
-                    //2.统一暴露 m2.js
-                    export {school, teach}; 
-                    //3.默认暴露
-                    export default{ //任意类型，对象居多
-                        school:'AIGUIGU',
-                        change:function(){
-                            console.log("尚硅谷");
-                        },
-                    }
-                    ```
+                 ```jsx
+                 //m1.js
+                 //1.分别暴露
+                 export let school = '尚硅谷';
+                 export function teach(){
+                     console.log("教你东西");
+                 }
+                 //2.统一暴露 m2.js
+                 export {school, teach}; 
+                 //3.默认暴露
+                 export default{ //任意类型，对象居多
+                     school:'AIGUIGU',
+                     change:function(){
+                         console.log("尚硅谷");
+                     },
+                 }
+                 ```
 
-                 2. **import**命令用于输入其他模块提供的功能
+                   1. **import**命令用于输入其他模块提供的功能
 
-                    ```html
-                    <script type="module">
-                        //1.通用导入方式
-                        import * as m1 from './m1.js'; //m1的所有标记export 暴露的导入
-                        console.log(m1); //Module {Symbol(Symbol.toStringTag):"Module"}..
-                        import * as m3 from 'm3.js';
-                        m3.default.change();
-                        //2.解构赋值形式(统一暴露)
-                        import {school,teach} from 'm2.js'; //相当于分别暴露
-                        console.log(school);
-                        console.log(teach);
-                        import {school as guigu, findJob} from 'm2.js'; //重名用as重命名
-                        console.log(guigu);
-                        import {default as m3} from "m3.js";//对应默认暴露（观看行对象形式友好）
-                        //3.简便形式，针对默认暴露
-                        import m3 from "m3.js";
-                    </script>
-                    ```
 
-                5. 在HTML中的引入
+                 ```html
+                 <script type="module">
+                     //1.通用导入方式
+                     import * as m1 from './m1.js'; //m1的所有标记export 暴露的导入
+                     console.log(m1); //Module {Symbol(Symbol.toStringTag):"Module"}..
+                     import * as m3 from 'm3.js';
+                     m3.default.change();
+                     //2.解构赋值形式(统一暴露)
+                     import {school,teach} from 'm2.js'; //相当于分别暴露
+                     console.log(school);
+                     console.log(teach);
+                     import {school as guigu, findJob} from 'm2.js'; //重名用as重命名
+                     console.log(guigu);
+                     import {default as m3} from "m3.js";//对应默认暴露（观看行对象形式友好）
+                     //3.简便形式，针对默认暴露
+                     import m3 from "m3.js";
+                 </script>
+                 ```
 
-              ```html
-              <!--HTML页面 引入一个js入口文件-->
-              <script src="app.js" type="Module">
-              </script>
-              <!--JS文件-->
-              <script>
-                  import * as m1 from "m1.js";
-              </script>
-              ```
+            5. 在HTML中的引入
 
-                6. **实际项目使用方式**
+          ```html
+          <!--HTML页面 引入一个js入口文件-->
+          <script src="app.js" type="Module">
+          </script>
+          <!--JS文件-->
+          <script>
+              import * as m1 from "m1.js";
+          </script>
+          ```
 
-                 1. 因兼容性考虑，使用Babel编译方式（JavaScript编译器），将ES6编译成ES5语法。
-                 2. HTML引入编译后的文件。
-                 3. **Babel使用方式**
-                       1. 安装工具：babel-cli（命令行工具）、babel-preset-env（预设包，转换）、browserify（打包工具，也可用webpack打包但是需要配置环境）
-                       2. 安装命令：`npm i babel cli babel-preset-env browserify -D`； 
-                             1. -D开发以来
+              6. **实际项目使用方式**
+                   1. 因兼容性考虑，使用Babel编译方式（JavaScript编译器），将ES6编译成ES5语法。
+                   2. HTML引入编译后的文件。
 
-                       3. 非全局安装**编译**使用命令：`npx babel src/js -d dist/js --preset=babel-preset-env`
-                             1. -d：目标目录
-                             2. --preset：预设环境
+               7. **Babel使用方式**
+                  1. 安装工具：babel-cli（命令行工具）、babel-preset-env（预设包，转换）、browserify（打包工具，也可用webpack打包但是需要配置环境）
+                  2. 安装命令：`npm i babel cli babel-preset-env browserify -D`； 
+                     1. -D开发以来
 
-                       4. **打包**入口文件：`npx browserify dist/js/app.js -o dist/bundle.js`
+                  3. 非全局安装**编译**使用命令：`npx babel src/js -d dist/js --preset=babel-preset-env`
+                     1. -d：目标目录
+                     2. --preset：预设环境
 
-                 4. 额外包实例 - jQuery
-                       1. 安装jQuery：`npm i jquery`
-                       2. 入口函数`app.js`导入：`import $ from 'jquery'`; 
-                             1. 通过npm安装的不需要路径
-                             2. 等同于`const $ = require("jquery");`
+                  4. **打包**入口文件：`npx browserify dist/js/app.js -o dist/bundle.js`
 
-                       3. 修改内容后，重新打包
-                             1. `$('body').css('background','pink')`
+               8. 额外包实例 - jQuery
+                  1. 安装jQuery：`npm i jquery`
+                  2. 入口函数`app.js`导入：`import $ from 'jquery'`; 
+                     1. 通过npm安装的不需要路径
+                     2. 等同于`const $ = require("jquery");`
+
+                  3. 修改内容后，重新打包
+                     1. `$('body').css('background','pink')`
 
    17. ## ES7新特性
 
@@ -7490,7 +7493,7 @@
 
 
           1. `Object.fromEntries()` 转为对象
-
+    
              ```js
              //二维数组
              const result = Object.fromEntries([
@@ -7504,26 +7507,26 @@
              const result2 = Object.fromEntries(m);
              console.log(result2); //[[Prototype]]: Object
              ```
-
+    
           2. `Object.entries`ES8，把对象转为二维数组。
-
+    
              ```js
              const arr = Object.entries({
                  name:"尚硅谷"
              });
              console.log(arr); //[Array(2)]
              ```
-
+    
           3. `trimStart()`与`trimEnd()`：清除左侧或者右侧空格
-
+    
              ```js
              let str = "    ilove you   ";
              console.log(str.trimStart());
              console.log(str.trimEnd());
              ```
-
+    
           4. `flap`和`flapMap`：将多维数组转为低位数组、降低Map维度
-
+    
              ```js
              const arr = [1,2,3,4,[5,6,7]];
              const arr2 = [1,2,3,4,[5,[6,7]]];
@@ -7535,9 +7538,9 @@
              const result2 = arr.map(item => [item * 10]); //二维数组， (4) [Array(1), Array(1), Array(1), Array(1)]
              const result2 = arr.flatMap(item => [item * 10]); //(4) [10, 20, 30, 40]
              ```
-
+    
           5. `Symbol.prototype.description`：用来获取Symbol的字符串描述
-
+    
              ```js
              let s = Symbol('尚硅谷');
              console.log(s.description);
@@ -7547,7 +7550,7 @@
 
 
           1. 私有属性
-
+    
              ```js
              class Person{
                  //共有属性
@@ -7570,9 +7573,9 @@
              console.log(girl.#age); //出错，外部无法访问私有属性
              console.log(girl.intro());
              ```
-
+    
           2. `Promise.allSettled([数组参数])`：返回一个始终成功的Promise对象
-
+    
              ```js
              const p1 = new Promise((resolve, reject)=>{
                  setTimeout(()=>{
@@ -7601,11 +7604,11 @@
              1: {status: 'rejected', reason: '出错啦！'}
              */
              ```
-
+    
           3. `Promise.all([数组参数])`：返回结果根据参数的返回值决定。若参数有一个是reject，则返回结果是reject。必须都resolve其返回结果才是resolve。
-
+    
           4. `String.prototype.matchAll`：正则批量匹配结果。
-
+    
              ```js
              //爬虫类使用率高的方法
              let str = `
@@ -7631,9 +7634,9 @@
              const arr = [...result];
              console.log(arr);
              ```
-
+    
           5. console返回内容里面：
-
+    
              ```js
              /*
              RegExpStringIterator {}
@@ -7642,9 +7645,9 @@
              */
              //可迭代对象可以使用 for...of迭代或者 扩展运算符展开
              ```
-
+    
           6. 可选链操作符`?.`
-
+    
              ```js
              function main(config){
                  const dbHost = config && config.db && config.db.host; //使用逻辑与，判断是否为空值，若为空console会报错
@@ -7662,9 +7665,9 @@
                  }
              });
              ```
-
+    
           7. 动态import：按需加载
-
+    
              ```js
              //app.js入口函数
              //import * as m1 from "./hello.js"; //静态导入
@@ -7682,9 +7685,9 @@
              }
              
              ```
-
+    
           8. `BigInt` 数据类型：大数值运算
-
+    
              ```js
              //大整形
              let n = 521n;
@@ -7698,13 +7701,12 @@
              console.log(max+1);
              console.log(BigInt(max)+1); //报错，不能跟普通整型运算
              ```
-
+    
           9. `globalThis` 全局对象 ：对全局参数的操作
-
+    
              ```js
              console.log(globalThis);
              ```
-
 
 
 
