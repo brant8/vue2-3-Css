@@ -7106,12 +7106,12 @@
 
             1. 模块化指将一个大的程序文件，拆分成许多小的文件，然后将小文件组合起来。
 
-            1. 模块化优点
+            2. 模块化优点
 
                    1. 防止命名冲突
                    2. 代码复用
                    3. 高维护性
-                 
+
             3. 模块化规范产品，ES6之前的模块化规范及产品有：
 
                    1. CommonJS => NodeJS、Browserify
@@ -7163,15 +7163,15 @@
 
             5. 在HTML中的引入
 
-          ```html
-          <!--HTML页面 引入一个js入口文件-->
-          <script src="app.js" type="Module">
-          </script>
-          <!--JS文件-->
-          <script>
-              import * as m1 from "m1.js";
-          </script>
-          ```
+                 ```js
+                 <!--HTML页面 引入一个js入口文件-->
+                 <script src="app.js" type="Module">
+                 </script>
+                 <!--JS文件-->
+                 <script>
+                     import * as m1 from "m1.js";
+                 </script>
+                 ```
 
               6. **实际项目使用方式**
                    1. 因兼容性考虑，使用Babel编译方式（JavaScript编译器），将ES6编译成ES5语法。
