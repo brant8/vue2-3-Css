@@ -6986,7 +6986,122 @@
 
       4. 注意：在应用开发中一般不用context，一般用它的封装react插件，如react-redux。
 
-6. 
+6. ##### 组件优化
+
+   1. Component的2个问题
+
+      1. 只要执行`setState()`，即使不改变状态数据，组件也会重新`render()`=>效率低
+      2. 只当前组件重新`render()`，就会自动重新render子组件，纵使子组件没有用到父组件的任何数据=>效率低。
+
+   2. 效率高的做法
+
+      1. 只有当组件的state或props数据发生改变时，才重新`render()`
+
+   3. 原因：Component中的`shouldComponentUpdate()`总是返回true（控制组件的阀门）
+
+   4. 解决方法
+
+      1. 方法一：
+
+         1. 重写`shouldComponentUpdate()`方法，比较旧state或props数据，如果有变化返回true，如果没有变化返回false。
+
+         ```jsx
+         export default class Index extends Component {
+             state = {carName:"奔驰233"}
+             changeCar = ()=>{
+                 this.setState({carName:"迈巴赫"}) //此处地址值不一样
+                 /**使用下面方式无法更新组件
+                 const obj = this.state;
+                 obj.carName = '迈巴赫';
+                 console.log(this.state===obj)//为true：下面阀门return则为false
+                 this.setState(obj);
+                 //数组更新不推荐使用push、unshift等其他，因为地址不变
+                 */
+             }
+         
+             shouldComponentUpdate(nextProps,nextState){
+                 console.log("目前的props和state: ",this.props,this.state);
+                 console.log("接下来props和state要变化成的结果: ",nextProps,nextState);
+                 // return true;//必须要有的返回值
+                 /**单个比较的时候*/
+                 if(this.state.carName === nextState.carName)
+                     return false;
+                 else
+                     return true;
+                 /**多个比较的时候，使用PureComponent或者JSON.stringify或者其他方式*/
+             }
+         
+             render() {
+                 console.log("Parent---render")
+                 return (
+                     <div className="parent">
+                         <h3>我是Optimize - Parent组件</h3>
+                         <span>我的车现在是：{this.state.carName}</span>
+                         <button onClick={this.changeCar}>点我换车</button>
+                         {/*<Child/>*/}
+                         <Child carName="奥托"/>
+                     </div>
+                 );
+             }
+         }
+         
+         class Child extends Component{
+             //子组件更关注nextProps，若是最后一个子组件，则没必要传入nextState
+             shouldComponentUpdate(nextProps,nextState){
+                 console.log("目前的props和state: ",this.props,this.state);
+                 console.log("接下来props和state要变化成的结果: ",nextProps,nextState);
+                 /**单个比较的时候(简化写法)*/
+                 return !this.props.carName === nextProps.carName;
+             }
+         
+             render() {
+                 console.log("Child --- render")
+                 return (
+                     <div className="child">
+                         <h3>我是child组件</h3>
+                         <p>我收到的车是：{this.props.carName}</p>
+                     </div>
+                 )
+             }
+         }
+         ```
+
+      2. 方法二：
+
+         1. 使用React提供的`{PureComponent}`替换`import {Component} from 'react'`
+         2. PureComponent重写了`shouldComponentUpdate()`，只有state或props数据有变化才返回true。
+         3. 注意：只是进行state和props数据的浅比较，如果只是数据对象内部数据变了，返回false。
+         4. 不要直接修改state数据，而是要产生新数据。项目中一般使用PureComponent来优化。
+
+7. ##### render props
+
+   1. 如何向组件内部动态传入带内容的结构（标签）
+
+      1. Vue：
+         1. 使用slot奇数，也就是通过组件标签体传入结构：`<AA><BB/></AA>`
+      2. React：
+         1. 使用child props：通过组件标签体传入结构
+         2. 使用render props：通过组件标签属性传入结构，一般render函数属性。
+
+   2. child props
+
+      ```jsx
+      <A>
+      	<B>xxx</B>
+      </A>
+      {this.props.children}
+      问题：如果B组件需要A组件内的数据，==>做不到
+      ```
+
+   3. render props
+
+      ```jsx
+      <A render={(data)=><C data={data}></C>}></A>
+      A组件：{this.props.render(内部state数据)}
+      C组件：读取A组件传入的数据显示{this.props.data}
+      ```
+
+   4. 
 
 
 
