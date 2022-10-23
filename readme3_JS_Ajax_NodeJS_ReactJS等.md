@@ -7089,11 +7089,14 @@
       <A>
       	<B>xxx</B>
       </A>
-      {this.props.children}
+      
+      子组件B：{this.props.children}
       问题：如果B组件需要A组件内的数据，==>做不到
       ```
 
-   3. render props
+   3. **render-props类似Vue的slot技术**
+
+      1. 当中的`render`是属于`props`的其中一个自定义属性（非固定，但是推荐使用render）。
 
       ```jsx
       <A render={(data)=><C data={data}></C>}></A>
@@ -7101,7 +7104,171 @@
       C组件：读取A组件传入的数据显示{this.props.data}
       ```
 
-   4. 
+   4. 举例，一般情况的父子组件传递参数
+
+      ```jsx
+      //一般情况
+      class A extends Component{
+          state={name:'tom'}
+          render() {
+              return(
+                  <div className="a">
+                      <h3>我是A组件</h3>
+                      <B name={this.state.name}/>
+                  </div>
+              )
+          }
+      }
+      class B extends Component{
+          render() {
+              return(
+                  <div className="b">
+                      <h3>我是B组件,{this.props.name}</h3>
+                  </div>
+              )
+          }
+      }
+      //引用情况，在A标签中使用B组件
+      class Index extends Component{
+          render() {
+              return(
+                  <div className="a">
+                      <h3>我是祖宗组件</h3>
+                      <A> <B/> </A>
+                  </div>
+              )
+          }
+      }
+      ```
+
+   5. render props方式父子组件传递参数
+
+      ```jsx
+      export default class Index extends Component {
+          render() {
+              return (
+                  <div className="pros">
+                      <h3>我是Parent组件</h3>
+                      {/*一：<A>Hello World - A组件</A>*/}
+                      
+                      {/**  <A render={()=><B/>}   />    
+                      	此处render能得到A组件this.props.render()的返回值 */}
+                      {/*二：A组件的返回值传给B*/}
+                      <A render={(name)=><B name={name}/>} />
+                  </div>
+              );
+          }
+      }
+      
+      class A extends Component{
+          state={name:'tom'}
+          render() {
+              return(
+                  <div className="a">
+                      <h3>我是A组件</h3>
+                      {/*需要使用this.props.children，才能在父组件中调用 标签、子组件*/}
+                      {/*一：{ this.props.children }*/}
+                      {/*二：调用从父亲穿过来的render，并且赋值返回给父组件*/}
+                      {this.props.render(this.state.name)}
+                  </div>
+              )
+          }
+      }
+      class B extends Component{
+          render() {
+              return(
+                  <div className="b">
+                      <h3>我是B组件,{this.props.name}</h3>
+                  </div>
+              )
+          }
+      }
+      ```
+
+8. ##### 错误边界
+
+   1. 当子组件出错时，不影响其他组件的输出，此时需要用到错误边界。
+
+   2. 错误边界 Error Boundary：用来捕获后代组件错误，渲染出备用页面。
+
+   3. 特点：只能捕获 *后代组件生命周期产生的错误*，不能捕获自己组件产生的错误和其他组件在合成事件、定时器中产生的错误。（声明周期指render等预定义函数，自定义函数不算在内）
+
+   4. 注意：错误边界只适合生产环境。部分情况下稳定输出，其他情况输出错误信息后还是展示错误页面。
+
+   5. 使用方式：`static getDerivedStateFromError`配合`componentDidCatch`（子组件出错，在父组件捕获）
+
+      ```jsx
+      state={hasError:''}
+      
+      //声明周期函数，一旦后台组件报错，就会触发
+      static getDerivedStateFromError(error){
+          console.log(error);
+          //在render之前触发
+          //返回新的state
+          return{
+              hasError:true,
+          };
+      }
+      
+      componentDidCatch(error,info){
+          //同级页面的错误，发送请求发送到后台去
+          console.log(error,info);
+      }
+      ```
+
+   6. React打包：
+
+      1. 打包命令：`npm build`
+      2. 打包后的静态文件需要在伺服器上运行。
+      3. 可以使用`express`或者使用`serve`
+      4. 安装serve命令：`npm i serve -g`
+      5. 在目录下使用：`serve build` 即自动上线项目。
+
+9. ##### 组件通信方式总结
+
+   1. 组件关系：父子组件、兄弟组件（非嵌套组件）、祖孙组件（跨级组件）
+
+   2. 几种通信方式
+
+      1. props：
+
+         1. children props
+
+            ```jsx
+            父组件A中：<B>hello world</B>
+            子组件B中接收：{this.props.children}
+            //单向传递变量
+            ```
+
+         2. render props
+
+            ```jsx
+            父组件A中用B接收C组件：<B render={(data)=><C name={data}/>} />
+            子组件C中接收：{this.props.render(this.state.name)}
+            //可以互传变量
+            ```
+
+      2. 消息订阅 - 发布：
+
+         1. pubs-sub、event等等
+
+      3. 集中式管理
+
+         1. redux、dva等
+
+      4. context：
+
+         1. 生产者 - 消费者模式 Provider - Consumer
+
+   3. 比较好的搭配方式：
+
+      1. 父子组件：props
+      2. 兄弟组件：消息订阅 - 发布、集中式管理
+      3. 祖孙组件（跨级组件）：消息订阅 - 发布、集中式管理、context（开发用的少，封装插件用的多）
+
+## React Router 6
+
+1. 
 
 
 
