@@ -6955,7 +6955,7 @@
 
    3. 使用
 
-      1. 创建Context容器对象：
+      1. (祖)父组件创建Context容器对象：
 
          1. `const XxxContext = React.createContext()`
 
