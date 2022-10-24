@@ -7266,9 +7266,609 @@
       2. 兄弟组件：消息订阅 - 发布、集中式管理
       3. 祖孙组件（跨级组件）：消息订阅 - 发布、集中式管理、context（开发用的少，封装插件用的多）
 
+10. intellij Idea/webStrom快捷键快速创建React组件
+
+    1. **rcc + tab键** - - 用ES6模块系统创建一个React组件类
+    2. rccp + tab键 - - 创建一个带有PropTypes和ES6模块系统的React组件类
+    3. rcfc + tab键 - - 创建一个带有PropTypes和所有生命周期方法以及ES6模块系统的React组件类
+    4. rcjc + tab键 - - 用ES6模块系统创建一个React组件类（无导出）
+    5. rdp + tab键 - - 快速生成defaultProps
+    6. rpc + tab键 - - 用PropTypes和ES6 moudle系统创建一个React纯组件类
+    7. rrc + tab键 - - 创建一个连接到redux的React组件类
+    8. rrdc + tab键 - - 创建一个通过dispatch连接到redux的React组件类
+    9. rsc + tab键 - - 创建没有PropTypes和ES6模块系统的无状态React组件
+    10. rscp + tab键 - - 创建有PropTypes和ES6模块系统的无状态React组件
+    11. **rsf + tab键** - - 以命名函数的形式创建无状态的React组件，不使用PropTypes
+    12. rsfp + tab键 - - 使用PropTypes将无状态的React组件作为命名函数创建
+    13. rsi + tab键 - - 创建无状态的React组件，不使用PropTypes和ES6模块系统，但使用隐式返回和道具
+    14. rwwd + tab键 - - 在没有导入的情况下，在ES6模块系统中创建一个有构造函数、空状态、proptypes和导出的React组件类。(主要用于React时，proptype由webpack提供插件提供
+
 ## React Router 6
 
-1. 
+1. 概述
+
+   1. React Router以三个不同的包发布到npm上，分别时
+      1. react-rtouer：路由的核心库，提供了很多的组件、钩子。
+      2. react-rtouer-dom：（网页）包含react-router所有内容，并添加一些专门用于DOM组件，比如`<BrowserRouter>`等。
+      3. react-router-native：（移动端）包括react-router所有内容，并添加一些专门用于ReactNative的API，例如`<NativeRouter>`等。
+   2. 与React Router 5.x版本相比，改变了什么？
+      1. 内置组件的变化：移除`<Switch/>`（精确匹配）、新增`<Routers/>`等
+      2. 语法的变化：`component{About}`变为`element={<About/>}`等
+      3. 新增多个hook，例如常用的：`useRoutes()`、`useNavigate()`、`userParams`、`useSearchParams`、`useLocation()`、`useMatch()`、`useInRouterContext()`、`useNavigationType()`、`useOutlet()`、`useResolvedPath()`等。
+      4. 官方明确推荐函数式组件。
+
+2. ##### **路由**常规匹配
+
+   1. `<Routes>`和`<Route>`要配合使用，且必须用`<Routes>`包裹`<Route>`
+
+   2. `<Route>`相当于一个if语句，如果其路径与当前URL匹配，则呈现对应的组件。
+
+   3. `<Route caseSensitive>`属性用于指定：匹配时是否区分大小写（默认为false）。
+
+   4. 当URL发生变化时，`<Routes>`都会查看所有子`<Route>`元素以找到最佳匹配并呈现组件。
+
+   5. `<Route>`也可以嵌套使用，且可配合`useRoutes()`配置 '路由表' ，但需要通过`<Outlet>`组件来渲染其子路由。
+
+      ```jsx
+      //示例代码
+      <Routes>
+      	<Route path="/login" element={<Login/>}></Route>
+          
+          /*用于定义嵌套路由，home时以及路由，对应的路径/home */
+          <Route path="home" element={<Home/>}>
+              /*test1和test2时二级路由，对应的路径是/home/test1 或/home/test2 */
+              <Route path="test1" element={<Test1/>}></Route>
+              <Route path="test2" element={<Test2/>}></Route>
+          </Route>
+          
+          /*Route也可以不写element属性，这时就是用于展示嵌套的路由，所对应的路径时？/users/xxx */
+          <Route path="users">
+              <Route path="xxxx" element={<Demo/>} />
+          </Route>
+      </Routes>
+      ```
+
+   6. 示例代码
+
+   ```jsx
+   import {NavLink,Routes,Route,Navigate} from "react-router-dom";
+   import About from './pages/About'
+   import Home from './pages/Home'
+   
+   export default function App() {
+     return (
+       <div className="App">
+   		...
+         <div className="list-group">
+           <NavLink className="list-group-item active" to="/about">About</NavLink><br/>
+           <NavLink className="list-group-item" to="/home">Home</NavLink>
+         </div>
+         ...    
+         <div className="panel-body">
+           {/*注册路由，必须用Routes包裹，替代以前的<Switch>*/}
+           <Routes>
+             {/*路由书写方式*/}  
+             <Route path="/about" element={<About/>}/>
+             <Route path="/home" element={<Home/>}/>
+             {/*默认路由不再用<Redirect>*/}  
+             <Route path="/" element={<Navigate to={"/about"}/>}/>
+           </Routes>
+   		...
+     );
+   }
+   ```
+
+3. ##### 跳转扩展
+
+   1. Navigate的两个属性
+      1. `to`
+      2. `replace`：默认模式push模式，即有历史记录可后退，值为false；值为true时，为替换当前地址，不可后退。
+
+   ```jsx
+   import React,{useState} from 'react';
+   import {Navigate} from "react-router-dom";
+   
+   function Home(props) {
+       //使用useState调用状态
+       const [sum,setSum] = useState(1)
+       return (
+           <div>
+               <h3>我是Home内容</h3>
+               {sum === 2 ? <Navigate to={"/about"} replace={false}/> : <h4>当前的sum值时{sum}</h4>}
+               <button onClick={()=>{setSum(2)}}>点击切换sum值</button>
+           </div>
+       );
+   }
+   
+   export default Home;
+   ```
+
+4. Router 6 中，实现自定义类名（常用于**高亮**active）需要使用让其className的值写成一个函数，且有返回值
+
+   1. Router 5中，使用`activeClassName='样式名'` ； NavLink具有高亮效果
+
+      ```jsx
+      <NavLink activeClassName='样式名' className="list-group-item" to="/home">Home</NavLink>
+      ```
+
+   2. Router 6中，当渲染时自动调用该className函数，且每次点击再调用一次。
+
+      ```jsx
+      //讲解 下面每次点击输出：jihuo {isActive: true, isPending: false}
+      <NavLink className={ (a)=>{console.log("jihuo",a)} } to="/home">Home</NavLink>
+      /**标准写法
+      a使用结构赋值{isActive}
+      */
+      <NavLink className={ 
+              ({isActive})=>{return isActive ? 'list-group-item atguigu' : 'list-group-item'} 
+          } to="/home">Home</NavLink>
+      ```
+
+   3. 封装为方法
+
+      ```jsx
+      function computedClassName({isActive}){
+          return isActive ? 'list-group-item atguigu' : 'list-group-item'
+      }
+      <NavLink className={ computedClassName  } to="/home">Home</NavLink>
+      ```
+
+   4. 尚硅谷示例
+
+      ```jsx
+      //注意：NavLink默认类名是active，下面是指定自定义的class
+      //自定义样式
+      <NavLink 
+          to="login"
+          className=({isActive})=>{
+              console.log('home',isActive)
+              return isActive ? 'base one' : 'base'
+          }
+      >Login</NavLink>}
+      /*
+      默认情况下，当Home的子组件匹配成功，Home的导航也会高亮
+      当NavLink上添加了end属性后，若Home的子组件匹配成功，则Home的导航没有高亮效果
+      */
+      <NavLink to="home" end>home</NavLink>
+      ```
+
+5. 把注册路由封装到一个参数，即形成**路由表**
+
+   ```jsx
+   import {NavLink,Routes,Route,Navigate,useRoutes} from "react-router-dom";
+   //1.把下面的路由注册保存到路由表中
+   <Routes>
+       <Route path="/about" element={<About/>}/>
+       <Route path="/home" element={<Home/>}/>
+       <Route path="/" element={<Navigate to={"/about"}/>}/>
+   </Routes>
+   //2.使用useRoutes路由表
+   const elements = useRoutes([
+       {
+         path:'/about',
+         element:<About/>
+       },
+       {
+         path:'/home',
+         element:<Home/>
+       },
+       {
+         path:'/',
+         element:<Navigate to='/about'/>
+       }
+     ])
+   //3.在render中直接使用
+   {elements}
+   ```
+
+6. 正规路由表写法
+
+   1. 把路由表抽离出来封装成一个js文件:、`src/routes/index.js`
+
+      ```jsx
+      import About from './pages/About'
+      import Home from './pages/Home'
+      import {Navigate} from 'react-router-dom'
+      export default [
+          {
+            path:'/about',
+            element:<About/>
+          },
+          {
+            path:'/home',
+            element:<Home/>
+          },
+          {
+            path:'/',
+            element:<Navigate to='/about'/>
+          }
+        ]
+      ```
+
+   2. 在使用路由表的文件中：
+
+      ```js
+      import routes from './routes/index'
+      const elements = useRoutes(routes)
+      ```
+
+7. ##### **路由表**搭配**嵌套路由**的使用
+
+   1. 路由表的使用`src/routes/index`
+
+      ```jsx
+      import About from "../pages/About";
+      import Home from "../pages/Home";
+      import Message from "../pages/Message";
+      import News from '../pages/News'
+      import {Navigate} from "react-router-dom";
+      
+      export default [
+          {
+              path:'/about',
+              element:<About/>
+          },
+          {
+              path:'/home',
+              element:<Home/>,
+              //二级路由
+              children:[
+                  {
+                      path:'news',
+                      element:<News/>
+                  },
+                  {
+                      path:'message',
+                      element:<Message/>
+                  }
+              ]
+          },
+          {
+              path:'/',
+              element:<Navigate to='/about'/>
+          }
+      ]
+      ```
+
+   2. 在App中使用该路由表`App.js`
+
+      ```jsx
+      import routes from './routes' 
+      const elements = useRoutes(routes);
+      ```
+
+   3. 使用`<Outlet/>`标记组件输出的位置；相当于Router5中的注册路由所在的位置，即展示位。
+
+      ```jsx
+      import React,{useState} from 'react';
+      import {Navigate,Outlet, NavLink} from "react-router-dom";
+      
+      function Home(props) {
+          //使用useState调用状态
+          const [sum,setSum] = useState(1)
+          return (
+              <div>
+                  <h3>我是Home内容</h3>
+                  {sum === 2 ? <Navigate to={"/about"} replace={false}/> : <h4>当前的sum值时{sum}</h4>}
+                  <button onClick={()=>{setSum(2)}}>点击切换sum值</button>
+      
+                  <ul>
+                      <li>
+                          <NavLink to='/home/news'>News</NavLink>
+                      </li>
+                      <li>
+                          {/*此处to='message'可省略/home且不带斜杠；相当于/home/message*/}
+                          <NavLink to='message'>Message</NavLink>
+                      </li>
+                      <li>{/*此处to='./contact'可省略/home；相当于/home/contact*/}
+                          <NavLink to='./contact'>Contact</NavLink>
+                      </li>
+                  </ul>
+                  {/*指定路由组件呈现的位置*/}
+                  <Outlet/>
+              </div>
+          );
+      }
+      
+      export default Home;
+      ```
+
+   4. 连锁高亮的控制：当点击Home下面的Message时，Home和Message都会处于高亮。
+
+      1. 当点击Message后，Home不想要高亮，使用`end`
+
+         ```jsx
+         <NavLink className={computedClassName } end to="/home">Home</NavLink>
+         ```
+
+8. 路由之间传参
+
+   1. Router 5中，使用`params`、`search`、`location.state`进行传参
+
+9. ##### Rouer 6中，可以使用`useParams`；相当于match.params
+
+   1. 导航页面如`Message.jsx`中
+
+      ```jsx
+      <ul>
+        {
+          messages.map((m)=>{
+            return (
+              <li key={m.id}>
+                <Link to={`detail/${m.id}/${m.title}/${m.content}`}>{m.title}</Link>
+               </li>
+              )
+           })
+        }
+      </ul>
+      ```
+
+   2. 通过prams传递时，需要在路由表中**占位**
+
+      ```jsx
+      ...
+      {
+          path:'message',
+              element:<Message/>,
+                  children:[
+                      {
+                          path:'detail/:id/:title/:content',
+                          element:<Detail/>
+                      }
+                  ]
+      }
+      ```
+
+   3. params方式：在展示页面组件中的代码使用`useParams`（常用）或者`useMatch`（不常用）
+
+      ```jsx
+      import React from 'react';
+      import {useParams,useMatch} from "react-router-dom";
+      
+      export default function Detail(props) {
+          //useParams获取接收到的对象参数
+          const {id,title,content} = useParams()  
+          //使用useMatch需要路由解析，且useParams包含在useMatch中，使用useParams更直接
+          const x = useMatch('/home/message/detail/:id/:title/:content')
+          
+          return (
+              <div>
+                  <li>{id}</li>
+                  <li>{title}</li>
+                  <li>{content}</li>
+              </div>
+          );
+      }
+      ```
+
+   4. 传递参数显示的地址栏：`http://localhost:3000/home/message/detail/001/消息1/锄禾日当午1`
+
+10. ##### Rouer 6中，可以使用`useSearchParams`; 相当于search
+
+    1. 导航页面如`Message.jsx`中
+
+       ```jsx
+       <ul>
+         {
+           messages.map((m)=>{
+             return (
+               <li key={m.id}>
+                 <Link to={`detail?id=${m.id}&title=${m.title}&content=${m.content}`}>{m.title}</Link>
+                </li>
+               )
+            })
+         }
+       </ul>
+       ```
+
+    2. 通过search传递时，路由表默认即可
+
+       ```jsx
+       ...
+       {
+           path:'message',
+           element:<Message/>,
+           children:[
+               {
+                   path:'detail',
+                   element:<Detail/>
+               }
+           ]
+       }
+       ```
+
+    3. 内容展示页
+
+       ```jsx
+       import React from 'react';
+       import {useSearchParams,useLocation} from "react-router-dom";
+       
+       export default function Detail(props) {
+           //search更新的参数，setSearch更新的方法(了解即可); map键值对
+           const [search,setSearch] = useSearchParams();
+           const id = search.get('id')
+           const title = search.get('title')
+           const content = search.get('content')
+           const y = useLocation();
+       
+           return (
+               <div>
+                   <button onClick={()=>{setSearch('id=008&title=嘿嘿&content=喜喜')}}>点击更新以下收到的search参数</button>
+                   <li>{id}</li>
+                   <li>{title}</li>
+                   <li>{content}</li>
+               </div>
+           );
+       }
+       
+       //传递参数显示的地址栏：`http://localhost:3000/home/message/detail?id=001&title=消息1&content=锄禾日当午1`
+       ```
+
+11. ##### Rouer 6中，可以使用`Location.state`，
+
+    1. 路由表默认即可
+
+       ```jsx
+       ...
+       {
+           path:'message',
+           element:<Message/>,
+           children:[
+               {
+                   path:'detail',
+                   element:<Detail/>
+               }
+           ]
+       }
+       ```
+
+    2. Message传参到Detail使用`Location.state`方式，不需要引入额外
+
+       ```jsx
+       <ul>
+         {
+           messages.map((m)=>{
+             return (
+               <li key={m.id}>
+                 <Link to='detail' state={
+                             {
+                                 id:m.id,
+                                 title:m.title,
+                                 content:m.content
+                             }
+                         }>{m.title}</Link>
+                </li>
+               )
+            })
+         }
+       </ul>
+       ```
+
+    3. 展示页面
+
+       ```jsx
+       import React from 'react';
+       import {useLocation} from "react-router-dom";
+       
+       export default function Detail(props) {
+           // const {state} = useLocation()
+           const {state:{id,title,content}} = useLocation() //连续解构赋值
+           return (
+               <div>
+                   <li>{id}</li>
+                   <li>{title}</li>
+                   <li>{content}</li>
+               </div>
+           );
+       }
+       ```
+
+12. ##### 编程式路由
+
+    1. Router 6 中，路由组件或者普通组件，均可以使用`import {useNavigate} from 'react-router-dom'`进行函数式编程。
+
+    2. Router 6 `useNavigate`路由组件示例
+
+       ```jsx
+       import {Link,Outlet,useNavigate} from "react-router-dom";
+       
+       function Message(props) {
+       	...
+           const navigate = useNavigate();
+           function showDetail (m){
+               /**navigate(路径[，配置对象])*/
+               //子路由不带斜杠
+               navigate('about',{
+                   replace:false,
+                   state:{
+                       id:m.id,
+                       title:m.title,
+                       content:m.content
+                   }
+               })
+               /**
+               params、search方式只能使用拼接，如navigate(`about?id=${m.id}`)
+               state使用对象形式传入参数
+               */
+           }
+           return (
+             <div>
+               <h3>message page</h3>
+                 <ul>
+                 {
+                  messages.map((m)=>{
+                   return (
+                     <li key={m.id}>
+                      <Link to='detail' state={
+                            {
+                              id:m.id,
+                              title:m.title,
+                              content:m.content
+                             }
+                       }>{m.title}</Link>
+                       <button onClick={()=>showDetail(m)}>查看详情</button>
+                      </li>
+                     )
+                     })
+                    }
+                 </ul>
+                <hr/>
+                <Outlet/>
+             </div>
+          );
+       }
+       
+       export default Message;
+       ```
+
+    3. Router 6 普通组件示例
+
+       ```jsx
+       import {useNavigate} from "react-router-dom";
+       export default function Header(){
+           const navigate = useNavigate()
+           function back(){
+               navigate(-1)
+           }
+           function forward(){
+               navigate(1)
+           }
+           return (
+           	<div>
+               	<button onClick={back}>后退</button>
+                   <button onClick={forward}>前进</button>
+               </div>
+           )
+       }
+       ```
+
+13. `useInRouterContext()`
+
+    1. 作用：如果组件在`<Router>`的上下文中呈现（被BrowserRouter包裹），则`useInRouterContext`钩子返回true，否则返回false。
+    2. 使用场景：使用第三方组件，查看第三方组件是否包裹在路由下。
+
+14. `useNavigationType()`
+
+    1. 作用：返回当前的导航类型（用户时如何来到当前页面的）
+    2. 返回值：`POP`、`PUSH`、`REPLACE`
+    3. 备注：`POP`是指在浏览器中直接打开了这个路由组件（刷新页面）
+
+15. `useOutlet()`
+
+    1. 作用：用来呈现当前组件中要渲染的嵌套路由
+
+    2. 示例代码
+
+       ```jsx
+       const result = useOutlet()
+       console.log(result)
+       //如果嵌套路由么有挂载，则result位null
+       //如果嵌套路由已经挂载，则展示嵌套的路由对象
+       ```
+
+16. `useResolvedPath()`
+
+    1. 作用：给定一个URL指，解析其中的：path、path、hash值。
 
 
 
