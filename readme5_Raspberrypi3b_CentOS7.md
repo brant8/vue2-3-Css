@@ -132,7 +132,7 @@
       10. Redis Windows版本（可执行）：[地址](https://github.com/MicrosoftArchive/redis/releases) 
       11. 查看redis进程：`ps -aux | grep redis`
       12. 结束该进程：`kill -9 [进程号]`
-      13. 启动redis服务：`redis-server redis.conf`
+      13. 启动redis服务（后台运行）：`redis-server redis.conf`
       14. 查看防火墙端口：`firewall-cmd --query-port=6379/tcp`
       15. 开启端口：`firewall-cmd --zone=public --add-port=6379/tcp --permanent`
       16. 重启防火墙：`firewall-cmd --reload`firewall-cmd --reload
